@@ -1,0 +1,100 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">
+        <h2>VitaMedicale</h2>
+      </div>
+      <h3>Connexion</h3>
+      <p>Accédez à votre espace personnel</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="user-type-selector">
+        <label class="user-type-option" [class.active]="loginForm.get('userType')?.value === 'patient'">
+          <input type="radio" formControlName="userType" value="patient">
+          <div class="option-content">
+            <div class="option-icon">👤</div>
+            <span>Patient</span>
+          </div>
+        </label>
+        
+        <label class="user-type-option" [class.active]="loginForm.get('userType')?.value === 'doctor'">
+          <input type="radio" formControlName="userType" value="doctor">
+          <div class="option-content">
+            <div class="option-icon">👨‍⚕️</div>
+            <span>Médecin</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          placeholder="votre.email&#64;example.com"
+          [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+        <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          <span *ngIf="loginForm.get('email')?.errors?.['required']">L'email est requis</span>
+          <span *ngIf="loginForm.get('email')?.errors?.['email']">Format d'email invalide</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <div class="password-input">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            formControlName="password" 
+            placeholder="Votre mot de passe"
+            [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <button type="button" class="password-toggle" (click)="togglePassword()">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Le mot de passe est requis</span>
+          <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères</span>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="checkbox-option">
+          <input type="checkbox" formControlName="rememberMe">
+          <span>Se souvenir de moi</span>
+        </label>
+        <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+      </div>
+
+      <div class="error-message global-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-large" [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="isLoading" class="loading-spinner">⏳</span>
+        {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Pas encore de compte ?</p>
+      <a (click)="onSwitchToRegister()" class="switch-link">Créer un compte</a>
+    </div>
+
+    <div class="demo-credentials" *ngIf="loginForm.get('userType')?.value">
+      <h4>Comptes de démonstration :</h4>
+      <div *ngIf="loginForm.get('userType')?.value === 'doctor'" class="demo-info">
+        <p><strong>Médecin :</strong></p>
+        <p>Email: dr.menard&#64;vitamedicale.ca</p>
+        <p>Mot de passe: password123</p>
+      </div>
+      <div *ngIf="loginForm.get('userType')?.value === 'patient'" class="demo-info">
+        <p><strong>Patient :</strong></p>
+        <p>Email: patient&#64;example.com</p>
+        <p>Mot de passe: password123</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,206 @@
+.about {
+  background: var(--background-light);
+}
+
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.about-text {
+  .lead-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 3rem;
+    line-height: 1.6;
+  }
+}
+
+.care-process {
+  margin-bottom: 3rem;
+}
+
+.process-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--background-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-lg);
+  }
+  
+  .step-icon {
+    font-size: 2.5rem;
+    min-width: 60px;
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+  }
+  
+  .step-content {
+    flex: 1;
+    
+    h4 {
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    p {
+      color: var(--text-light);
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+}
+
+.trust-message {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  
+  h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+}
+
+.about-images {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.clinic-image {
+  .image-placeholder {
+    width: 100%;
+    height: 250px;
+    background: var(--background-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--box-shadow-lg);
+    }
+    
+    .placeholder-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    p {
+      color: var(--text-muted);
+      font-weight: 500;
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 968px) {
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr 1fr;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .process-step {
+    flex-direction: column;
+    text-align: center;
+    
+    .step-icon {
+      align-self: center;
+      margin-bottom: 1rem;
+    }
+  }
+  
+  .trust-message {
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
+  
+  .image-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .clinic-image {
+    .image-placeholder {
+      height: 200px;
+      
+      .placeholder-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .about-text {
+    .lead-text {
+      font-size: 1.1rem;
+    }
+  }
+  
+  .process-step {
+    padding: 1rem;
+    
+    .step-icon {
+      width: 50px;
+      height: 50px;
+      font-size: 2rem;
+    }
+  }
+}

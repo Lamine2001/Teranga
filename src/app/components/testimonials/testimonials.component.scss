@@ -1,0 +1,149 @@
+.testimonials {
+  background: var(--background-light);
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-light);
+  margin-bottom: 3rem;
+  font-weight: 500;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.testimonial-card {
+  background: var(--background-white);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--box-shadow);
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 4rem;
+    color: var(--primary-color);
+    font-family: serif;
+    opacity: 0.3;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-lg);
+  }
+}
+
+.stars {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  
+  span {
+    color: #ffd700;
+    font-size: 1.2rem;
+  }
+}
+
+.testimonial-text {
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.author-avatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.author-info {
+  h4 {
+    color: var(--text-dark);
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  
+  span {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .testimonial-card {
+    padding: 1.5rem;
+    
+    &::before {
+      font-size: 3rem;
+      top: -5px;
+      left: 15px;
+    }
+  }
+  
+  .testimonial-text {
+    font-size: 0.95rem;
+  }
+  
+  .author-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .author-info {
+    h4 {
+      font-size: 0.95rem;
+    }
+    
+    span {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  .testimonial-card {
+    padding: 1.25rem;
+  }
+  
+  .stars {
+    span {
+      font-size: 1rem;
+    }
+  }
+  
+  .testimonial-text {
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+  }
+}

@@ -1,0 +1,220 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">
+        <h2>VitaMedicale</h2>
+      </div>
+      <h3>Créer un compte</h3>
+      <p>Rejoignez notre communauté médicale</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="user-type-selector">
+        <label class="user-type-option" [class.active]="registerForm.get('userType')?.value === 'patient'">
+          <input type="radio" formControlName="userType" value="patient" (change)="onUserTypeChange()">
+          <div class="option-content">
+            <div class="option-icon">👤</div>
+            <span>Patient</span>
+          </div>
+        </label>
+        
+        <label class="user-type-option" [class.active]="registerForm.get('userType')?.value === 'doctor'">
+          <input type="radio" formControlName="userType" value="doctor" (change)="onUserTypeChange()">
+          <div class="option-content">
+            <div class="option-icon">👨‍⚕️</div>
+            <span>Médecin</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Informations de base -->
+      <div class="form-section">
+        <h4>Informations personnelles</h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">Prénom</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              formControlName="firstName" 
+              placeholder="Votre prénom"
+              [class.error]="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
+            <div class="error-message" *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
+              Le prénom est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Nom</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              formControlName="lastName" 
+              placeholder="Votre nom"
+              [class.error]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+            <div class="error-message" *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+              Le nom est requis
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="votre.email&#64;example.com"
+            [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">L'email est requis</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">Format d'email invalide</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Téléphone (optionnel)</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            formControlName="phone" 
+            placeholder="+1 514 123-4567">
+        </div>
+      </div>
+
+      <!-- Champs spécifiques aux médecins -->
+      <div class="form-section" *ngIf="registerForm.get('userType')?.value === 'doctor'">
+        <h4>Informations professionnelles</h4>
+        
+        <div class="form-group">
+          <label for="specialization">Spécialisation</label>
+          <select id="specialization" formControlName="specialization" 
+                  [class.error]="registerForm.get('specialization')?.invalid && registerForm.get('specialization')?.touched">
+            <option value="">Sélectionnez votre spécialisation</option>
+            <option value="Médecine générale">Médecine générale</option>
+            <option value="Cardiologie">Cardiologie</option>
+            <option value="Dermatologie">Dermatologie</option>
+            <option value="Pédiatrie">Pédiatrie</option>
+            <option value="Psychiatrie">Psychiatrie</option>
+            <option value="Chirurgie">Chirurgie</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <div class="error-message" *ngIf="registerForm.get('specialization')?.invalid && registerForm.get('specialization')?.touched">
+            La spécialisation est requise
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="licenseNumber">Numéro de licence</label>
+          <input 
+            type="text" 
+            id="licenseNumber" 
+            formControlName="licenseNumber" 
+            placeholder="Numéro de licence médicale"
+            [class.error]="registerForm.get('licenseNumber')?.invalid && registerForm.get('licenseNumber')?.touched">
+          <div class="error-message" *ngIf="registerForm.get('licenseNumber')?.invalid && registerForm.get('licenseNumber')?.touched">
+            Le numéro de licence est requis
+          </div>
+        </div>
+      </div>
+
+      <!-- Champs spécifiques aux patients -->
+      <div class="form-section" *ngIf="registerForm.get('userType')?.value === 'patient'">
+        <h4>Informations personnelles</h4>
+        
+        <div class="form-group">
+          <label for="dateOfBirth">Date de naissance</label>
+          <input 
+            type="date" 
+            id="dateOfBirth" 
+            formControlName="dateOfBirth"
+            [class.error]="registerForm.get('dateOfBirth')?.invalid && registerForm.get('dateOfBirth')?.touched">
+          <div class="error-message" *ngIf="registerForm.get('dateOfBirth')?.invalid && registerForm.get('dateOfBirth')?.touched">
+            La date de naissance est requise
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Adresse</label>
+          <textarea 
+            id="address" 
+            formControlName="address" 
+            rows="3" 
+            placeholder="Votre adresse complète"
+            [class.error]="registerForm.get('address')?.invalid && registerForm.get('address')?.touched"></textarea>
+          <div class="error-message" *ngIf="registerForm.get('address')?.invalid && registerForm.get('address')?.touched">
+            L'adresse est requise
+          </div>
+        </div>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="form-section">
+        <h4>Sécurité</h4>
+        
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <div class="password-input">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password" 
+              formControlName="password" 
+              placeholder="Minimum 6 caractères"
+              [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <button type="button" class="password-toggle" (click)="togglePassword()">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          <div class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <span *ngIf="registerForm.get('password')?.errors?.['required']">Le mot de passe est requis</span>
+            <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmer le mot de passe</label>
+          <div class="password-input">
+            <input 
+              [type]="showConfirmPassword ? 'text' : 'password'" 
+              id="confirmPassword" 
+              formControlName="confirmPassword" 
+              placeholder="Confirmez votre mot de passe"
+              [class.error]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+            <button type="button" class="password-toggle" (click)="toggleConfirmPassword()">
+              {{ showConfirmPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          <div class="error-message" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">La confirmation est requise</span>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Les mots de passe ne correspondent pas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-option">
+          <input type="checkbox" formControlName="acceptTerms">
+          <span>J'accepte les <a href="#" class="link">conditions d'utilisation</a> et la <a href="#" class="link">politique de confidentialité</a></span>
+        </label>
+        <div class="error-message" *ngIf="registerForm.get('acceptTerms')?.invalid && registerForm.get('acceptTerms')?.touched">
+          Vous devez accepter les conditions d'utilisation
+        </div>
+      </div>
+
+      <div class="error-message global-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-large" [disabled]="registerForm.invalid || isLoading">
+        <span *ngIf="isLoading" class="loading-spinner">⏳</span>
+        {{ isLoading ? 'Création du compte...' : 'Créer mon compte' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Déjà un compte ?</p>
+      <a (click)="onSwitchToLogin()" class="switch-link">Se connecter</a>
+    </div>
+  </div>
+</div>

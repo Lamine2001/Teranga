@@ -1,0 +1,155 @@
+.partners {
+  background: var(--background-white);
+}
+
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+  align-items: center;
+}
+
+.partner-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  
+  .logo-placeholder {
+    width: 180px;
+    height: 100px;
+    background: var(--background-light);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    &:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-5px);
+      box-shadow: var(--box-shadow);
+      
+      &::before {
+        left: 100%;
+      }
+      
+      .logo-text {
+        color: var(--primary-color);
+      }
+    }
+    
+    .logo-text {
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.2;
+      transition: color 0.3s ease;
+      z-index: 1;
+      position: relative;
+    }
+  }
+}
+
+.trust-statement {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--background-light), #ffffff);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  
+  h3 {
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 768px) {
+  .partners-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .partner-logo {
+    .logo-placeholder {
+      width: 150px;
+      height: 80px;
+      
+      .logo-text {
+        font-size: 0.8rem;
+      }
+    }
+  }
+  
+  .trust-statement {
+    padding: 1.5rem;
+    
+    h3 {
+      font-size: 1.5rem;
+    }
+    
+    p {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .partners-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .partner-logo {
+    .logo-placeholder {
+      width: 200px;
+      height: 70px;
+      
+      .logo-text {
+        font-size: 0.85rem;
+      }
+    }
+  }
+  
+  .trust-statement {
+    padding: 1.25rem;
+    
+    h3 {
+      font-size: 1.3rem;
+    }
+    
+    p {
+      font-size: 0.95rem;
+    }
+  }
+}

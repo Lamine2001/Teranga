@@ -1,0 +1,11 @@
+<div class="auth-page">
+  <app-login 
+    *ngIf="!showRegister" 
+    (switchToRegister)="toggleMode()">
+  </app-login>
+  
+  <app-register 
+    *ngIf="showRegister" 
+    (switchToLogin)="toggleMode()">
+  </app-register>
+</div>
