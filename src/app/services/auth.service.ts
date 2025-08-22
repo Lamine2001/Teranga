@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   login(credentials: LoginCredentials): Observable<{ success: boolean; user?: User; error?: string }> {
-    return this.http.post<{ user: User; token: string }>(`${this.apiUrl}/auth/login`, credentials, this.httpOptions)
+    return this.http.post<{ user: User; token: string }>(`${this.apiUrl}/auth/apiLogin`, credentials, this.httpOptions)
       .pipe(
         map(response => {
           if (response.user && response.token) {
@@ -91,6 +91,7 @@ export class AuthService {
         })
       );
   }
+ 
 
   private clearUserData(): void {
     if (isPlatformBrowser(this.platformId)) {

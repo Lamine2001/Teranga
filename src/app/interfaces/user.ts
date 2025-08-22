@@ -8,6 +8,8 @@ export interface User {
   isActive: boolean;
   createdAt: Date;
   lastLogin?: Date;
+
+  
 }
 
 export interface Doctor extends User {

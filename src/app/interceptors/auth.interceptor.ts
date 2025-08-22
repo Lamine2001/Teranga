@@ -7,7 +7,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authService.getAuthToken();
 
   // Ajouter le token d'authentification si disponible
-  if (token && !req.url.includes('/auth/login') && !req.url.includes('/auth/register')) {
+  if (token && !req.url.includes('/auth/apiLogin') && !req.url.includes('/auth/register')) {
     const authReq = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${token}`)
     });
