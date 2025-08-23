@@ -1,1 +1,133 @@
-<p>patient-dashboard works!</p>
+<div class="patient-dashboard-container">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="welcome-section">
+      <h1><i class="fas fa-user-circle"></i> Tableau de Bord Patient</h1>
+      <p *ngIf="currentUser">
+        Bienvenue, {{ currentUser.firstName }} {{ currentUser.lastName }} !
+      </p>
+    </div>
+    <div class="user-actions">
+      <button class="btn btn-outline-primary" (click)="onProfileClick()">
+        <i class="fas fa-user-edit"></i> Profil
+      </button>
+      <button class="btn btn-outline-danger" (click)="onLogoutClick()">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <div class="action-card primary" (click)="onRendezVousClick()">
+      <div class="action-icon">
+        <i class="fas fa-calendar-plus"></i>
+      </div>
+      <div class="action-content">
+        <h3>Prendre un Rendez-vous</h3>
+        <p>Rechercher et réserver un créneau avec un médecin</p>
+      </div>
+      <div class="action-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+
+    <div class="action-card secondary" (click)="onViewAppointmentsClick()">
+      <div class="action-icon">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div class="action-content">
+        <h3>Mes Rendez-vous</h3>
+        <p>Consulter et gérer vos rendez-vous</p>
+      </div>
+      <div class="action-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Appointments -->
+  <div class="appointments-section">
+    <h2><i class="fas fa-clock"></i> Prochains Rendez-vous</h2>
+    
+    <div class="appointments-list" *ngIf="!isLoading && upcomingAppointments.length > 0">
+      <div 
+        *ngFor="let appointment of upcomingAppointments" 
+        class="appointment-card"
+      >
+        <div class="appointment-header">
+          <div class="doctor-info">
+            <div class="doctor-avatar">
+              <i class="fas fa-user-md"></i>
+            </div>
+            <div class="doctor-details">
+              <h4>Dr. {{ appointment.doctorFirstName }} {{ appointment.doctorLastName }}</h4>
+              <p class="specialty">{{ appointment.doctorSpecialty }}</p>
+            </div>
+          </div>
+          <div class="appointment-status" [class]="'status-' + appointment.status.toLowerCase()">
+            {{ appointment.status }}
+          </div>
+        </div>
+        
+        <div class="appointment-details">
+          <div class="time-info">
+            <i class="fas fa-calendar"></i>
+            <span>{{ getDateDisplay(appointment.appointmentTime) }}</span>
+          </div>
+          <div class="time-info">
+            <i class="fas fa-clock"></i>
+            <span>{{ getTimeDisplay(appointment.appointmentTime) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-appointments" *ngIf="!isLoading && upcomingAppointments.length === 0">
+      <i class="fas fa-calendar-times"></i>
+      <h3>Aucun rendez-vous à venir</h3>
+      <p>Prenez votre premier rendez-vous en cliquant sur le bouton ci-dessus</p>
+    </div>
+
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement des rendez-vous...</p>
+    </div>
+  </div>
+
+  <!-- Health Summary -->
+  <div class="health-summary">
+    <h2><i class="fas fa-heartbeat"></i> Résumé de Santé</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Rendez-vous Total</h3>
+          <p class="summary-number">{{ upcomingAppointments.length }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Médecins Consultés</h3>
+          <p class="summary-number">{{ getUniqueDoctorsCount() }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-stethoscope"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Spécialités</h3>
+          <p class="summary-number">{{ getUniqueSpecialtiesCount() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

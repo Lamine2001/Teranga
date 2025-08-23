@@ -1,0 +1,161 @@
+<div class="appointment-search-container">
+  <div class="search-header">
+    <h2><i class="fas fa-search"></i> Rechercher un Rendez-vous</h2>
+    <p>Trouvez le créneau qui vous convient le mieux</p>
+  </div>
+
+  <!-- Search Form -->
+  <div class="search-form-container">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="date">
+            <i class="fas fa-calendar"></i> Date souhaitée *
+          </label>
+          <input 
+            type="date" 
+            id="date" 
+            formControlName="date"
+            [min]="getTomorrowDate()"
+            class="form-control"
+            [class.error]="searchForm.get('date')?.invalid && searchForm.get('date')?.touched"
+          >
+          <div class="error-message" *ngIf="searchForm.get('date')?.invalid && searchForm.get('date')?.touched">
+            Veuillez sélectionner une date
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="specialty">
+            <i class="fas fa-stethoscope"></i> Spécialité
+          </label>
+          <select id="specialty" formControlName="specialty" class="form-control">
+            <option value="">Toutes les spécialités</option>
+            <option *ngFor="let specialty of specialties" [value]="specialty">
+              {{ specialty }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="maxDistance">
+            <i class="fas fa-map-marker-alt"></i> Distance maximale (km)
+          </label>
+          <input 
+            type="number" 
+            id="maxDistance" 
+            formControlName="maxDistance"
+            min="1" 
+            max="100"
+            class="form-control"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>
+            <i class="fas fa-clock"></i> Heures préférées
+          </label>
+          <div class="time-preferences">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="preferredTimes" value="09:00">
+              <span>09:00</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="preferredTimes" value="14:00">
+              <span>14:00</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="preferredTimes" value="16:00">
+              <span>16:00</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary search-btn"
+          [disabled]="searchForm.invalid || isLoading"
+        >
+          <i class="fas fa-search" *ngIf="!isLoading"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+          {{ isLoading ? 'Recherche...' : 'Rechercher' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-container" *ngIf="errorMessage">
+    <div class="error-message global-error">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <div class="search-results" *ngIf="availableSlots.length > 0">
+    <h3><i class="fas fa-list"></i> Créneaux Disponibles</h3>
+    
+    <div class="slots-grid">
+      <div 
+        *ngFor="let slot of availableSlots" 
+        class="slot-card"
+        [class.highlighted]="isPreferredTime(slot.appointmentTime)"
+      >
+        <div class="slot-header">
+          <div class="doctor-info">
+            <div class="doctor-avatar">
+              <i class="fas fa-user-md"></i>
+            </div>
+            <div class="doctor-details">
+              <h4>Dr. {{ slot.doctorFirstName }} {{ slot.doctorLastName }}</h4>
+              <p class="specialty">{{ slot.doctorSpecialty }}</p>
+              <p class="license">Licence: {{ slot.doctorDepartment }}</p>
+            </div>
+          </div>
+          <div class="slot-status available">
+            <i class="fas fa-check-circle"></i> Disponible
+          </div>
+        </div>
+
+        <div class="slot-details">
+          <div class="time-info">
+            <i class="fas fa-clock"></i>
+            <span class="time">{{ getTimeRange(slot.appointmentTime, slot.endTime) }}</span>
+          </div>
+          <div class="date-info">
+            <i class="fas fa-calendar"></i>
+            <span class="date">{{ getDateDisplay(slot.appointmentTime) }}</span>
+          </div>
+        </div>
+
+        <div class="slot-actions">
+          <button 
+            class="btn btn-success book-btn"
+            (click)="onBookAppointment(slot.id)"
+          >
+            <i class="fas fa-calendar-plus"></i>
+            Réserver
+          </button>
+          <button class="btn btn-outline-primary details-btn">
+            <i class="fas fa-info-circle"></i>
+            Détails
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Results -->
+  <div class="no-results" *ngIf="availableSlots.length === 0 && !isLoading && searchForm.get('date')?.touched">
+    <div class="no-results-content">
+      <i class="fas fa-search"></i>
+      <h3>Aucun créneau disponible</h3>
+      <p>Essayez de modifier vos critères de recherche ou de sélectionner une autre date.</p>
+    </div>
+  </div>
+</div>
