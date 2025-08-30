@@ -1,43 +1,20 @@
 <div class="login-form-container">
   <div class="login-card">
     <div class="login-header">
-      <h2>Connexion à M-Santé</h2>
-      <p>Connectez-vous à votre compte pour accéder à vos services de santé</p>
+      <h2>Connexion</h2>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <!-- User Type Selection -->
-      <div class="form-group">
-        <label for="userType">Type d'utilisateur</label>
-        <div class="user-type-selector">
-          <div class="user-type-option" 
-               [class.selected]="loginForm.get('userType')?.value === 'patient'"
-               (click)="loginForm.patchValue({userType: 'patient'})">
-            <i class="fas fa-user-injured"></i>
-            <span>Patient</span>
-          </div>
-          <div class="user-type-option" 
-               [class.selected]="loginForm.get('userType')?.value === 'doctor'"
-               (click)="loginForm.patchValue({userType: 'doctor'})">
-            <i class="fas fa-user-md"></i>
-            <span>Médecin</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Email Field -->
       <div class="form-group">
-        <label for="email">Adresse email</label>
-        <div class="input-group">
-          <i class="fas fa-envelope input-icon"></i>
-          <input 
-            type="email" 
-            id="email" 
-            formControlName="email" 
-            placeholder="votre.email@exemple.com"
-            [class.invalid]="isFieldInvalid('email')"
-            class="form-control">
-        </div>
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          placeholder="Email"
+          [class.invalid]="isFieldInvalid('email')"
+          class="form-control">
         <div class="error-message" *ngIf="isFieldInvalid('email')">
           {{ getFieldError('email') }}
         </div>
@@ -46,22 +23,13 @@
       <!-- Password Field -->
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <div class="input-group">
-          <i class="fas fa-lock input-icon"></i>
-          <input 
-            [type]="showPassword ? 'text' : 'password'" 
-            id="password" 
-            formControlName="password" 
-            placeholder="Votre mot de passe"
-            [class.invalid]="isFieldInvalid('password')"
-            class="form-control">
-          <button 
-            type="button" 
-            class="password-toggle"
-            (click)="togglePasswordVisibility()">
-            <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-          </button>
-        </div>
+        <input 
+          [type]="showPassword ? 'text' : 'password'" 
+          id="password" 
+          formControlName="password" 
+          placeholder="Mot de passe"
+          [class.invalid]="isFieldInvalid('password')"
+          class="form-control">
         <div class="error-message" *ngIf="isFieldInvalid('password')">
           {{ getFieldError('password') }}
         </div>
@@ -72,32 +40,27 @@
         {{ errorMessage }}
       </div>
 
+      <!-- Forgot Password Link -->
+      <div class="forgot-password-link">
+        <a href="javascript:void(0)" (click)="onForgotPassword()">Mot de passe oublié ?</a>
+      </div>
+
       <!-- Submit Button -->
       <button 
         type="submit" 
-        class="btn btn-primary btn-login"
+        class="btn btn-primary"
         [disabled]="loginForm.invalid || isLoading">
-        <span *ngIf="!isLoading">Se connecter</span>
+        <span *ngIf="!isLoading">Connexion</span>
         <span *ngIf="isLoading" class="loading-spinner">
           <i class="fas fa-spinner fa-spin"></i>
-          Connexion en cours...
+          Connexion...
         </span>
       </button>
-
-      <!-- Forgot Password Link -->
-      <div class="forgot-password">
-        <a href="#" class="text-muted">Mot de passe oublié ?</a>
-      </div>
-
-      <!-- Divider -->
-      <div class="divider">
-        <span>ou</span>
-      </div>
 
       <!-- Register Link -->
       <div class="register-link">
         <p>Vous n'avez pas de compte ? 
-          <a routerLink="/auth" [queryParams]="{mode: 'register'}">Créer un compte</a>
+          <a href="javascript:void(0)" (click)="onSwitchToRegister()">Créer un compte</a>
         </p>
       </div>
     </form>

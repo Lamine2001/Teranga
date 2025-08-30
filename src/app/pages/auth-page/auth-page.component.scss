@@ -1,6 +1,6 @@
 .auth-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #FDFFFE;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,9 +10,8 @@
 .auth-container {
   width: 100%;
   max-width: 500px;
-  background: white;
+  background: #FDFFFE;
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   animation: slideUp 0.6s ease-out;
 }

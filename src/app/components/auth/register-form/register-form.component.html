@@ -9,19 +9,20 @@
       <!-- User Type Selection -->
       <div class="form-group">
         <label for="userType">Type d'utilisateur *</label>
-        <div class="user-type-selector">
-          <div class="user-type-option" 
-               [class.selected]="registerForm.get('userType')?.value === 'patient'"
-               (click)="registerForm.patchValue({userType: 'patient'})">
-            <i class="fas fa-user-injured"></i>
-            <span>Patient</span>
-          </div>
-          <div class="user-type-option" 
-               [class.selected]="registerForm.get('userType')?.value === 'doctor'"
-               (click)="registerForm.patchValue({userType: 'doctor'})">
-            <i class="fas fa-user-md"></i>
-            <span>Médecin</span>
-          </div>
+        <div class="input-group">
+          <i class="fas fa-user input-icon"></i>
+          <select 
+            id="userType" 
+            formControlName="userType" 
+            [class.invalid]="isFieldInvalid('userType')"
+            class="form-control select-control">
+            <option value="">Sélectionnez votre profil</option>
+            <option value="patient">Patient</option>
+            <option value="doctor">Psychologue</option>
+          </select>
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('userType')">
+          {{ getFieldError('userType') }}
         </div>
       </div>
 
@@ -132,7 +133,7 @@
 
       <!-- Doctor-specific fields -->
       <div class="form-section" *ngIf="registerForm.get('userType')?.value === 'doctor'">
-        <h3>Informations médecin</h3>
+        <h3>Informations psychologue</h3>
         
         <div class="form-row">
           <div class="form-group">
@@ -141,7 +142,7 @@
               type="text" 
               id="specialty" 
               formControlName="specialty" 
-              placeholder="Votre spécialité médicale"
+              placeholder="Votre spécialité en psychologie"
               [class.invalid]="isFieldInvalid('specialty')"
               class="form-control">
             <div class="error-message" *ngIf="isFieldInvalid('specialty')">
@@ -155,7 +156,7 @@
               type="text" 
               id="licenseNumber" 
               formControlName="licenseNumber" 
-              placeholder="Numéro de licence médicale"
+              placeholder="Numéro de licence professionnelle"
               [class.invalid]="isFieldInvalid('licenseNumber')"
               class="form-control">
             <div class="error-message" *ngIf="isFieldInvalid('licenseNumber')">
@@ -265,13 +266,6 @@
           Création en cours...
         </span>
       </button>
-
-      <!-- Login Link -->
-      <div class="login-link">
-        <p>Vous avez déjà un compte ? 
-          <a routerLink="/auth" [queryParams]="{mode: 'login'}">Se connecter</a>
-        </p>
-      </div>
     </form>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,6 +12,8 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./register-form.component.scss']
 })
 export class RegisterFormComponent implements OnInit {
+  @Output() switchToLogin = new EventEmitter<void>();
+  
   registerForm: FormGroup;
   isLoading = false;
   errorMessage = '';
@@ -29,13 +31,13 @@ export class RegisterFormComponent implements OnInit {
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^\+221\s?[0-9]{2}\s?[0-9]{3}\s?[0-9]{2}\s?[0-9]{2}$/)]],
-      userType: ['patient', Validators.required],
+      userType: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
       // Patient-specific fields
       dateOfBirth: [''],
       address: [''],
-      // Doctor-specific fields
+      // Doctor-specific fields (Psychologue)
       specialty: [''],
       licenseNumber: [''],
       department: ['']
@@ -247,5 +249,10 @@ export class RegisterFormComponent implements OnInit {
   isFieldRequired(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
     return !!field?.hasValidator(Validators.required);
+  }
+
+  // Method to emit switch to login event
+  onSwitchToLogin(): void {
+    this.switchToLogin.emit();
   }
 }

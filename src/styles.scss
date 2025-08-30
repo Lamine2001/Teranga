@@ -2,16 +2,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #2c5282;
-  --secondary-color: #3182ce;
-  --accent-color: #4299e1;
-  --text-dark: #2d3748;
-  --text-light: #4a5568;
-  --text-muted: #718096;
-  --background-light: #f7fafc;
+  /* Couleurs pour la santé mentale - tons apaisants et professionnels */
+  --primary-color: #2E8B8B;        /* Teal professionnel et apaisant */
+  --primary-light: #4ECDC4;        /* Teal clair lumineux */
+  --secondary-color: #7B68EE;      /* Lavande pour la sérénité */
+  --accent-color: #98D8C8;         /* Mint doux et rassurant */
+  --tertiary-color: #B2E5D4;       /* Vert menthe très doux */
+  --text-dark: #2C3E50;            /* Bleu foncé professionnel */
+  --text-light: #5A6C75;           /* Gris-bleu doux */
+  --text-muted: #8FA5AB;           /* Gris-bleu très doux */
+  --background-light: #F8FFFE;     /* Blanc cassé apaisant */
   --background-white: #ffffff;
-  --border-color: #e2e8f0;
-  --success-color: #38a169;
+  --border-color: #E5F2F1;         /* Bordure teal très claire */
+  --success-color: #52C084;        /* Vert succès apaisant */
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 1.5rem;

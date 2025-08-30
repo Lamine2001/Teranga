@@ -1,35 +1,9 @@
 <div class="auth-page">
   <div class="auth-container">
-    <!-- Mode Toggle Header -->
-    <div class="mode-toggle">
-      <button 
-        class="mode-btn" 
-        [class.active]="!showRegister"
-        (click)="showRegister = false; toggleMode()">
-        <i class="fas fa-sign-in-alt"></i>
-        Se connecter
-      </button>
-      <button 
-        class="mode-btn" 
-        [class.active]="showRegister"
-        (click)="showRegister = true; toggleMode()">
-        <i class="fas fa-user-plus"></i>
-        S'inscrire
-      </button>
-    </div>
-
     <!-- Form Container -->
     <div class="form-container">
-      <app-login-form *ngIf="!showRegister"></app-login-form>
-      <app-register-form *ngIf="showRegister"></app-register-form>
-    </div>
-
-    <!-- Mode Switch Link -->
-    <div class="mode-switch">
-      <p>{{ getModeDescription() }}</p>
-      <button class="switch-btn" (click)="toggleMode()">
-        {{ getModeText() }}
-      </button>
+      <app-login-form *ngIf="!showRegister" (switchToRegister)="toggleMode()"></app-login-form>
+      <app-register-form *ngIf="showRegister" (switchToLogin)="toggleMode()"></app-register-form>
     </div>
   </div>
 </div>

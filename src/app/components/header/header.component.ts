@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -14,6 +14,7 @@ import { User } from '../../interfaces/user';
 export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   isAuthenticated = false;
+  isScrolled = false;
   currentUser: User | null = null;
   private authSubscription: Subscription = new Subscription();
 
@@ -21,6 +22,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router
   ) {}
+
+  @HostListener('window:scroll', ['$event'])
+  onWindowScroll() {
+    this.isScrolled = window.scrollY > 50;
+  }
 
   ngOnInit(): void {
     this.authSubscription.add(

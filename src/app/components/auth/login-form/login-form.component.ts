@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,6 +12,8 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./login-form.component.scss']
 })
 export class LoginFormComponent implements OnInit {
+  @Output() switchToRegister = new EventEmitter<void>();
+  
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
@@ -24,8 +26,7 @@ export class LoginFormComponent implements OnInit {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      userType: ['patient', Validators.required]
+      password: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
@@ -116,5 +117,16 @@ export class LoginFormComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field?.invalid && field?.touched);
+  }
+
+  // Method to emit switch to register event
+  onSwitchToRegister(): void {
+    this.switchToRegister.emit();
+  }
+
+  // Method to handle forgot password
+  onForgotPassword(): void {
+    // TODO: Implement forgot password functionality
+    console.log('Forgot password clicked');
   }
 }

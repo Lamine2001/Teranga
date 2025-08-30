@@ -12,7 +12,7 @@ import { RegisterFormComponent } from '../../components/auth/register-form/regis
   styleUrls: ['./auth-page.component.scss']
 })
 export class AuthPageComponent implements OnInit {
-  showRegister = false;
+  showRegister = false; // Default to login page
 
   constructor(
     private route: ActivatedRoute,
