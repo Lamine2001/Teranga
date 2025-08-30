@@ -1,5 +1,23 @@
 .services {
   background: var(--background-white);
+  
+  // Animation d'entrée pour les cartes
+  .service-card {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .section-subtitle {
@@ -12,9 +30,41 @@
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
   margin-bottom: 4rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  
+  // Mobile : 1 colonne
+  grid-template-columns: 1fr;
+  
+  // Tablette : 2 colonnes
+  @media (min-width: 769px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  // Desktop : 2 colonnes avec cartes centrées si possible
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+    
+    // Effet de centrage pour 4 éléments
+    .service-card {
+      margin: 0 auto;
+      max-width: 350px;
+    }
+  }
+  
+  // Très large écran : 4 colonnes
+  @media (min-width: 1400px) {
+    grid-template-columns: repeat(4, 1fr);
+    
+    .service-card {
+      max-width: none;
+      margin: 0;
+    }
+  }
 }
 
 .service-card {
@@ -26,6 +76,39 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  height: fit-content;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--box-shadow-lg);
+    border-color: var(--primary-color);
+    
+    &::before {
+      transform: scaleX(1);
+    }
+    
+    .service-icon {
+      transform: scale(1.1);
+    }
+  }
+  
+  // Animation d'entrée différée pour chaque carte
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  &:nth-child(4) { animation-delay: 0.4s; }
   
   &::before {
     content: '';

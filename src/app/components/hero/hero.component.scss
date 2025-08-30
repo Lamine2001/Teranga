@@ -39,9 +39,9 @@
 
 .hero-text {
   .hero-title {
-    font-size: 3.5rem;
+    font-size: 2.8rem;
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.2;
     margin-bottom: 1rem;
     color: var(--text-dark);
     
@@ -137,6 +137,15 @@
     .image-placeholder {
       width: 350px;
       height: 250px;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero-text {
+    .hero-title {
+      font-size: 2.4rem;
+      line-height: 1.3;
     }
   }
 }
