@@ -20,6 +20,7 @@ export class RegisterFormComponent implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
   passwordStrength = 0;
+  currentStep = 1; // Add current step tracking
 
   constructor(
     private fb: FormBuilder,
@@ -68,21 +69,28 @@ export class RegisterFormComponent implements OnInit {
     if (userType === 'patient') {
       patientFields.forEach(field => {
         this.registerForm.get(field)?.setValidators([Validators.required]);
+        this.registerForm.get(field)?.updateValueAndValidity();
       });
       doctorFields.forEach(field => {
         this.registerForm.get(field)?.clearValidators();
+        this.registerForm.get(field)?.updateValueAndValidity();
       });
     } else if (userType === 'doctor') {
       doctorFields.forEach(field => {
         this.registerForm.get(field)?.setValidators([Validators.required]);
+        this.registerForm.get(field)?.updateValueAndValidity();
       });
       patientFields.forEach(field => {
         this.registerForm.get(field)?.clearValidators();
+        this.registerForm.get(field)?.updateValueAndValidity();
+      });
+    } else {
+      // If no user type selected, clear all conditional validators
+      [...patientFields, ...doctorFields].forEach(field => {
+        this.registerForm.get(field)?.clearValidators();
+        this.registerForm.get(field)?.updateValueAndValidity();
       });
     }
-
-    // Revalidate form
-    this.registerForm.updateValueAndValidity();
   }
 
   private passwordMatchValidator(form: FormGroup): { [key: string]: any } | null {
@@ -105,14 +113,6 @@ export class RegisterFormComponent implements OnInit {
     if (/[0-9]/.test(password)) strength += 25;
     
     return strength;
-  }
-
-  getPasswordStrengthText(): string {
-    if (this.passwordStrength === 0) return 'Très faible';
-    if (this.passwordStrength <= 25) return 'Faible';
-    if (this.passwordStrength <= 50) return 'Moyen';
-    if (this.passwordStrength <= 75) return 'Bon';
-    return 'Très bon';
   }
 
   getPasswordStrengthColor(): string {
@@ -190,12 +190,12 @@ export class RegisterFormComponent implements OnInit {
     });
   }
 
-  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
-    if (field === 'password') {
-      this.showPassword = !this.showPassword;
-    } else {
-      this.showConfirmPassword = !this.showConfirmPassword;
-    }
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   getFieldError(fieldName: string): string {
@@ -254,5 +254,96 @@ export class RegisterFormComponent implements OnInit {
   // Method to emit switch to login event
   onSwitchToLogin(): void {
     this.switchToLogin.emit();
+  }
+
+  // Step navigation methods
+  nextStep(): void {
+    if (this.canProceedToNextStep() && this.currentStep < 4) {
+      this.currentStep++;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  canProceedToNextStep(): boolean {
+    switch (this.currentStep) {
+      case 1:
+        return this.registerForm.get('userType')?.valid || false;
+      case 2:
+        return ['firstName', 'lastName', 'email', 'phone'].every(field => 
+          this.registerForm.get(field)?.valid
+        );
+      case 3:
+        const userType = this.registerForm.get('userType')?.value;
+        if (userType === 'patient') {
+          return ['dateOfBirth', 'address'].every(field => 
+            this.registerForm.get(field)?.valid
+          );
+        } else if (userType === 'doctor') {
+          return ['specialty', 'licenseNumber', 'department'].every(field => 
+            this.registerForm.get(field)?.valid
+          );
+        }
+        return false;
+      case 4:
+        return ['password', 'confirmPassword'].every(field => 
+          this.registerForm.get(field)?.valid
+        ) && !this.registerForm.errors?.['passwordMismatch'];
+      default:
+        return false;
+    }
+  }
+
+  selectUserType(userType: string): void {
+    this.registerForm.get('userType')?.setValue(userType);
+  }
+
+  getProgressPercentage(): number {
+    return (this.currentStep / 4) * 100;
+  }
+
+  getPasswordStrengthClass(): string {
+    if (this.passwordStrength < 40) return 'strength-weak';
+    if (this.passwordStrength < 80) return 'strength-medium';
+    return 'strength-strong';
+  }
+
+  getPasswordStrengthText(): string {
+    if (this.passwordStrength === 0) return 'Très faible';
+    if (this.passwordStrength <= 25) return 'Faible';
+    if (this.passwordStrength <= 50) return 'Moyen';
+    if (this.passwordStrength <= 75) return 'Bon';
+    return 'Très bon';
+  }
+
+  isFormValidForSubmission(): boolean {
+    const basicFields = ['firstName', 'lastName', 'email', 'phone', 'userType', 'password', 'confirmPassword'];
+    const userType = this.registerForm.get('userType')?.value;
+    
+    // Check if all basic fields are valid
+    const basicFieldsValid = basicFields.every(field => 
+      this.registerForm.get(field)?.valid
+    );
+    
+    // Check user-specific fields
+    let specificFieldsValid = true;
+    if (userType === 'patient') {
+      specificFieldsValid = ['dateOfBirth', 'address'].every(field => 
+        this.registerForm.get(field)?.valid
+      );
+    } else if (userType === 'doctor') {
+      specificFieldsValid = ['specialty', 'licenseNumber', 'department'].every(field => 
+        this.registerForm.get(field)?.valid
+      );
+    }
+    
+    // Check password match
+    const passwordsMatch = !this.registerForm.errors?.['passwordMismatch'];
+    
+    return basicFieldsValid && specificFieldsValid && passwordsMatch;
   }
 }

@@ -1,45 +1,100 @@
 <div class="register-form-container">
   <div class="register-card">
     <div class="register-header">
-      <h2>Créer un compte M-Santé</h2>
-      <p>Rejoignez notre plateforme de santé pour une meilleure prise en charge</p>
+      <h2>Créer un compte</h2>
+      <p>Rejoignez M-Santé en quelques étapes</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+      </div>
+      <div class="progress-steps">
+        <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+          <span class="step-number">1</span>
+          <span class="step-label">Type</span>
+        </div>
+        <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+          <span class="step-number">2</span>
+          <span class="step-label">Personnel</span>
+        </div>
+        <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+          <span class="step-number">3</span>
+          <span class="step-label">Profil</span>
+        </div>
+        <div class="step" [class.active]="currentStep >= 4" [class.completed]="currentStep > 4">
+          <span class="step-number">4</span>
+          <span class="step-label">Sécurité</span>
+        </div>
+      </div>
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
-      <!-- User Type Selection -->
-      <div class="form-group">
-        <label for="userType">Type d'utilisateur *</label>
-        <div class="input-group">
-          <i class="fas fa-user input-icon"></i>
-          <select 
-            id="userType" 
-            formControlName="userType" 
-            [class.invalid]="isFieldInvalid('userType')"
-            class="form-control select-control">
-            <option value="">Sélectionnez votre profil</option>
-            <option value="patient">Patient</option>
-            <option value="doctor">Psychologue</option>
-          </select>
+      <!-- Étape 1: Type d'utilisateur -->
+      <div class="form-step" *ngIf="currentStep === 1">
+        <div class="step-header">
+          <h3>Choisissez votre profil</h3>
+          <p>Sélectionnez le type de compte qui vous correspond</p>
         </div>
+        
+        <div class="user-type-selection">
+          <div class="user-type-card" 
+               [class.selected]="registerForm.get('userType')?.value === 'patient'"
+               (click)="selectUserType('patient')">
+            <div class="card-icon">
+              <i class="fas fa-user-injured"></i>
+            </div>
+            <div class="card-content">
+              <h4>Patient</h4>
+              <p>Je cherche un accompagnement psychologique pour mon bien-être</p>
+            </div>
+            <div class="card-radio">
+              <input type="radio" name="userType" value="patient" formControlName="userType">
+            </div>
+          </div>
+          
+          <div class="user-type-card" 
+               [class.selected]="registerForm.get('userType')?.value === 'doctor'"
+               (click)="selectUserType('doctor')">
+            <div class="card-icon">
+              <i class="fas fa-user-md"></i>
+            </div>
+            <div class="card-content">
+              <h4>Psychologue</h4>
+              <p>Je suis un professionnel de la santé mentale</p>
+            </div>
+            <div class="card-radio">
+              <input type="radio" name="userType" value="doctor" formControlName="userType">
+            </div>
+          </div>
+        </div>
+        
         <div class="error-message" *ngIf="isFieldInvalid('userType')">
           {{ getFieldError('userType') }}
         </div>
       </div>
 
-      <!-- Personal Information Section -->
-      <div class="form-section">
-        <h3>Informations personnelles</h3>
+      <!-- Étape 2: Informations personnelles -->
+      <div class="form-step" *ngIf="currentStep === 2">
+        <div class="step-header">
+          <h3>Informations personnelles</h3>
+          <p>Renseignez vos informations de base</p>
+        </div>
         
-        <div class="form-row">
+        <div class="form-grid">
           <div class="form-group">
             <label for="firstName">Prénom *</label>
-            <input 
-              type="text" 
-              id="firstName" 
-              formControlName="firstName" 
-              placeholder="Votre prénom"
-              [class.invalid]="isFieldInvalid('firstName')"
-              class="form-control">
+            <div class="input-group">
+              <i class="fas fa-user input-icon"></i>
+              <input 
+                type="text" 
+                id="firstName" 
+                formControlName="firstName" 
+                placeholder="Votre prénom"
+                [class.invalid]="isFieldInvalid('firstName')"
+                class="form-control">
+            </div>
             <div class="error-message" *ngIf="isFieldInvalid('firstName')">
               {{ getFieldError('firstName') }}
             </div>
@@ -47,22 +102,23 @@
 
           <div class="form-group">
             <label for="lastName">Nom *</label>
-            <input 
-              type="text" 
-              id="lastName" 
-              formControlName="lastName" 
-              placeholder="Votre nom"
-              [class.invalid]="isFieldInvalid('lastName')"
-              class="form-control">
+            <div class="input-group">
+              <i class="fas fa-user input-icon"></i>
+              <input 
+                type="text" 
+                id="lastName" 
+                formControlName="lastName" 
+                placeholder="Votre nom"
+                [class.invalid]="isFieldInvalid('lastName')"
+                class="form-control">
+            </div>
             <div class="error-message" *ngIf="isFieldInvalid('lastName')">
               {{ getFieldError('lastName') }}
             </div>
           </div>
-        </div>
 
-        <div class="form-row">
           <div class="form-group">
-            <label for="email">Adresse email *</label>
+            <label for="email">Email *</label>
             <div class="input-group">
               <i class="fas fa-envelope input-icon"></i>
               <input 
@@ -97,149 +153,185 @@
         </div>
       </div>
 
-      <!-- Patient-specific fields -->
-      <div class="form-section" *ngIf="registerForm.get('userType')?.value === 'patient'">
-        <h3>Informations patient</h3>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="dateOfBirth">Date de naissance *</label>
-            <input 
-              type="date" 
-              id="dateOfBirth" 
-              formControlName="dateOfBirth" 
-              [class.invalid]="isFieldInvalid('dateOfBirth')"
-              class="form-control">
-            <div class="error-message" *ngIf="isFieldInvalid('dateOfBirth')">
-              {{ getFieldError('dateOfBirth') }}
+      <!-- Étape 3: Informations spécifiques -->
+      <div class="form-step" *ngIf="currentStep === 3">
+        <!-- Patient Information -->
+        <div *ngIf="registerForm.get('userType')?.value === 'patient'">
+          <div class="step-header">
+            <h3>Informations patient</h3>
+            <p>Ces informations nous aident à mieux vous accompagner</p>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="dateOfBirth">Date de naissance *</label>
+              <div class="input-group">
+                <i class="fas fa-calendar input-icon"></i>
+                <input 
+                  type="date" 
+                  id="dateOfBirth" 
+                  formControlName="dateOfBirth"
+                  [class.invalid]="isFieldInvalid('dateOfBirth')"
+                  class="form-control">
+              </div>
+              <div class="error-message" *ngIf="isFieldInvalid('dateOfBirth')">
+                {{ getFieldError('dateOfBirth') }}
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="address">Adresse *</label>
+              <div class="input-group">
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                <textarea 
+                  id="address" 
+                  formControlName="address" 
+                  placeholder="Votre adresse complète"
+                  [class.invalid]="isFieldInvalid('address')"
+                  class="form-control"
+                  rows="3"></textarea>
+              </div>
+              <div class="error-message" *ngIf="isFieldInvalid('address')">
+                {{ getFieldError('address') }}
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label for="address">Adresse *</label>
-            <textarea 
-              id="address" 
-              formControlName="address" 
-              placeholder="Votre adresse complète"
-              [class.invalid]="isFieldInvalid('address')"
-              class="form-control"
-              rows="3"></textarea>
-            <div class="error-message" *ngIf="isFieldInvalid('address')">
-              {{ getFieldError('address') }}
+        <!-- Doctor Information -->
+        <div *ngIf="registerForm.get('userType')?.value === 'doctor'">
+          <div class="step-header">
+            <h3>Informations professionnelles</h3>
+            <p>Renseignez vos qualifications professionnelles</p>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="specialty">Spécialité *</label>
+              <div class="input-group">
+                <i class="fas fa-brain input-icon"></i>
+                <select 
+                  id="specialty" 
+                  formControlName="specialty" 
+                  [class.invalid]="isFieldInvalid('specialty')"
+                  class="form-control select-control">
+                  <option value="">Choisissez votre spécialité</option>
+                  <option value="clinical">Psychologie clinique</option>
+                  <option value="cognitive">Thérapie cognitive et comportementale</option>
+                  <option value="family">Thérapie familiale</option>
+                  <option value="child">Psychologie de l'enfant</option>
+                  <option value="neuropsychology">Neuropsychologie</option>
+                  <option value="other">Autre</option>
+                </select>
+              </div>
+              <div class="error-message" *ngIf="isFieldInvalid('specialty')">
+                {{ getFieldError('specialty') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="licenseNumber">Numéro de licence *</label>
+              <div class="input-group">
+                <i class="fas fa-id-card input-icon"></i>
+                <input 
+                  type="text" 
+                  id="licenseNumber" 
+                  formControlName="licenseNumber" 
+                  placeholder="Votre numéro d'ordre"
+                  [class.invalid]="isFieldInvalid('licenseNumber')"
+                  class="form-control">
+              </div>
+              <div class="error-message" *ngIf="isFieldInvalid('licenseNumber')">
+                {{ getFieldError('licenseNumber') }}
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="department">Département/Région d'exercice *</label>
+              <div class="input-group">
+                <i class="fas fa-map input-icon"></i>
+                <select 
+                  id="department" 
+                  formControlName="department" 
+                  [class.invalid]="isFieldInvalid('department')"
+                  class="form-control select-control">
+                  <option value="">Sélectionnez votre département</option>
+                  <option value="dakar">Dakar</option>
+                  <option value="thies">Thiès</option>
+                  <option value="saint-louis">Saint-Louis</option>
+                  <option value="diourbel">Diourbel</option>
+                  <option value="louga">Louga</option>
+                  <option value="fatick">Fatick</option>
+                  <option value="kaolack">Kaolack</option>
+                  <option value="tambacounda">Tambacounda</option>
+                  <option value="kolda">Kolda</option>
+                  <option value="ziguinchor">Ziguinchor</option>
+                  <option value="matam">Matam</option>
+                  <option value="kaffrine">Kaffrine</option>
+                  <option value="kedougou">Kédougou</option>
+                  <option value="sedhiou">Sédhiou</option>
+                </select>
+              </div>
+              <div class="error-message" *ngIf="isFieldInvalid('department')">
+                {{ getFieldError('department') }}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Doctor-specific fields -->
-      <div class="form-section" *ngIf="registerForm.get('userType')?.value === 'doctor'">
-        <h3>Informations psychologue</h3>
+      <!-- Étape 4: Sécurité du compte -->
+      <div class="form-step" *ngIf="currentStep === 4">
+        <div class="step-header">
+          <h3>Sécurité du compte</h3>
+          <p>Créez un mot de passe sécurisé pour protéger votre compte</p>
+        </div>
         
-        <div class="form-row">
+        <div class="form-grid">
           <div class="form-group">
-            <label for="specialty">Spécialité *</label>
-            <input 
-              type="text" 
-              id="specialty" 
-              formControlName="specialty" 
-              placeholder="Votre spécialité en psychologie"
-              [class.invalid]="isFieldInvalid('specialty')"
-              class="form-control">
-            <div class="error-message" *ngIf="isFieldInvalid('specialty')">
-              {{ getFieldError('specialty') }}
+            <label for="password">Mot de passe *</label>
+            <div class="input-group">
+              <i class="fas fa-lock input-icon"></i>
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                id="password" 
+                formControlName="password" 
+                placeholder="Votre mot de passe"
+                [class.invalid]="isFieldInvalid('password')"
+                class="form-control">
+              <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+                <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+            <div class="password-strength" *ngIf="registerForm.get('password')?.value">
+              <div class="strength-bar" [ngClass]="getPasswordStrengthClass()">
+                <div class="strength-fill"></div>
+              </div>
+              <div class="strength-text">{{ getPasswordStrengthText() }}</div>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('password')">
+              {{ getFieldError('password') }}
             </div>
           </div>
 
           <div class="form-group">
-            <label for="licenseNumber">Numéro de licence *</label>
-            <input 
-              type="text" 
-              id="licenseNumber" 
-              formControlName="licenseNumber" 
-              placeholder="Numéro de licence professionnelle"
-              [class.invalid]="isFieldInvalid('licenseNumber')"
-              class="form-control">
-            <div class="error-message" *ngIf="isFieldInvalid('licenseNumber')">
-              {{ getFieldError('licenseNumber') }}
+            <label for="confirmPassword">Confirmer le mot de passe *</label>
+            <div class="input-group">
+              <i class="fas fa-lock input-icon"></i>
+              <input 
+                [type]="showConfirmPassword ? 'text' : 'password'" 
+                id="confirmPassword" 
+                formControlName="confirmPassword" 
+                placeholder="Confirmez votre mot de passe"
+                [class.invalid]="isFieldInvalid('confirmPassword')"
+                class="form-control">
+              <button type="button" class="password-toggle" (click)="toggleConfirmPasswordVisibility()">
+                <i [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
             </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="department">Département *</label>
-          <input 
-            type="text" 
-            id="department" 
-            formControlName="department" 
-            placeholder="Département ou service"
-            [class.invalid]="isFieldInvalid('department')"
-            class="form-control">
-          <div class="error-message" *ngIf="isFieldInvalid('department')">
-            {{ getFieldError('department') }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Password Section -->
-      <div class="form-section">
-        <h3>Sécurité du compte</h3>
-        
-        <div class="form-group">
-          <label for="password">Mot de passe *</label>
-          <div class="input-group">
-            <i class="fas fa-lock input-icon"></i>
-            <input 
-              [type]="showPassword ? 'text' : 'password'" 
-              id="password" 
-              formControlName="password" 
-              placeholder="Votre mot de passe"
-              [class.invalid]="isFieldInvalid('password')"
-              class="form-control">
-            <button 
-              type="button" 
-              class="password-toggle"
-              (click)="togglePasswordVisibility('password')">
-              <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-            </button>
-          </div>
-          
-          <!-- Password Strength Indicator -->
-          <div class="password-strength" *ngIf="registerForm.get('password')?.value">
-            <div class="strength-bar">
-              <div class="strength-fill" 
-                   [style.width.%]="passwordStrength"
-                   [style.background-color]="getPasswordStrengthColor()"></div>
+            <div class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+              {{ getFieldError('confirmPassword') }}
             </div>
-            <span class="strength-text" [style.color]="getPasswordStrengthColor()">
-              {{ getPasswordStrengthText() }}
-            </span>
-          </div>
-          
-          <div class="error-message" *ngIf="isFieldInvalid('password')">
-            {{ getFieldError('password') }}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">Confirmer le mot de passe *</label>
-          <div class="input-group">
-            <i class="fas fa-lock input-icon"></i>
-            <input 
-              [type]="showConfirmPassword ? 'text' : 'password'" 
-              id="confirmPassword" 
-              formControlName="confirmPassword" 
-              placeholder="Confirmez votre mot de passe"
-              [class.invalid]="isFieldInvalid('confirmPassword')"
-              class="form-control">
-            <button 
-              type="button" 
-              class="password-toggle"
-              (click)="togglePasswordVisibility('confirmPassword')">
-              <i [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-            </button>
-          </div>
-          <div class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
-            {{ getFieldError('confirmPassword') }}
           </div>
         </div>
 
@@ -250,22 +342,55 @@
         </div>
       </div>
 
+      <!-- Navigation Buttons -->
+      <div class="step-navigation">
+        <button 
+          type="button" 
+          class="btn btn-secondary btn-back"
+          *ngIf="currentStep > 1"
+          (click)="previousStep()">
+          <i class="fas fa-arrow-left"></i>
+          Précédent
+        </button>
+
+        <button 
+          type="button" 
+          class="btn btn-primary btn-next"
+          *ngIf="currentStep < 4"
+          (click)="nextStep()"
+          [disabled]="!canProceedToNextStep()">
+          Suivant
+          <i class="fas fa-arrow-right"></i>
+        </button>
+
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-register"
+          *ngIf="currentStep === 4"
+          [disabled]="!isFormValidForSubmission() || isLoading">
+          <span *ngIf="!isLoading">Créer mon compte</span>
+          <span *ngIf="isLoading" class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            Création en cours...
+          </span>
+        </button>
+      </div>
+
       <!-- Global Error Message -->
       <div class="error-message global-error" *ngIf="errorMessage">
         {{ errorMessage }}
       </div>
 
-      <!-- Submit Button -->
-      <button 
-        type="submit" 
-        class="btn btn-primary btn-register"
-        [disabled]="registerForm.invalid || isLoading">
-        <span *ngIf="!isLoading">Créer mon compte</span>
-        <span *ngIf="isLoading" class="loading-spinner">
-          <i class="fas fa-spinner fa-spin"></i>
-          Création en cours...
-        </span>
-      </button>
+      <!-- Login Link -->
+      <div class="login-link">
+        <p>Déjà un compte ? 
+          <a href="javascript:void(0)" 
+             class="login-link-text"
+             (click)="onSwitchToLogin()">
+            Se connecter
+          </a>
+        </p>
+      </div>
     </form>
   </div>
 </div>
