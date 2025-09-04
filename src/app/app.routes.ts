@@ -6,6 +6,7 @@ import { PatientDashboardComponent } from './pages/dashboard/patient-dashboard/p
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
+  { path: 'services', loadComponent: () => import('./pages/service-page/service-page.component').then(m => m.ServicePageComponent) },
   { path: 'auth', component: AuthPageComponent },
   { path: 'doctor-dashboard', component: DoctorDashboardComponent },
   { path: 'patient-dashboard', component: PatientDashboardComponent },
