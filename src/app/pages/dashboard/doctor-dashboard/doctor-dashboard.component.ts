@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../interfaces/user';
+import { CreateAvailabilityComponent } from '../../../components/availability/create-availability/create-availability.component';
+import { ViewAvailabilityComponent } from '../../../components/availability/view-availability/view-availability.component';
 
 interface DoctorProfile extends User {
   speciality?: string;
@@ -42,7 +44,13 @@ interface DashboardStats {
 @Component({
   selector: 'app-doctor-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    FormsModule,
+    CreateAvailabilityComponent,
+    ViewAvailabilityComponent
+  ],
   templateUrl: './doctor-dashboard.component.html',
   styleUrls: ['./doctor-dashboard.component.css']
 })
@@ -246,25 +254,26 @@ export class DoctorDashboardComponent implements OnInit {
     return mainItem.label;
   }
 
-  // Placeholder methods for future functionality
+  // Updated placeholder methods with proper implementations
   handleCreateAvailability() {
-    console.log('Creating availability...');
-    // TODO: Implement create availability
+    this.activeSubSection = 'create-availability';
   }
 
   handleDeleteAvailability() {
-    console.log('Deleting availability...');
-    // TODO: Implement delete availability
+    this.activeSubSection = 'delete-availability';
   }
 
   handleGetDoctorAvailability() {
-    console.log('Getting doctor availability...');
-    // TODO: Implement get doctor availability
+    this.activeSubSection = 'view-availability';
   }
 
   handleBlockAvailability() {
-    console.log('Blocking availability...');
-    // TODO: Implement block availability
+    this.activeSubSection = 'block-availability';
+  }
+
+  onAvailabilityCreated() {
+    // Refresh or navigate to view availabilities
+    this.activeSubSection = 'view-availability';
   }
 
   handleGetDoctorAppointments() {

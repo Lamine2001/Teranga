@@ -1,0 +1,88 @@
+<div class="availability-view-container">
+  <div class="view-header">
+    <h3><i class="fas fa-calendar-alt"></i> Mes Disponibilités</h3>
+    <button class="btn btn-primary" (click)="loadAvailabilities()">
+      <i class="fas fa-sync"></i> Actualiser
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement des disponibilités...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && availabilities.length === 0" class="empty-state">
+    <i class="fas fa-calendar-times"></i>
+    <h4>Aucune disponibilité</h4>
+    <p>Vous n'avez pas encore créé de disponibilités.</p>
+  </div>
+
+  <!-- Availabilities List -->
+  <div *ngIf="!loading && availabilities.length > 0" class="availabilities-grid">
+    <div *ngFor="let availability of availabilities" class="availability-card" [class.blocked]="availability.isBlocked">
+      <div class="card-header">
+        <div class="date-info">
+          <i class="fas fa-calendar"></i>
+          <span>{{ formatDate(availability.startTime) }}</span>
+        </div>
+        <span class="status-badge" [class.blocked]="availability.isBlocked">
+          {{ availability.isBlocked ? 'Bloqué' : 'Disponible' }}
+        </span>
+      </div>
+      
+      <div class="card-body">
+        <div class="time-info">
+          <div class="time-slot">
+            <i class="fas fa-clock"></i>
+            <span>{{ formatTime(availability.startTime) }} - {{ formatTime(availability.endTime) }}</span>
+          </div>
+          <div class="duration">
+            <i class="fas fa-hourglass-half"></i>
+            <span>Créneaux de {{ availability.durationMinutes }} min</span>
+          </div>
+        </div>
+
+        <!-- Time Slots if available -->
+        <div *ngIf="availability.slots && availability.slots.length > 0" class="slots-info">
+          <p class="slots-title">Créneaux disponibles:</p>
+          <div class="slots-grid">
+            <span *ngFor="let slot of availability.slots" 
+                  class="slot-badge" 
+                  [class.booked]="slot.isBooked"
+                  [class.available]="slot.isAvailable && !slot.isBooked">
+              {{ formatTime(slot.startTime) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-sm btn-warning" 
+                (click)="blockAvailability(availability.id)"
+                *ngIf="!availability.isBlocked"
+                title="Bloquer cette disponibilité">
+          <i class="fas fa-ban"></i> Bloquer
+        </button>
+        <button class="btn btn-sm btn-success" 
+                (click)="blockAvailability(availability.id)"
+                *ngIf="availability.isBlocked"
+                title="Débloquer cette disponibilité">
+          <i class="fas fa-check"></i> Débloquer
+        </button>
+        <button class="btn btn-sm btn-danger" 
+                (click)="deleteAvailability(availability.id)"
+                title="Supprimer cette disponibilité">
+          <i class="fas fa-trash"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -171,44 +171,32 @@
 
         <!-- Availability Management Section -->
         <div *ngIf="activeSection === 'availability'" class="section-content">
-          <div class="feature-placeholder" [ngSwitch]="activeSubSection">
+          <div [ngSwitch]="activeSubSection">
+            <!-- Create Availability -->
             <div *ngSwitchCase="'create-availability'">
-              <i class="fas fa-plus-circle feature-icon"></i>
-              <h3>Créer des Disponibilités</h3>
-              <p>Définissez vos créneaux de consultation disponibles</p>
-              <button class="btn btn-primary" (click)="handleCreateAvailability()">
-                Créer des Disponibilités
-              </button>
+              <app-create-availability
+                (availabilityCreated)="onAvailabilityCreated()"
+                (close)="activeSubSection = ''">
+              </app-create-availability>
             </div>
 
+            <!-- View Availability -->
             <div *ngSwitchCase="'view-availability'">
-              <i class="fas fa-eye feature-icon"></i>
-              <h3>Voir mes Disponibilités</h3>
-              <p>Consultez votre planning de disponibilités</p>
-              <button class="btn btn-primary" (click)="handleGetDoctorAvailability()">
-                Voir le Planning
-              </button>
+              <app-view-availability></app-view-availability>
             </div>
 
+            <!-- Block Availability -->
             <div *ngSwitchCase="'block-availability'">
-              <i class="fas fa-ban feature-icon"></i>
-              <h3>Bloquer des Créneaux</h3>
-              <p>Marquez des créneaux comme indisponibles</p>
-              <button class="btn btn-warning" (click)="handleBlockAvailability()">
-                Bloquer des Créneaux
-              </button>
+              <app-view-availability></app-view-availability>
             </div>
 
+            <!-- Delete Availability -->
             <div *ngSwitchCase="'delete-availability'">
-              <i class="fas fa-trash feature-icon"></i>
-              <h3>Supprimer des Disponibilités</h3>
-              <p>Retirez des créneaux de votre planning</p>
-              <button class="btn btn-danger" (click)="handleDeleteAvailability()">
-                Supprimer des Créneaux
-              </button>
+              <app-view-availability></app-view-availability>
             </div>
 
-            <div *ngSwitchDefault>
+            <!-- Default -->
+            <div *ngSwitchDefault class="feature-placeholder">
               <i class="fas fa-calendar-check feature-icon"></i>
               <h3>Gestion des Disponibilités</h3>
               <p>Sélectionnez une option dans le menu pour gérer vos disponibilités</p>

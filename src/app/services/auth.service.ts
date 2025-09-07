@@ -238,14 +238,46 @@ export class AuthService {
     return this.isAuthenticatedSubject.value;
   }
 
-  isDoctor(): boolean {
+  // Ajouter une méthode pour vérifier le rôle
+  hasRole(role: string): boolean {
     const user = this.getCurrentUser();
-    return user?.userType === 'doctor';
+    console.log('Current user:', user); // Debug log
+    console.log('User role:', user?.role); // Debug log
+    console.log('Checking for role:', role); // Debug log
+    
+    // Vérifier les différents formats possibles du rôle
+    if (user?.role) {
+      // Si le rôle est stocké avec le préfixe ROLE_
+      if (user.role === `ROLE_${role}`) {
+        return true;
+      }
+      // Si le rôle est stocké sans préfixe
+      if (user.role === role) {
+        return true;
+      }
+      // Comparaison insensible à la casse
+      if (user.role.toUpperCase() === role.toUpperCase()) {
+        return true;
+      }
+      // Si le rôle contient ROLE_ et on compare sans
+      if (user.role.replace('ROLE_', '') === role) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isDoctor(): boolean {
+    // Essayer différentes variantes du rôle DOCTOR
+    return this.hasRole('DOCTOR') || 
+           this.hasRole('MEDECIN') || 
+           this.hasRole('ROLE_DOCTOR') ||
+           this.hasRole('ROLE_MEDECIN');
   }
 
   isPatient(): boolean {
-    const user = this.getCurrentUser();
-    return user?.userType === 'patient';
+    return this.hasRole('PATIENT') || 
+           this.hasRole('ROLE_PATIENT');
   }
 
   getToken(): string | null {
@@ -548,5 +580,5 @@ export class AuthService {
 
 
 
-  
+
 
