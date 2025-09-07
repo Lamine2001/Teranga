@@ -47,84 +47,85 @@ export class AuthService {
           console.log('Full response:', response);
           console.log('Response keys:', Object.keys(response));
           
-          // Try to find the JWT token in various possible locations
-          let token = null;
+          // The response should have the structure: { user: UserResponseDTO, token: string }
+          let token = response.token;
+          let userData = response.user;
           
-          // Check common token field names
-          const tokenFields = ['jwt', 'JWT', 'token', 'Token', 'accessToken', 'access_token', 'authToken', 'authorization'];
-          for (const field of tokenFields) {
-            if (response[field]) {
-              token = response[field];
-              console.log(`Token found in field "${field}":`, token);
-              break;
-            }
+          if (!token) {
+            console.error('No token in response');
+            return { success: false, error: 'Aucun token reçu du serveur' };
           }
           
-          // Check if the whole response is the token (string response)
-          if (!token && typeof response === 'string' && response.length > 20) {
-            token = response;
-            console.log('Response is the token itself:', token);
+          if (!userData) {
+            console.error('No user data in response');
+            return { success: false, error: 'Données utilisateur manquantes' };
           }
           
-          let user: User = response.user || response;
+          console.log('Token found:', token);
+          console.log('User data found:', userData);
           
-          if (token) {
-            console.log('Token to be stored:', token);
-            console.log('Token type:', typeof token);
-            
-            // Make sure token is a string
-            token = String(token).trim();
-            
-            // Remove "Bearer " prefix if it exists
-            if (token.startsWith('Bearer ')) {
-              token = token.substring(7);
+          // Map UserResponseDTO to User interface
+          // UserResponseDTO has: userId, firstName, lastName, phone, email, userType, isActive, createdAt
+          const user: User = {
+            id: userData.userId,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            phone: userData.phone,
+            // IMPORTANT: Map userType from backend to both role and userType in frontend
+            role: userData.userType,  // backend sends userType (e.g., "DOCTOR", "PATIENT")
+            userType: userData.userType,
+            isActive: userData.isActive,
+            createdAt: userData.createdAt
+          } as User;
+          
+          // Normalize the userType/role to lowercase for consistency
+          if (user.userType) {
+            const normalizedType = user.userType.toLowerCase();
+            // Handle both uppercase and lowercase versions
+            if (normalizedType === 'doctor' || normalizedType === 'docteur') {
+              user.role = 'doctor';
+              user.userType = 'doctor';
+            } else if (normalizedType === 'patient') {
+              user.role = 'patient';
+              user.userType = 'patient';
+            } else if (normalizedType === 'admin') {
+              user.role = 'admin';
+              user.userType = 'admin';
             }
-            
-            // Save token consistently across all storage keys
-            if (isPlatformBrowser(this.platformId)) {
-              // Use consistent token storage
-              localStorage.setItem('token', token);
-              localStorage.setItem('authToken', token);
-              localStorage.setItem('jwt', token);
-              sessionStorage.setItem('token', token);
-              sessionStorage.setItem('authToken', token);
-              sessionStorage.setItem('jwt', token);
-              
-              console.log('Token saved to storage');
-              console.log('Verification - token from storage:', localStorage.getItem('token'));
-            }
-            
-            // Create user object if not provided
-            if (!user.id && response.id) {
-              user = {
-                id: response.id,
-                email: response.email || credentials.email,
-                role: response.role || response.userType,
-                userType: response.userType || response.role,
-                firstName: response.firstName,
-                lastName: response.lastName
-              } as User;
-            }
-            
-            // Ensure role is set for compatibility
-            if (!user.role && user.userType) {
-              user.role = user.userType;
-            }
-            
-            // Save user info
-            if (isPlatformBrowser(this.platformId)) {
-              localStorage.setItem(this.userKey, JSON.stringify(user));
-              localStorage.setItem('currentUser', JSON.stringify(user));
-            }
-            
-            this.currentUserSubject.next(user);
-            this.isAuthenticatedSubject.next(true);
-            
-            return { success: true, user: user };
+            // Keep original if not recognized
           }
           
-          console.error('No token found in response');
-          return { success: false, error: 'Aucun token reçu du serveur' };
+          console.log('Mapped user object:', user);
+          console.log('User role:', user.role);
+          console.log('User type:', user.userType);
+          
+          // Clean and store token
+          token = String(token).trim();
+          if (token.startsWith('Bearer ')) {
+            token = token.substring(7);
+          }
+          
+          // Save token and user data
+          if (isPlatformBrowser(this.platformId)) {
+            // Store token in multiple keys for compatibility
+            localStorage.setItem('token', token);
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('jwt', token);
+            sessionStorage.setItem('token', token);
+            
+            // Store user data
+            localStorage.setItem(this.userKey, JSON.stringify(user));
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            console.log('Data saved to storage');
+            console.log('Stored user:', JSON.parse(localStorage.getItem('currentUser') || '{}'));
+          }
+          
+          this.currentUserSubject.next(user);
+          this.isAuthenticatedSubject.next(true);
+          
+          return { success: true, user: user };
         }),
         catchError(error => {
           console.error('Login error:', error);
@@ -136,22 +137,64 @@ export class AuthService {
   }
 
   register(data: RegisterData): Observable<{ success: boolean; user?: User; error?: string }> {
-    return this.http.post<{ user: User; token: string }>(`${this.apiUrl}/signup`, data, this.httpOptions)
+    return this.http.post<any>(`${this.apiUrl}/register`, data, this.httpOptions)
       .pipe(
         map(response => {
-          if (response.user && response.token) {
-            // Stocker le token
-            if (isPlatformBrowser(this.platformId)) {
-              localStorage.setItem('authToken', response.token);
-            }
-            this.setCurrentUser(response.user);
-            return { success: true, user: response.user };
+          console.log('=== REGISTER RESPONSE DEBUG ===');
+          console.log('Full response:', response);
+          
+          // Response should have the structure: { user: UserResponseDTO, token: string }
+          let token = response.token;
+          let userData = response.user;
+          
+          if (!token || !userData) {
+            return { success: false, error: 'Réponse invalide du serveur' };
           }
-          return { success: false, error: 'Réponse invalide du serveur' };
+          
+          // Map UserResponseDTO to User interface
+          const user: User = {
+            id: userData.userId,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            phone: userData.phone,
+            // Map userType from backend
+            role: userData.userType,
+            userType: userData.userType,
+            isActive: userData.isActive,
+            createdAt: userData.createdAt
+          } as User;
+          
+          // Normalize the userType/role
+          if (user.userType) {
+            const normalizedType = user.userType.toLowerCase();
+            if (normalizedType === 'doctor' || normalizedType === 'docteur') {
+              user.role = 'doctor';
+              user.userType = 'doctor';
+            } else if (normalizedType === 'patient') {
+              user.role = 'patient';
+              user.userType = 'patient';
+            } else if (normalizedType === 'admin') {
+              user.role = 'admin';
+              user.userType = 'admin';
+            }
+          }
+          
+          console.log('Registered user:', user);
+          console.log('User role:', user.role);
+          
+          // Store token
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('token', token);
+          }
+          
+          this.setCurrentUser(user);
+          return { success: true, user: user };
         }),
         catchError(error => {
           const errorMessage = this.errorHandler.handleHttpError(error);
-          return [{ success: false, error: errorMessage }];
+          return of({ success: false, error: errorMessage });
         })
       );
   }
@@ -249,12 +292,42 @@ export class AuthService {
       });
     }
 
-    return this.http.get<{ user: User }>(`${this.apiUrl}/auth/verify`, this.getAuthHeaders())
+    return this.http.get<any>(`${this.apiUrl}/verify`, this.getAuthHeaders())
       .pipe(
-        map(response => ({ valid: true, user: response.user })),
+        map(response => {
+          if (response.user) {
+            const userData = response.user;
+            const user: User = {
+              id: userData.userId,
+              email: userData.email,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              phone: userData.phone,
+              role: userData.userType,
+              userType: userData.userType,
+              isActive: userData.isActive,
+              createdAt: userData.createdAt
+            } as User;
+            
+            // Normalize userType
+            if (user.userType) {
+              const normalizedType = user.userType.toLowerCase();
+              if (normalizedType === 'doctor' || normalizedType === 'docteur') {
+                user.role = 'doctor';
+                user.userType = 'doctor';
+              } else if (normalizedType === 'patient') {
+                user.role = 'patient';
+                user.userType = 'patient';
+              }
+            }
+            
+            return { valid: true, user: user };
+          }
+          return { valid: false };
+        }),
         catchError(() => {
           this.clearUserData();
-          return [{ valid: false }];
+          return of({ valid: false });
         })
       );
   }
@@ -270,23 +343,40 @@ export class AuthService {
   private checkAuthStatus(): void {
     if (isPlatformBrowser(this.platformId)) {
       const savedUser = localStorage.getItem('currentUser');
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
       
       if (savedUser && token) {
-        // Vérifier la validité du token avec le backend
-        this.verifyToken().subscribe({
-          next: (result) => {
-            if (result.valid && result.user) {
-              this.currentUserSubject.next(result.user);
-              this.isAuthenticatedSubject.next(true);
-            } else {
-              this.clearUserData();
+        try {
+          const user = JSON.parse(savedUser);
+          console.log('Restored user from storage:', user);
+          console.log('User role from storage:', user.role);
+          console.log('User type from storage:', user.userType);
+          
+          // Set user immediately to avoid delay
+          this.currentUserSubject.next(user);
+          this.isAuthenticatedSubject.next(true);
+          
+          // Then verify with backend (optional)
+          this.verifyToken().subscribe({
+            next: (result) => {
+              if (result.valid && result.user) {
+                // Update with fresh data from server
+                console.log('Token verified, user from server:', result.user);
+                this.currentUserSubject.next(result.user);
+                this.isAuthenticatedSubject.next(true);
+              } else {
+                this.clearUserData();
+              }
+            },
+            error: () => {
+              // Keep local user if verification fails (offline mode)
+              console.warn('Token verification failed, keeping local user');
             }
-          },
-          error: () => {
-            this.clearUserData();
-          }
-        });
+          });
+        } catch (e) {
+          console.error('Error parsing saved user:', e);
+          this.clearUserData();
+        }
       }
     }
   }
@@ -453,3 +543,10 @@ export class AuthService {
     return null;
   }
 }
+
+
+
+
+
+  
+
