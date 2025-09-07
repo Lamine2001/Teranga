@@ -1,65 +1,56 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { AppointmentService, AppointmentResponseDTO } from '../../../services/appointment.service';
+import { UserProfileService } from '../../../services/user-profile.service';
+import { UserProfile } from '../../../models/user-profile.model';
 
 @Component({
   selector: 'app-patient-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule],
   templateUrl: './patient-dashboard.component.html',
-  styleUrl: './patient-dashboard.component.scss'
+  styleUrls: ['./patient-dashboard.component.css']
 })
 export class PatientDashboardComponent implements OnInit {
-  currentUser: any = null;
-  upcomingAppointments: AppointmentResponseDTO[] = [];
+  currentUser: UserProfile | null = null;
+  upcomingAppointments: any[] = [];
   isLoading = false;
 
   constructor(
     private authService: AuthService,
-    private appointmentService: AppointmentService,
+    private userProfileService: UserProfileService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadUserData();
+    this.loadUserProfile();
     this.loadUpcomingAppointments();
   }
 
-  loadUserData(): void {
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
+  loadUserProfile(): void {
+    this.userProfileService.getCurrentUserProfile().subscribe({
+      next: (profile) => {
+        this.currentUser = profile;
+      },
+      error: (err) => {
+        console.error('Error loading user profile:', err);
+      }
     });
   }
 
   loadUpcomingAppointments(): void {
     this.isLoading = true;
-    this.appointmentService.getUpcomingAppointments().subscribe({
-      next: (appointments) => {
-        this.upcomingAppointments = appointments;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading appointments:', error);
-        this.isLoading = false;
-      }
-    });
-  }
-
-  onRendezVousClick(): void {
-    // Navigate to appointment search page
-    this.router.navigate(['/appointments/search']);
-  }
-
-  onViewAppointmentsClick(): void {
-    // Navigate to appointments list
-    this.router.navigate(['/appointments/patient']);
+    // TODO: Implement appointment loading from backend
+    setTimeout(() => {
+      this.upcomingAppointments = [];
+      this.isLoading = false;
+    }, 1000);
   }
 
   onProfileClick(): void {
-    // Navigate to profile page
-    this.router.navigate(['/users/profile']);
+    // Navigate to profile view page
+    this.router.navigate(['/profile']);
   }
 
   onLogoutClick(): void {
@@ -67,39 +58,41 @@ export class PatientDashboardComponent implements OnInit {
       next: () => {
         this.router.navigate(['/auth']);
       },
-      error: (error) => {
-        console.error('Logout error:', error);
+      error: (err) => {
+        console.error('Logout error:', err);
+        // Force navigation even on error
         this.router.navigate(['/auth']);
       }
     });
   }
 
-  getTimeDisplay(appointmentTime: string): string {
-    return new Date(appointmentTime).toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  onRendezVousClick(): void {
+    this.router.navigate(['/appointments/search']);
   }
 
-  getDateDisplay(appointmentTime: string): string {
-    return new Date(appointmentTime).toLocaleDateString('fr-FR', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short'
-    });
+  onViewAppointmentsClick(): void {
+    this.router.navigate(['/appointments']);
+  }
+
+  getDateDisplay(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString('fr-FR');
+  }
+
+  getTimeDisplay(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
 
   getUniqueDoctorsCount(): number {
-    const uniqueDoctors = new Set(
-      this.upcomingAppointments.map(app => app.doctorId)
-    );
+    const uniqueDoctors = new Set(this.upcomingAppointments.map(a => a.doctorId));
     return uniqueDoctors.size;
   }
 
   getUniqueSpecialtiesCount(): number {
-    const uniqueSpecialties = new Set(
-      this.upcomingAppointments.map(app => app.doctorSpecialty)
-    );
+    const uniqueSpecialties = new Set(this.upcomingAppointments.map(a => a.doctorSpecialty));
     return uniqueSpecialties.size;
   }
 }

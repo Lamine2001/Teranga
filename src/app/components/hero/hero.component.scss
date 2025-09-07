@@ -3,8 +3,87 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding-top: 80px;
   overflow: hidden;
+  
+  // Placeholder de fond pendant le chargement
+  .hero-background-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    // Add subtle animation while loading
+    background: linear-gradient(135deg, 
+      rgba(11, 77, 110, 0.9) 0%, 
+      rgba(26, 127, 160, 0.9) 50%, 
+      rgba(37, 150, 190, 0.9) 100%);
+    
+    .placeholder-blur {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: blur(20px);
+      transform: scale(1.1); // Prevent blur edge artifacts
+      opacity: 0.7; // Make it blend with the background
+    }
+    
+    .loading-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        border-top-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+  
+  // Image de fond réelle
+  .hero-background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/pic_12.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    
+    &.loaded {
+      opacity: 1;
+    }
+  }
+  
+  // Animation de chargement
+  &.image-loaded {
+    .hero-background-placeholder {
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      pointer-events: none;
+    }
+  }
+  
+  // Image de préchargement (cachée)
+  .preload-image {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
 
 .hero-background {
@@ -260,4 +339,8 @@
       max-width: 280px;
     }
   }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

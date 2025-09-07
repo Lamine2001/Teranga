@@ -1,15 +1,11 @@
 export interface User {
-  id: string;
+  id?: number | string;
   email: string;
-  firstName: string;
-  lastName: string;
-  userType: 'doctor' | 'patient';
+  firstName?: string;
+  lastName?: string;
   phone?: string;
-  isActive: boolean;
-  createdAt: Date;
-  lastLogin?: Date;
-
-  
+  userType?: 'patient' | 'doctor' | string;
+  role?: string;  // Add role property for compatibility
 }
 
 export interface Doctor extends User {
@@ -49,3 +45,4 @@ export interface RegisterData extends LoginCredentials {
   dateOfBirth?: Date; // Pour les patients
   address?: string; // Pour les patients
 }
+

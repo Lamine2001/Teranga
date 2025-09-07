@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { ForgotPasswordModalComponent } from '../forgot-password-modal/forgot-password-modal.component';
 
 @Component({
   selector: 'app-login-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ForgotPasswordModalComponent],
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.scss']
 })
@@ -18,6 +19,7 @@ export class LoginFormComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   showPassword = false;
+  showForgotPasswordModal = false;
 
   constructor(
     private fb: FormBuilder,
@@ -126,7 +128,10 @@ export class LoginFormComponent implements OnInit {
 
   // Method to handle forgot password
   onForgotPassword(): void {
-    // TODO: Implement forgot password functionality
-    console.log('Forgot password clicked');
+    this.showForgotPasswordModal = true;
+  }
+
+  closeForgotPasswordModal(): void {
+    this.showForgotPasswordModal = false;
   }
 }

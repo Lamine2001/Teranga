@@ -1,0 +1,56 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Mon Profil</h1>
+    
+    <div *ngIf="loading" class="text-center py-8">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Chargement...</span>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+
+    <div *ngIf="userProfile && !loading" class="bg-white shadow rounded-lg p-6">
+      <div class="flex justify-between items-start mb-6">
+        <h2 class="text-xl font-semibold">Informations Personnelles</h2>
+        <div class="space-x-2">
+          <a routerLink="/profile/edit" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Modifier
+          </a>
+          <a routerLink="/profile/change-password" class="btn btn-secondary">
+            <i class="fas fa-key"></i> Changer le mot de passe
+          </a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-gray-600">Nom d'utilisateur</label>
+          <p class="font-medium">{{ userProfile.username }}</p>
+        </div>
+        <div>
+          <label class="text-gray-600">Email</label>
+          <p class="font-medium">{{ userProfile.email }}</p>
+        </div>
+        <div>
+          <label class="text-gray-600">Prénom</label>
+          <p class="font-medium">{{ userProfile.firstName || 'Non renseigné' }}</p>
+        </div>
+        <div>
+          <label class="text-gray-600">Nom</label>
+          <p class="font-medium">{{ userProfile.lastName || 'Non renseigné' }}</p>
+        </div>
+        <div>
+          <label class="text-gray-600">Téléphone</label>
+          <p class="font-medium">{{ userProfile.phoneNumber || 'Non renseigné' }}</p>
+        </div>
+        <div>
+          <label class="text-gray-600">Rôle</label>
+          <p class="font-medium">{{ userProfile.role || 'Utilisateur' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
