@@ -433,7 +433,7 @@ export class AuthService {
     }
     
     // Actual API call - adjust endpoint path based on your Swagger spec
-    return this.http.post(`${this.apiUrl}/auth/forgot-password`, { email }, this.httpOptions)
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email }, this.httpOptions)
       .pipe(
         map(response => response),
         catchError(error => {
@@ -448,30 +448,7 @@ export class AuthService {
   }
 
   verifyResetCode(email: string, code: string): Observable<any> {
-    const useMockAPI = false; // Disabled mock
-    
-    if (useMockAPI) {
-      return of({ success: true }).pipe(
-        delay(500),
-        map(() => {
-          if (isPlatformBrowser(this.platformId)) {
-            const mockCode = sessionStorage.getItem('mockResetCode');
-            const resetEmail = sessionStorage.getItem('resetEmail');
-            
-            if (email === resetEmail && code === mockCode) {
-              return { success: true, message: 'Code verified' };
-            } else {
-              throw new Error('Code invalide ou expiré');
-            }
-          }
-          return { success: true };
-        }),
-        catchError(error => throwError(() => error))
-      );
-    }
-    
-    // Verify code endpoint
-    return this.http.post(`${this.apiUrl}/auth/verify-code`, { email, code }, this.httpOptions)
+    return this.http.post(`${this.apiUrl}/verifyCode`, { email, code }, this.httpOptions)
       .pipe(
         map(response => response),
         catchError(error => {
@@ -501,7 +478,7 @@ export class AuthService {
     }
     
     // Reset password endpoint from Swagger
-    return this.http.post(`${this.apiUrl}/auth/reset-password`, { 
+    return this.http.post(`${this.apiUrl}/reset-password`, { 
       email, 
       code, 
       newPassword 
@@ -528,7 +505,7 @@ export class AuthService {
   }
 
   confirmPasswordReset(email: string, token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/password-reset/confirm`, {
+    return this.http.post(`${this.apiUrl}/password-reset/confirm`, {
       email,
       token,
       newPassword
