@@ -28,12 +28,37 @@ export interface SearchAvailabilityRequestDTO {
   date: Date;
   specialty?: string;
   doctorId?: number;
+  doctorName?: string;
+  appointmentType?: 'virtual' | 'onsite';
   preferredTimes?: string[];
   maxDistance?: number;
+  location?: string;
 }
 
 export interface BookAppointmentRequestDTO {
   availabilityId: number;
+  patientId?: string;
+  appointmentType?: 'virtual' | 'onsite';
+  reasonForVisit?: string;
+  symptoms?: string;
+  urgency?: 'low' | 'medium' | 'high';
+  preferredLanguage?: string;
+  technicalRequirements?: {
+    hasStableInternet?: boolean;
+    hasWebcam?: boolean;
+    hasMicrophone?: boolean;
+    hasSpeaker?: boolean;
+    platformPreference?: string;
+  };
+  transportationMethod?: string;
+  accessibilityNeeds?: string;
+  reminderPreferences?: {
+    method: string;
+    timing: string;
+  };
+  additionalNotes?: string;
+  paymentData?: any;
+  paymentId?: string;
   notes?: string;
 }
 
@@ -47,6 +72,10 @@ export class AppointmentService {
 
   searchAvailableSlots(request: SearchAvailabilityRequestDTO): Observable<AppointmentResponseDTO[]> {
     return this.http.post<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/search`, request);
+  }
+
+  searchAvailableSlotsPublic(request: SearchAvailabilityRequestDTO): Observable<AppointmentResponseDTO[]> {
+    return this.http.post<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/search-public`, request);
   }
 
   bookAppointment(request: BookAppointmentRequestDTO): Observable<AppointmentResponseDTO> {
