@@ -243,9 +243,30 @@ export class AuthService {
     const user = this.getCurrentUser();
     console.log('Current user:', user); // Debug log
     console.log('User role:', user?.role); // Debug log
+    console.log('User userType:', user?.userType); // Debug log
     console.log('Checking for role:', role); // Debug log
     
-    // Vérifier les différents formats possibles du rôle
+    // Vérifier d'abord dans userType (attribut principal pour le rôle)
+    if (user?.userType) {
+      // Si le rôle est stocké avec le préfixe ROLE_
+      if (user.userType === `ROLE_${role}`) {
+        return true;
+      }
+      // Si le rôle est stocké sans préfixe
+      if (user.userType === role) {
+        return true;
+      }
+      // Comparaison insensible à la casse
+      if (user.userType.toUpperCase() === role.toUpperCase()) {
+        return true;
+      }
+      // Si le rôle contient ROLE_ et on compare sans
+      if (user.userType.replace('ROLE_', '') === role) {
+        return true;
+      }
+    }
+    
+    // Fallback: vérifier aussi dans role pour compatibilité
     if (user?.role) {
       // Si le rôle est stocké avec le préfixe ROLE_
       if (user.role === `ROLE_${role}`) {
@@ -268,11 +289,25 @@ export class AuthService {
   }
 
   isDoctor(): boolean {
-    // Essayer différentes variantes du rôle DOCTOR
-    return this.hasRole('DOCTOR') || 
-           this.hasRole('MEDECIN') || 
-           this.hasRole('ROLE_DOCTOR') ||
-           this.hasRole('ROLE_MEDECIN');
+    // Essayer différentes variantes du rôle DOCTOR en vérifiant d'abord userType
+    const user = this.getCurrentUser();
+    console.log('isDoctor() check - userType:', user?.userType, 'role:', user?.role);
+    
+    if (!user?.userType) {
+      return false;
+    }
+    
+    // Normaliser le userType en minuscules pour la comparaison
+    const normalizedUserType = user.userType.toLowerCase();
+    
+    // Vérifier si l'utilisateur est un docteur (insensible à la casse)
+    return normalizedUserType === 'doctor' || 
+           normalizedUserType === 'medecin' || 
+           normalizedUserType === 'role_doctor' ||
+           normalizedUserType === 'role_medecin' ||
+           // Retirer le préfixe ROLE_ s'il existe
+           normalizedUserType.replace('role_', '') === 'doctor' ||
+           normalizedUserType.replace('role_', '') === 'medecin';
   }
 
   isPatient(): boolean {

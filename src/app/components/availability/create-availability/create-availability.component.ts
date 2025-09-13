@@ -53,13 +53,14 @@ export class CreateAvailabilityComponent implements OnInit {
     const user = this.authService.getCurrentUser();
     console.log('Current user in component:', user);
     console.log('User role:', user?.role);
+    console.log('User userType:', user?.userType);
     console.log('Is doctor?', this.authService.isDoctor());
     
     // Vérifier que l'utilisateur est bien un docteur
     if (!this.authService.isDoctor()) {
       // Pour debug, afficher plus d'informations
-      this.error = `Seuls les médecins peuvent créer des disponibilités. Rôle actuel: ${user?.role || 'non défini'}`;
-      console.error('User is not a doctor. Current role:', user?.role);
+      this.error = `Seuls les médecins peuvent créer des disponibilités. Rôle actuel: ${user?.userType || user?.role || 'non défini'}`;
+      console.error('User is not a doctor. Current userType:', user?.userType, 'Current role:', user?.role);
     }
   }
 
@@ -76,10 +77,25 @@ export class CreateAvailabilityComponent implements OnInit {
   onSubmit() {
     // Pour debug, vérifier le rôle et afficher des informations
     const user = this.authService.getCurrentUser();
+    const token = this.authService.getToken();
     console.log('Submitting as user:', user);
     console.log('User role on submit:', user?.role);
+    console.log('User userType on submit:', user?.userType);
+    console.log('Auth token:', token);
+    console.log('Is authenticated:', this.authService.isAuthenticated());
 
     if (!this.validateForm()) {
+      return;
+    }
+
+    // Vérifier si l'utilisateur est connecté et a un token
+    if (!token) {
+      this.error = 'Vous devez être connecté pour créer une disponibilité';
+      return;
+    }
+
+    if (!this.authService.isDoctor()) {
+      this.error = 'Seuls les médecins peuvent créer des disponibilités';
       return;
     }
 
@@ -114,8 +130,17 @@ export class CreateAvailabilityComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.error = 'Erreur de connexion au serveur';
-        console.error('Error:', error);
+        console.error('Full error object:', error);
+        console.error('Error status:', error.status);
+        console.error('Error headers:', error.headers);
+        
+        if (error.status === 401) {
+          this.error = 'Non autorisé - Veuillez vous reconnecter';
+        } else if (error.status === 403) {
+          this.error = 'Accès refusé - Vous n\'avez pas les permissions nécessaires';
+        } else {
+          this.error = error.error?.message || 'Erreur de connexion au serveur';
+        }
       }
     });
   }

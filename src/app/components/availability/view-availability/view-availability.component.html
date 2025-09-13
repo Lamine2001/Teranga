@@ -66,19 +66,19 @@
 
       <div class="card-actions">
         <button class="btn btn-sm btn-warning" 
-                (click)="blockAvailability(availability.id)"
+                (click)="availability.id !== undefined && blockAvailability(availability.id.toString())"
                 *ngIf="!availability.isBlocked"
                 title="Bloquer cette disponibilité">
           <i class="fas fa-ban"></i> Bloquer
         </button>
         <button class="btn btn-sm btn-success" 
-                (click)="blockAvailability(availability.id)"
+                (click)="availability.id !== undefined && blockAvailability(availability.id.toString())"
                 *ngIf="availability.isBlocked"
                 title="Débloquer cette disponibilité">
           <i class="fas fa-check"></i> Débloquer
         </button>
         <button class="btn btn-sm btn-danger" 
-                (click)="deleteAvailability(availability.id)"
+                (click)="availability.id !== undefined && deleteAvailability(availability.id.toString())"
                 title="Supprimer cette disponibilité">
           <i class="fas fa-trash"></i> Supprimer
         </button>

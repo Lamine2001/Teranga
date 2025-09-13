@@ -14,67 +14,75 @@ export class ViewAvailabilityComponent implements OnInit {
   availabilities: Availability[] = [];
   loading = false;
   error = '';
-  selectedAvailability: Availability | null = null;
 
   constructor(private availabilityService: AvailabilityService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadAvailabilities();
   }
 
-  loadAvailabilities() {
+  loadAvailabilities(): void {
     this.loading = true;
     this.error = '';
 
-    this.availabilityService.getDoctorAvailabilities().subscribe({
+    this.availabilityService.getAvailabilities().subscribe({
       next: (response) => {
         this.loading = false;
-        if (response.success && response.data) {
-          this.availabilities = response.data;
-        } else {
-          this.error = response.error || 'Erreur lors du chargement';
-        }
+        this.availabilities = response.data || response || [];
       },
       error: (error) => {
         this.loading = false;
-        this.error = 'Erreur de connexion au serveur';
-        console.error('Error:', error);
+        this.error = 'Erreur lors du chargement des disponibilités';
+        console.error('Error loading availabilities:', error);
       }
     });
   }
 
-  deleteAvailability(id: string) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette disponibilité ?')) {
+  deleteAvailability(id: string | number): void {
+    if (!id) {
+      console.error('ID is required for deletion');
+      return;
+    }
+    
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette disponibilité ?')) {
+      this.availabilityService.deleteAvailability(id).subscribe({
+        next: () => {
+          this.loadAvailabilities();
+        },
+        error: (error) => {
+          console.error('Error deleting availability:', error);
+          this.error = 'Erreur lors de la suppression';
+        }
+      });
+    }
+  }
+
+  blockAvailability(id: string | number): void {
+    if (!id) {
+      console.error('ID is required for blocking');
+      return;
+    }
+    
+    // Trouver la disponibilité dans la liste
+    const availability = this.availabilities.find(a => a.id?.toString() === id.toString());
+    if (!availability) {
+      this.error = 'Disponibilité non trouvée';
       return;
     }
 
-    this.availabilityService.deleteAvailability(id).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.loadAvailabilities();
-        } else {
-          alert(response.error || 'Erreur lors de la suppression');
-        }
+    // Basculer le statut isBlocked
+    const newBlockedStatus = !availability.isBlocked;
+    
+    this.availabilityService.updateAvailability(id, {
+      ...availability,
+      isBlocked: newBlockedStatus
+    }).subscribe({
+      next: () => {
+        this.loadAvailabilities();
       },
       error: (error) => {
-        alert('Erreur de connexion au serveur');
-        console.error('Error:', error);
-      }
-    });
-  }
-
-  blockAvailability(id: string) {
-    this.availabilityService.blockAvailability(id).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.loadAvailabilities();
-        } else {
-          alert(response.error || 'Erreur lors du blocage');
-        }
-      },
-      error: (error) => {
-        alert('Erreur de connexion au serveur');
-        console.error('Error:', error);
+        console.error('Error updating availability:', error);
+        this.error = 'Erreur lors de la mise à jour';
       }
     });
   }

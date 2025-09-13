@@ -5,31 +5,31 @@ export interface CreateAvailabilityRequest {
 }
 
 export interface Availability {
-  id: string;
-  doctorId: string;
+  id?: number;
+  doctorId: number;
   startTime: string;
   endTime: string;
   durationMinutes: number;
-  isBlocked: boolean;
+  isAvailable: boolean;
+  isBlocked?: boolean;
+  slots?: TimeSlot[];
   createdAt?: string;
   updatedAt?: string;
-  slots?: TimeSlot[];
 }
 
 export interface TimeSlot {
-  id?: string;
+  id?: number;
   startTime: string;
   endTime: string;
   isAvailable: boolean;
   isBooked: boolean;
-  patientId?: string;
 }
 
 export interface AvailabilityResponse {
   success: boolean;
-  data?: Availability;
   message?: string;
   error?: string;
+  data?: Availability;
 }
 
 export interface AvailabilityListResponse {
