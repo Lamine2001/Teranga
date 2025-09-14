@@ -1,6 +1,7 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { BreadcrumbComponent, BreadcrumbItem } from '../../shared/breadcrumb/breadcrumb.component';
 
 export interface ConsultationMode {
@@ -18,7 +19,7 @@ export interface ConsultationMode {
   templateUrl: './consultation-mode-selector.component.html',
   styleUrls: ['./consultation-mode-selector.component.scss']
 })
-export class ConsultationModeSelectorComponent {
+export class ConsultationModeSelectorComponent implements OnInit {
   @Output() modeSelected = new EventEmitter<'cabinet' | 'video'>();
 
   consultationForm: FormGroup;
@@ -57,11 +58,16 @@ export class ConsultationModeSelectorComponent {
     }
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router
+  ) {
     this.consultationForm = this.fb.group({
       mode: ['', [Validators.required]]
     });
   }
+
+  ngOnInit(): void {}
 
   selectMode(mode: 'cabinet' | 'video'): void {
     this.consultationForm.patchValue({ mode });
@@ -80,7 +86,13 @@ export class ConsultationModeSelectorComponent {
     if (this.consultationForm.valid) {
       const selectedMode = this.getSelectedMode();
       if (selectedMode) {
-        this.modeSelected.emit(selectedMode);
+        // Stocker le mode sélectionné dans sessionStorage pour l'utiliser plus tard
+        sessionStorage.setItem('consultationMode', selectedMode);
+        
+        // Naviguer vers l'étape du choix du type de patient
+        this.router.navigate(['/appointments/patient-type'], {
+          queryParams: { mode: selectedMode }
+        });
       }
     }
   }

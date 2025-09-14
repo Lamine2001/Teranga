@@ -1,0 +1,101 @@
+<div class="doctors-list-container">
+  <!-- Breadcrumb -->
+  <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+  <!-- Header -->
+  <div class="list-header">
+    <h1><i class="fas fa-user-md"></i> Choisir un médecin</h1>
+    <p>Sélectionnez le professionnel de santé qui vous convient</p>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-filter-section">
+    <form [formGroup]="searchForm" class="search-form">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          formControlName="searchText"
+          placeholder="Rechercher par nom ou spécialité..."
+          class="search-input"
+        >
+      </div>
+
+      <div class="filters">
+        <select formControlName="specialty" class="filter-select">
+          <option *ngFor="let spec of specialties" [value]="spec">{{ spec }}</option>
+        </select>
+
+        <select formControlName="availability" class="filter-select">
+          <option value="all">Tous les médecins</option>
+          <option value="available">Disponibles uniquement</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement des médecins...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadDoctors()" class="btn btn-primary">
+      <i class="fas fa-redo"></i> Réessayer
+    </button>
+  </div>
+
+  <!-- Doctors Grid -->
+  <div *ngIf="!isLoading && !errorMessage" class="doctors-grid">
+    <div 
+      *ngFor="let doctor of filteredDoctors" 
+      class="doctor-card"
+      (click)="selectDoctor(doctor)"
+    >
+      <div class="doctor-avatar">
+        <img [src]="getDoctorAvatar(doctor)" [alt]="doctor.firstName + ' ' + doctor.lastName">
+        <div class="availability-badge" *ngIf="doctor.isAvailable">
+          <i class="fas fa-circle"></i> Disponible
+        </div>
+      </div>
+
+      <div class="doctor-info">
+        <h3>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h3>
+        <p class="specialty">{{ doctor.specialty }}</p>
+        <p class="department" *ngIf="doctor.department">{{ doctor.department }}</p>
+        
+        <div class="doctor-meta">
+          <div class="rating">
+            <i class="fas fa-star"></i>
+            <span>{{ getDoctorRating(doctor) }}</span>
+          </div>
+          <div class="experience">
+            <i class="fas fa-briefcase-medical"></i>
+            <span>{{ getDoctorExperience(doctor) }}</span>
+          </div>
+        </div>
+
+        <div class="languages" *ngIf="doctor.languages">
+          <i class="fas fa-language"></i>
+          <span>{{ doctor.languages.join(', ') }}</span>
+        </div>
+      </div>
+
+      <button class="select-btn">
+        Choisir ce médecin
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !errorMessage && filteredDoctors.length === 0" class="empty-state">
+    <i class="fas fa-search"></i>
+    <h3>Aucun médecin trouvé</h3>
+    <p>Essayez de modifier vos critères de recherche</p>
+  </div>
+</div>

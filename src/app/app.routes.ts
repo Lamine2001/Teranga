@@ -8,6 +8,8 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { EditProfileComponent } from './components/user-profile/edit-profile/edit-profile.component';
 import { ChangePasswordComponent } from './components/user-profile/change-password/change-password.component';
 import { AuthGuard } from './guards/auth.guard';
+import { PatientTypeSelectorComponent } from './components/appointments/patient-type-selector/patient-type-selector.component';
+import { DoctorsListComponent } from './components/appointments/doctors-list/doctors-list.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -49,6 +51,11 @@ export const routes: Routes = [
     path: 'profile/change-password', 
     component: ChangePasswordComponent,
     canActivate: [AuthGuard]
+  },
+  { path: 'appointments/patient-type', component: PatientTypeSelectorComponent },
+  { 
+    path: 'appointments/doctors', 
+    component: DoctorsListComponent 
   },
   { path: '**', redirectTo: '/home' }
 ];
