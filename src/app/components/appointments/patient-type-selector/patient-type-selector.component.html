@@ -1,0 +1,88 @@
+<div class="patient-type-container">
+  <!-- Breadcrumb -->
+  <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+  <!-- Header -->
+  <div class="type-header">
+    <div class="mode-indicator">
+      <i [class]="getModeIcon()"></i>
+      <span>{{ getModeLabel() }}</span>
+    </div>
+    <h1><i class="fas fa-users"></i> Choisissez votre statut</h1>
+    <p>Êtes-vous un nouveau patient ou avez-vous déjà un compte ?</p>
+  </div>
+
+  <!-- Patient Type Selection -->
+  <div class="type-selection">
+    <form [formGroup]="patientTypeForm">
+      <div class="types-grid">
+        <div 
+          *ngFor="let type of patientTypes"
+          class="type-card"
+          [class.selected]="isSelected(type.value)"
+          (click)="selectType(type.value)"
+        >
+          <div class="type-icon">
+            <i [class]="type.icon"></i>
+          </div>
+          
+          <div class="type-content">
+            <h3>{{ type.label }}</h3>
+            <p class="type-description">{{ type.description }}</p>
+            
+            <div class="type-features">
+              <h4>Avantages :</h4>
+              <ul>
+                <li *ngFor="let feature of type.features">
+                  <i class="fas fa-check-circle"></i>
+                  {{ feature }}
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="type-selection-indicator">
+            <i class="fas fa-check-circle" *ngIf="isSelected(type.value)"></i>
+            <i class="far fa-circle" *ngIf="!isSelected(type.value)"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue Button -->
+      <div class="form-actions">
+        <button 
+          type="button"
+          class="btn btn-primary btn-large"
+          [disabled]="patientTypeForm.invalid"
+          (click)="onContinue()"
+        >
+          <i class="fas fa-arrow-right"></i>
+          Continuer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Information Section -->
+  <div class="info-section">
+    <div class="info-cards">
+      <div class="info-card">
+        <i class="fas fa-shield-alt"></i>
+        <h4>Sécurité garantie</h4>
+        <p>Vos données personnelles et médicales sont protégées par un chiffrement de niveau bancaire.</p>
+      </div>
+      
+      <div class="info-card">
+        <i class="fas fa-clock"></i>
+        <h4>Processus rapide</h4>
+        <p>Inscription et prise de rendez-vous en moins de 5 minutes.</p>
+      </div>
+      
+      <div class="info-card">
+        <i class="fas fa-headset"></i>
+        <h4>Support 24/7</h4>
+        <p>Notre équipe est disponible pour vous aider à tout moment.</p>
+      </div>
+    </div>
+  </div>
+</div>

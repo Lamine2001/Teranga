@@ -38,6 +38,12 @@ export class GuestRegistrationModalComponent implements OnInit {
     'Collègue', 'Voisin/Voisine', 'Autre'
   ];
 
+  // Cities for address selection
+  cities = [
+    'Dakar', 'Thiès', 'Kaolack', 'Ziguinchor', 'Saint-Louis',
+    'Touba', 'Diourbel', 'Louga', 'Fatick', 'Kolda', 'Tambacounda', 'Matam'
+  ];
+
   // Insurance providers
   insuranceProviders = [
     'CNAS', 'IPM', 'Mutuelle de santé', 'Assurance privée', 'Autre', 'Aucune'
@@ -164,7 +170,7 @@ export class GuestRegistrationModalComponent implements OnInit {
 
   isCurrentSectionValid(): boolean {
     const controls = this.getCurrentSectionControls();
-    return controls.every(control => control.valid);
+    return controls.every(control => control?.valid);
   }
 
   getCurrentSectionControls() {
@@ -216,7 +222,7 @@ export class GuestRegistrationModalComponent implements OnInit {
         phone: formData.phone,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-        userType: 'patient',
+        userType: 'patient' as 'patient' | 'doctor',
         dateOfBirth: formData.dateOfBirth,
         gender: formData.gender,
         address: formData.address,

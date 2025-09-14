@@ -18,6 +18,8 @@ export interface AppointmentResponseDTO {
   doctorDepartment: string;
   appointmentTime: string;
   endTime: string;
+  appointmentType?: 'virtual' | 'onsite';
+  consultationFee?: number;
   status: string;
   notes: string;
   createdAt: string;
@@ -62,6 +64,13 @@ export interface BookAppointmentRequestDTO {
   notes?: string;
 }
 
+export interface BookingResponseDTO {
+  success: boolean;
+  appointment?: AppointmentResponseDTO;
+  error?: string;
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -78,8 +87,8 @@ export class AppointmentService {
     return this.http.post<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/search-public`, request);
   }
 
-  bookAppointment(request: BookAppointmentRequestDTO): Observable<AppointmentResponseDTO> {
-    return this.http.post<AppointmentResponseDTO>(`${this.apiUrl}/appointments/book`, request);
+  bookAppointment(request: BookAppointmentRequestDTO): Observable<BookingResponseDTO> {
+    return this.http.post<BookingResponseDTO>(`${this.apiUrl}/appointments/book`, request);
   }
 
   getPatientAppointments(): Observable<AppointmentResponseDTO[]> {

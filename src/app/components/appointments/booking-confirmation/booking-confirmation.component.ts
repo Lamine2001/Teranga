@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { AppointmentService, AppointmentResponseDTO } from '../../../services/appointment.service';
+import { AppointmentService, AppointmentResponseDTO, BookingResponseDTO } from '../../../services/appointment.service';
 import { PaymentService } from '../../../services/payment.service';
 
 @Component({
@@ -386,7 +386,8 @@ export class BookingConfirmationComponent implements OnInit {
     return level?.color || '#6c757d';
   }
 
-  formatCurrency(amount: number): string {
+  formatCurrency(amount?: number): string {
+    if (!amount) return '0 XOF';
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'XOF',
@@ -394,7 +395,8 @@ export class BookingConfirmationComponent implements OnInit {
     }).format(amount);
   }
 
-  getAppointmentTypeIcon(type: string): string {
+  getAppointmentTypeIcon(type?: string): string {
+    if (!type) return 'fas fa-calendar';
     const appointmentType = this.appointmentTypes.find(t => t.value === type);
     return appointmentType?.icon || 'fas fa-calendar';
   }

@@ -17,7 +17,22 @@ export const routes: Routes = [
   { path: 'doctor-dashboard', component: DoctorDashboardComponent },
   { path: 'patient-dashboard', component: PatientDashboardComponent },
   { path: 'appointments/search', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
-  { path: 'book-appointment', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+  
+  // New Workflow Routes
+  { 
+    path: 'book-appointment', 
+    loadComponent: () => import('./components/appointments/appointment-workflow/appointment-workflow.component').then(m => m.AppointmentWorkflowComponent),
+    children: [
+      { path: '', redirectTo: 'mode', pathMatch: 'full' },
+      { path: 'mode', loadComponent: () => import('./components/appointments/consultation-mode-selector/consultation-mode-selector.component').then(m => m.ConsultationModeSelectorComponent) },
+      { path: 'patient-type', loadComponent: () => import('./components/appointments/patient-type-selector/patient-type-selector.component').then(m => m.PatientTypeSelectorComponent) },
+      { path: 'specialty', loadComponent: () => import('./components/appointments/specialty-selector/specialty-selector.component').then(m => m.SpecialtySelectorComponent) },
+      { path: 'professional', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+      { path: 'availability', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+      { path: 'information', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+      { path: 'confirmation', loadComponent: () => import('./components/appointments/booking-confirmation/booking-confirmation.component').then(m => m.BookingConfirmationComponent) }
+    ]
+  },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ForgotPasswordComponent },
   { 

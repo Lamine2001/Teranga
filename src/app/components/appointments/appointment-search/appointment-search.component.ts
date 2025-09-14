@@ -51,7 +51,7 @@ export class AppointmentSearchComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private appointmentService: AppointmentService,
-    private authService: AuthService
+    public authService: AuthService
   ) {
     this.searchForm = this.fb.group({
       date: ['', [Validators.required]],
@@ -69,6 +69,9 @@ export class AppointmentSearchComponent implements OnInit {
     // Check if user is authenticated
     this.isGuestUser = !this.authService.isAuthenticated();
     
+    // For development: Generate mock token if none exists
+    this.ensureMockTokenForDevelopment();
+    
     // Set default date to tomorrow
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -76,6 +79,35 @@ export class AppointmentSearchComponent implements OnInit {
       date: tomorrow.toISOString().split('T')[0],
       location: 'Dakar'
     });
+  }
+
+  /**
+   * Generate a mock token for development when backend is not available
+   */
+  private ensureMockTokenForDevelopment(): void {
+    if (!this.authService.getToken()) {
+      // Generate a simple mock token for development
+      const mockToken = this.generateMockToken();
+      localStorage.setItem('token', mockToken);
+      console.log('🔧 Development: Mock token generated');
+    }
+  }
+
+  /**
+   * Generate a simple mock JWT token for development
+   */
+  private generateMockToken(): string {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const payload = btoa(JSON.stringify({
+      sub: 'mock-user-id',
+      email: 'mock@teranga.com',
+      role: 'patient',
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+    }));
+    const signature = btoa('mock-signature-for-development');
+    
+    return `${header}.${payload}.${signature}`;
   }
 
   onSearch(): void {
@@ -131,7 +163,7 @@ export class AppointmentSearchComponent implements OnInit {
     this.showBookingConfirmation = true;
   }
 
-  onBookingComplete(): void {
+  onBookingComplete(result?: any): void {
     this.showBookingConfirmation = false;
     this.selectedSlot = null;
     // Optionally redirect to dashboard or show success message
@@ -142,22 +174,6 @@ export class AppointmentSearchComponent implements OnInit {
     this.selectedSlot = null;
   }
 
-  isPreferredTime(timeSlot: string): boolean {
-    const selectedTimes = this.searchForm.get('preferredTimes')?.value || [];
-    if (selectedTimes.length === 0) return false;
-    
-    const time = new Date(timeSlot);
-    const hour = time.getHours();
-    
-    return selectedTimes.some((pref: string) => {
-      switch(pref) {
-        case 'morning': return hour >= 8 && hour < 12;
-        case 'afternoon': return hour >= 12 && hour < 17;
-        case 'evening': return hour >= 17 && hour < 20;
-        default: return false;
-      }
-    });
-  }
 
   getTimeRange(startTime: string, endTime: string): string {
     const start = new Date(startTime);

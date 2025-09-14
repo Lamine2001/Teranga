@@ -1,0 +1,54 @@
+<div class="appointment-workflow">
+  <!-- Progress Header -->
+  <div class="workflow-header">
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+      </div>
+      <div class="progress-text">
+        Étape {{ currentStep }} sur {{ totalSteps }} • {{ getWorkflowSummary() }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Step Navigation -->
+  <div class="step-navigation">
+    <div class="steps-container">
+      <div 
+        *ngFor="let step of steps; let i = index"
+        [class]="getStepClass(step)"
+        (click)="navigateToStep(step)"
+      >
+        <div class="step-number">
+          <i class="fas fa-check" *ngIf="step.completed"></i>
+          <span *ngIf="!step.completed">{{ step.id }}</span>
+        </div>
+        <div class="step-label">{{ step.name }}</div>
+        <div class="step-connector" *ngIf="i < steps.length - 1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workflow Content -->
+  <div class="workflow-content">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Workflow Actions -->
+  <div class="workflow-actions">
+    <button 
+      type="button" 
+      class="btn btn-outline-secondary"
+      (click)="resetWorkflow()"
+    >
+      <i class="fas fa-undo"></i>
+      Recommencer
+    </button>
+    
+    <div class="workflow-help">
+      <i class="fas fa-question-circle"></i>
+      <span>Besoin d'aide ?</span>
+      <a href="#" class="help-link">Contactez-nous</a>
+    </div>
+  </div>
+</div>
