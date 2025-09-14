@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvailabilityService } from '../../../services/availability.service';
 import { Availability } from '../../../interfaces/availability.interface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-view-availability',
@@ -14,6 +15,7 @@ export class ViewAvailabilityComponent implements OnInit {
   availabilities: Availability[] = [];
   loading = false;
   error = '';
+  successMessage = '';
 
   constructor(private availabilityService: AvailabilityService) {}
 
@@ -41,17 +43,82 @@ export class ViewAvailabilityComponent implements OnInit {
   deleteAvailability(id: string | number): void {
     if (!id) {
       console.error('ID is required for deletion');
+      this.error = 'ID requis pour la suppression';
+      this.successMessage = '';
       return;
     }
     
     if (confirm('Êtes-vous sûr de vouloir supprimer cette disponibilité ?')) {
+      this.loading = true;
+      this.error = '';
+      this.successMessage = '';
+
       this.availabilityService.deleteAvailability(id).subscribe({
-        next: () => {
+        next: (response: any) => {
+          this.loading = false;
+          
+          // Analyser le statut de la réponse pour donner le bon feedback
+          if (response && response.status) {
+            switch (response.status) {
+              case 200:
+                this.successMessage = 'Disponibilité supprimée avec succès';
+                break;
+              case 204:
+                this.successMessage = 'Disponibilité supprimée avec succès (aucun contenu retourné)';
+                break;
+              default:
+                this.successMessage = 'Disponibilité supprimée';
+            }
+          } else {
+            // Si pas de statut explicite mais succès
+            this.successMessage = 'Disponibilité supprimée avec succès';
+          }
+
+          // Recharger la liste pour refléter les changements
           this.loadAvailabilities();
+          
+          // Effacer le message de succès après 3 secondes
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
+          this.loading = false;
+          this.successMessage = '';
+          
+          // Gestion détaillée des erreurs selon le statut HTTP
+          switch (error.status) {
+            case 400:
+              this.error = 'Requête invalide : Vérifiez les données envoyées';
+              break;
+            case 401:
+              this.error = 'Non autorisé : Veuillez vous reconnecter';
+              break;
+            case 403:
+              this.error = 'Accès interdit : Vous n\'avez pas les permissions nécessaires';
+              break;
+            case 404:
+              this.error = 'Disponibilité non trouvée : Elle a peut-être déjà été supprimée';
+              break;
+            case 409:
+              this.error = 'Conflit : Cette disponibilité est peut-être liée à des rendez-vous existants';
+              break;
+            case 500:
+              this.error = 'Erreur serveur : Veuillez réessayer plus tard';
+              break;
+            case 0:
+              this.error = 'Erreur de connexion : Vérifiez votre connexion internet';
+              break;
+            default:
+              this.error = error.error?.message || 'Erreur lors de la suppression de la disponibilité';
+          }
+          
           console.error('Error deleting availability:', error);
-          this.error = 'Erreur lors de la suppression';
+          
+          // Effacer le message d'erreur après 5 secondes
+          setTimeout(() => {
+            this.error = '';
+          }, 5000);
         }
       });
     }
