@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { DoctorService, Doctor } from '../../../services/doctor.service';
+import { DoctorService, Doctor, AvailabilityDTO } from '../../../services/doctor.service';
 import { BreadcrumbComponent } from '../../shared/breadcrumb/breadcrumb.component';
+import { DoctorAvailabilityComponent } from '../doctor-availability/doctor-availability.component';
 
 @Component({
   selector: 'app-doctors-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BreadcrumbComponent],
+  imports: [CommonModule, ReactiveFormsModule, BreadcrumbComponent, DoctorAvailabilityComponent],
   templateUrl: './doctors-list.component.html',
   styleUrls: ['./doctors-list.component.scss']
 })
@@ -20,6 +21,7 @@ export class DoctorsListComponent implements OnInit {
   consultationMode: string = '';
   patientType: string = '';
   searchForm: FormGroup;
+  expandedDoctorId: string | null = null;
   
   breadcrumbItems = [
     { label: 'Accueil', url: '/' },
@@ -103,9 +105,10 @@ export class DoctorsListComponent implements OnInit {
       // Filtrer par spécialité
       const matchesSpecialty = specialty === 'Tous' || doctor.specialty === specialty;
       
-      // Filtrer par disponibilité (si implémenté)
+      // Filtrer par disponibilité - vérifier si le docteur a des disponibilités
+      const hasAvailabilities = doctor.availabilities && doctor.availabilities.length > 0;
       const matchesAvailability = availability === 'all' || 
-        (availability === 'available' && doctor.isAvailable);
+        (availability === 'available' && hasAvailabilities);
       
       return matchesSearch && matchesSpecialty && matchesAvailability;
     });
@@ -137,15 +140,108 @@ export class DoctorsListComponent implements OnInit {
     }
   }
 
-  getDoctorAvatar(doctor: Doctor): string {
-    return doctor.avatarUrl || '/assets/default-doctor-avatar.png';
+  toggleDoctorPanel(doctorId: string): void {
+    this.expandedDoctorId = this.expandedDoctorId === doctorId ? null : doctorId;
   }
 
-  getDoctorRating(doctor: Doctor): number {
-    return doctor.rating || 4.5;
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    }).format(amount);
+  }
+
+  // Supprimer ou modifier ces méthodes qui utilisent des champs inexistants
+  getDoctorAvatar(doctor: Doctor): string {
+    // Utiliser une image par défaut car avatarUrl n'existe pas
+    return '/assets/default-doctor-avatar.png';
+  }
+
+  getDoctorRating(doctor: Doctor): number | null {
+    return doctor.rating;
   }
 
   getDoctorExperience(doctor: Doctor): string {
-    return doctor.yearsOfExperience ? `${doctor.yearsOfExperience} ans d'expérience` : 'Expérience non spécifiée';
+    // Utiliser le champ experience au lieu de yearsOfExperience
+    return doctor.experience || 'Expérience non spécifiée';
+  }
+
+  getDoctorLanguages(doctor: Doctor): string {
+    return doctor.languages || 'Français';
+  }
+
+  getDoctorWorkingHours(doctor: Doctor): string {
+    return doctor.workingHours || 'Horaires non spécifiés';
+  }
+
+  getDoctorEducation(doctor: Doctor): string {
+    return doctor.education || 'Formation non spécifiée';
+  }
+
+  getDoctorDepartment(doctor: Doctor): string {
+    return doctor.department || '';
+  }
+
+  getDoctorDisplayName(doctor: Doctor): string {
+    if (doctor.firstName && doctor.lastName) {
+      return `${doctor.firstName} ${doctor.lastName}`;
+    } else if (doctor.firstName) {
+      return doctor.firstName;
+    } else if (doctor.lastName) {
+      return doctor.lastName;
+    }
+    return 'Médecin';
+  }
+
+  formatSpecialty(specialty: string | null): string {
+    if (!specialty) return 'Médecine générale';
+    
+    const specialtyMap: { [key: string]: string } = {
+      'family': 'Médecine familiale',
+      'clinical': 'Médecine clinique',
+      'child': 'Pédiatrie',
+      'general': 'Médecine générale',
+      'cardiology': 'Cardiologie',
+      'dermatology': 'Dermatologie',
+      'gynecology': 'Gynécologie',
+      'orthopedics': 'Orthopédie'
+    };
+    
+    return specialtyMap[specialty.toLowerCase()] || specialty;
+  }
+
+  hasAvailabilities(doctor: Doctor): boolean {
+    return doctor.availabilities && doctor.availabilities.length > 0;
+  }
+
+  onSelectTimeSlot(slot: AvailabilityDTO, doctor: Doctor): void {
+    // Stocker les informations du médecin et du créneau sélectionné
+    sessionStorage.setItem('selectedDoctor', JSON.stringify(doctor));
+    sessionStorage.setItem('selectedSlot', JSON.stringify(slot));
+    
+    // Rediriger en fonction du type de patient
+    if (this.patientType === 'new') {
+      // Nouveau patient - rediriger vers l'inscription
+      this.router.navigate(['/register'], {
+        queryParams: {
+          doctorId: doctor.id,
+          slotId: slot.id,
+          redirect: '/appointments/booking',
+          mode: this.consultationMode
+        }
+      });
+    } else if (this.patientType === 'guest') {
+      // Patient invité - aller directement à la réservation
+      this.router.navigate(['/appointments/booking'], {
+        queryParams: {
+          doctorId: doctor.id,
+          slotId: slot.id,
+          mode: this.consultationMode,
+          guest: true
+        }
+      });
+    }
   }
 }
+

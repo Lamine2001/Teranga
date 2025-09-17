@@ -191,32 +191,62 @@
     
     .doctor-meta {
       display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 0;
       
-      .rating, .experience {
+      .meta-item {
         display: flex;
         align-items: center;
         gap: 0.25rem;
         font-size: 0.9rem;
-        color: #7f8c8d;
+        color: #6c757d;
         
         i {
-          color: #f39c12;
+          color: #3498db;
+          font-size: 0.85rem;
         }
       }
     }
     
-    .languages {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-      color: #7f8c8d;
+    .availability-indicator {
+      margin-top: 0.75rem;
       
-      i {
-        color: #9b59b6;
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        
+        &.available {
+          background-color: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+          
+          i {
+            color: #28a745;
+          }
+        }
+        
+        &.unavailable {
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+          
+          i {
+            color: #dc3545;
+          }
+        }
       }
+    }
+
+    .department {
+      color: #6c757d;
+      font-size: 0.95rem;
+      margin: 0.25rem 0;
     }
   }
   
@@ -242,6 +272,187 @@
     &:hover i {
       transform: translateX(5px);
     }
+  }
+}
+
+// Doctors Panels (nouveau style)
+.doctors-panels {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.doctor-panel {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &.expanded {
+    .expand-icon {
+      transform: rotate(180deg);
+    }
+  }
+
+  .panel-header {
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #f8f9fa;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+
+      .doctor-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+          color: white;
+          font-size: 24px;
+        }
+      }
+
+      .doctor-details {
+        flex: 1;
+
+        .doctor-name {
+          margin: 0 0 0.5rem;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #2c3e50;
+        }
+
+        .consultation-fee {
+          margin: 0 0 1rem;
+          font-weight: 500;
+          color: #3498db;
+        }
+
+        .doctor-description {
+          p {
+            margin: 0 0 0.5rem;
+            color: #6c757d;
+            line-height: 1.6;
+
+            &:first-child {
+              font-weight: 500;
+              color: #495057;
+            }
+          }
+        }
+
+        .doctor-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          margin: 1rem 0;
+          
+          .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+            
+            i {
+              color: #3498db;
+              font-size: 0.85rem;
+            }
+          }
+        }
+
+        .availability-indicator {
+          margin-top: 0.75rem;
+          
+          .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            
+            &.available {
+              background-color: #d4edda;
+              color: #155724;
+              border: 1px solid #c3e6cb;
+              
+              i {
+                color: #28a745;
+              }
+            }
+            
+            &.unavailable {
+              background-color: #f8d7da;
+              color: #721c24;
+              border: 1px solid #f5c6cb;
+              
+              i {
+                color: #dc3545;
+              }
+            }
+          }
+        }
+
+        .department {
+          color: #6c757d;
+          font-size: 0.95rem;
+          margin: 0.25rem 0;
+        }
+      }
+
+      .expand-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+
+        i {
+          color: #6c757d;
+        }
+
+        &.rotated {
+          transform: rotate(180deg);
+        }
+      }
+    }
+  }
+
+  .panel-body {
+    padding: 0 1.5rem 1.5rem;
+    animation: slideDown 0.3s ease;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
   }
 }
 

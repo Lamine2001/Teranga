@@ -2,21 +2,31 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface AvailabilityDTO {
+  id: string;
+  doctorId: string;
+  doctorName: string;
+  specialty: string;
+  startTime: string;
+  endTime: string;
+  status: 'AVAILABLE' | 'BOOKED' | 'CANCELLED';
+}
+
 export interface Doctor {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   specialty: string;
-  department?: string;
-  avatarUrl?: string;
-  rating?: number;
-  yearsOfExperience?: number;
-  languages?: string[];
-  isAvailable?: boolean;
-  email?: string;
-  phone?: string;
-  address?: string;
-  consultationFee?: number;
+  department: string | null;
+  bio: string | null;
+  education: string | null;
+  experience: string | null;
+  consultationFee: string | null;
+  languages: string | null;
+  workingHours: string | null;
+  rating: number | null;
+  totalReviews: number | null;
+  availabilities: AvailabilityDTO[];
 }
 
 @Injectable({

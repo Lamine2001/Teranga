@@ -49,46 +49,62 @@
     </button>
   </div>
 
-  <!-- Doctors Grid -->
-  <div *ngIf="!isLoading && !errorMessage" class="doctors-grid">
+  <!-- Doctors List -->
+  <div *ngIf="!isLoading && !errorMessage" class="doctors-panels">
     <div 
       *ngFor="let doctor of filteredDoctors" 
-      class="doctor-card"
-      (click)="selectDoctor(doctor)"
+      class="doctor-panel"
+      [class.expanded]="expandedDoctorId === doctor.id"
     >
-      <div class="doctor-avatar">
-        <img [src]="getDoctorAvatar(doctor)" [alt]="doctor.firstName + ' ' + doctor.lastName">
-        <div class="availability-badge" *ngIf="doctor.isAvailable">
-          <i class="fas fa-circle"></i> Disponible
+      <!-- Panel Header -->
+      <div class="panel-header" (click)="toggleDoctorPanel(doctor.id)">
+        <div class="header-content">
+          <div class="doctor-icon">
+            <i class="fas fa-user-md"></i>
+          </div>
+          
+          <div class="doctor-details">
+            <h3 class="doctor-name">
+              Dr. {{ getDoctorDisplayName(doctor) }}
+            </h3>
+            <p class="specialty">{{ formatSpecialty(doctor.specialty) }}</p>
+            <div class="doctor-description">
+              <p>
+                Consultez un médecin rapidement, sans vous déplacer, grâce à la téléconsultation. 
+                Depuis chez vous, vous pouvez recevoir des conseils médicaux, une consultation pour des problèmes 
+                de santé mineurs ou un renouvellement d'ordonnance.
+              </p>
+            </div>
+
+            <!-- Badge de disponibilité -->
+            <div class="availability-indicator" *ngIf="hasAvailabilities(doctor)">
+              <span class="badge available">
+                <i class="fas fa-check-circle"></i>
+                {{ doctor.availabilities.length }} créneaux disponibles
+              </span>
+            </div>
+            <div class="availability-indicator" *ngIf="!hasAvailabilities(doctor)">
+              <span class="badge unavailable">
+                <i class="fas fa-times-circle"></i>
+                Aucun créneau disponible
+              </span>
+            </div>
+          </div>
+          
+          <div class="expand-icon" [class.rotated]="expandedDoctorId === doctor.id">
+            <i class="fas fa-chevron-down"></i>
+          </div>
         </div>
       </div>
 
-      <div class="doctor-info">
-        <h3>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h3>
-        <p class="specialty">{{ doctor.specialty }}</p>
-        <p class="department" *ngIf="doctor.department">{{ doctor.department }}</p>
-        
-        <div class="doctor-meta">
-          <div class="rating">
-            <i class="fas fa-star"></i>
-            <span>{{ getDoctorRating(doctor) }}</span>
-          </div>
-          <div class="experience">
-            <i class="fas fa-briefcase-medical"></i>
-            <span>{{ getDoctorExperience(doctor) }}</span>
-          </div>
-        </div>
-
-        <div class="languages" *ngIf="doctor.languages">
-          <i class="fas fa-language"></i>
-          <span>{{ doctor.languages.join(', ') }}</span>
-        </div>
+      <!-- Panel Body (Availability Section) -->
+      <div class="panel-body" *ngIf="expandedDoctorId === doctor.id">
+        <app-doctor-availability 
+          [doctor]="doctor"
+          [consultationMode]="consultationMode"
+          (selectSlot)="onSelectTimeSlot($event, doctor)"
+        ></app-doctor-availability>
       </div>
-
-      <button class="select-btn">
-        Choisir ce médecin
-        <i class="fas fa-arrow-right"></i>
-      </button>
     </div>
   </div>
 
@@ -99,3 +115,5 @@
     <p>Essayez de modifier vos critères de recherche</p>
   </div>
 </div>
+      
+
