@@ -132,49 +132,27 @@ export class DoctorsListComponent implements OnInit, OnDestroy {
     return doctor.availabilities && doctor.availabilities.length > 0;
   }
 
-  onShowRegistration(slot: any, doctor: any): void {
-    // Pour les nouveaux patients, afficher le formulaire d'inscription
-    console.log('Show registration for new patient:', slot, doctor);
-    
-    // S'assurer que le contexte est bien mis à jour avec toutes les informations
-    const currentContext = this.appointmentContextService.getContext();
-    
-    this.appointmentContextService.updateContext({
-      consultationMode: currentContext.consultationMode,
-      patientType: currentContext.patientType || 'new',
-      selectedDoctor: doctor,
-      selectedSlot: slot
-    });
-    
-    // Naviguer vers la page de booking
-    this.router.navigate(['/appointments/booking']).then(success => {
-      console.log('Navigation success:', success);
-    }).catch(error => {
-      console.error('Navigation error:', error);
-    });
-  }
-
   onSelectTimeSlot(slot: any, doctor: any): void {
     // Pour les patients existants, procéder directement à la réservation
     console.log('Selected slot for existing patient:', slot, doctor);
     
-    const currentContext = this.appointmentContextService.getContext();
+    // Sauvegarder le contexte
+    this.appointmentContextService.setSelectedDoctor(doctor);
+    this.appointmentContextService.setSelectedSlot(slot);
     
-    this.appointmentContextService.updateContext({
-      consultationMode: currentContext.consultationMode,
-      patientType: 'existing',
-      selectedDoctor: doctor,
-      selectedSlot: slot
-    });
+    // Rediriger vers la page de réservation/confirmation
+    this.router.navigate(['/appointments/booking']);
+  }
+
+  onShowRegistration(slot: any, doctor: any): void {
+    // Pour les nouveaux patients, afficher le formulaire d'inscription
+    console.log('Show registration for new patient:', slot, doctor);
     
-    // Naviguer vers la page de booking
-    this.router.navigate(['/appointments/booking']).then(success => {
-      console.log('Navigation success:', success);
-    }).catch(error => {
-      console.error('Navigation error:', error);
-    });
+    // Sauvegarder le contexte
+    this.appointmentContextService.setSelectedDoctor(doctor);
+    this.appointmentContextService.setSelectedSlot(slot);
+    
+    // Rediriger vers la page de réservation avec le formulaire d'inscription
+    this.router.navigate(['/appointments/booking']);
   }
 }
-
-
-

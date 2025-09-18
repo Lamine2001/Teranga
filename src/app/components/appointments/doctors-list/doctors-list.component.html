@@ -99,10 +99,13 @@
 
       <!-- Panel Body (Availability Section) -->
       <div class="panel-body" *ngIf="expandedDoctorId === doctor.id">
+        <!-- Doctor Availability Section -->
         <app-doctor-availability 
-          [doctor]="doctor"
-          [consultationMode]="consultationMode"
-          (selectSlot)="onSelectTimeSlot($event, doctor)"
+          *ngIf="selectedDoctor?.id === doctor.id"
+          [doctorId]="doctor.id"
+          [doctorAvailabilities]="doctor.availabilities || []"
+          (slotSelected)="onSelectTimeSlot($event, doctor)"
+          (showRegistration)="onShowRegistration($event, doctor)"
         ></app-doctor-availability>
       </div>
     </div>
@@ -115,5 +118,5 @@
     <p>Essayez de modifier vos critères de recherche</p>
   </div>
 </div>
-      
+
 

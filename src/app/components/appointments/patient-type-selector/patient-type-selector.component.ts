@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/breadcrumb/breadcrumb.component';
+import { AppointmentContextService } from '../../../services/appointment-context.service';
 
 @Component({
   selector: 'app-patient-type-selector',
@@ -49,7 +50,8 @@ export class PatientTypeSelectorComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private appointmentContext: AppointmentContextService
   ) {
     this.patientTypeForm = this.fb.group({
       patientType: ['', Validators.required]
@@ -57,9 +59,14 @@ export class PatientTypeSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Récupérer le mode de consultation depuis les query params ou sessionStorage
+    // Récupérer le mode de consultation depuis les query params ou le contexte
     this.route.queryParams.subscribe(params => {
-      this.consultationMode = params['mode'] || sessionStorage.getItem('consultationMode') || '';
+      this.consultationMode = params['mode'] || this.appointmentContext.getConsultationMode() || '';
+      
+      // Mettre à jour le contexte
+      if (this.consultationMode) {
+        this.appointmentContext.updateContext({ consultationMode: this.consultationMode });
+      }
     });
   }
 
@@ -76,8 +83,8 @@ export class PatientTypeSelectorComponent implements OnInit {
     const patientType = type || this.patientTypeForm.get('patientType')?.value;
     
     if (patientType) {
-      // Stocker le type de patient
-      sessionStorage.setItem('patientType', patientType);
+      // Mettre à jour le contexte avec le type de patient
+      this.appointmentContext.updateContext({ patientType });
       
       switch (patientType) {
         case 'new':

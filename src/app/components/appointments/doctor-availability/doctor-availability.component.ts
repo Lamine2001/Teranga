@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Doctor, AvailabilityDTO } from '../../../services/doctor.service';
+import { AppointmentService } from '../../../services/appointment.service';
+import { AppointmentContextService } from '../../../services/appointment-context.service';
 
 @Component({
   selector: 'app-doctor-availability',
@@ -10,27 +11,63 @@ import { Doctor, AvailabilityDTO } from '../../../services/doctor.service';
   styleUrls: ['./doctor-availability.component.scss']
 })
 export class DoctorAvailabilityComponent implements OnInit {
-  @Input() doctor!: Doctor;
-  @Input() consultationMode!: string;
-  @Output() selectSlot = new EventEmitter<AvailabilityDTO>();
-
-  availableSlots: AvailabilityDTO[] = [];
-  nextAvailableSlot: AvailabilityDTO | null = null;
+  @Input() doctorId: string = '';
+  @Input() doctorAvailabilities: any[] = []; // Recevoir directement les disponibilités
+  @Output() slotSelected = new EventEmitter<any>();
+  @Output() showRegistration = new EventEmitter<any>();
+  
+  availableSlots: any[] = [];
+  nextAvailableSlot: any | null = null;
   showAllSlots = false;
   isLoading = false;
 
+  constructor(
+    private appointmentService: AppointmentService,
+    private appointmentContext: AppointmentContextService
+  ) {}
+
   ngOnInit(): void {
-    this.loadAvailabilities();
+    // Si on a déjà les disponibilités, les utiliser directement
+    if (this.doctorAvailabilities && this.doctorAvailabilities.length > 0) {
+      this.processAvailabilities(this.doctorAvailabilities);
+    } else if (this.doctorId) {
+      // Seulement si on n'a pas les disponibilités, faire la requête
+      this.loadAvailabilities();
+    }
+  }
+
+  ngOnChanges(): void {
+    // Réagir aux changements des disponibilités passées en Input
+    if (this.doctorAvailabilities && this.doctorAvailabilities.length > 0) {
+      this.processAvailabilities(this.doctorAvailabilities);
+    }
+  }
+
+  private processAvailabilities(availabilities: any[]): void {
+    this.availableSlots = availabilities
+      .filter(slot => slot.status === 'AVAILABLE' && new Date(slot.startTime) > new Date())
+      .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    
+    this.nextAvailableSlot = this.availableSlots[0] || null;
   }
 
   loadAvailabilities(): void {
-    // Utiliser directement les disponibilités du docteur
-    if (this.doctor && this.doctor.availabilities) {
-      this.availableSlots = this.doctor.availabilities
-        .filter(slot => slot.status === 'AVAILABLE')
-        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
-      
-      this.nextAvailableSlot = this.availableSlots[0] || null;
+    // Cette méthode n'est utilisée que si les disponibilités ne sont pas passées en Input
+    if (this.doctorId) {
+      this.isLoading = true;
+      this.appointmentService.getDoctorAvailability(this.doctorId).subscribe({
+        next: (response) => {
+          const availabilities = Array.isArray(response) ? response : response.availabilities || [];
+          this.processAvailabilities(availabilities);
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading availabilities:', error);
+          this.isLoading = false;
+          this.availableSlots = [];
+          this.nextAvailableSlot = null;
+        }
+      });
     }
   }
 
@@ -57,9 +94,32 @@ export class DoctorAvailabilityComponent implements OnInit {
     return `${this.formatTime(startTime)} - ${this.formatTime(endTime)}`;
   }
 
-  onSelectSlot(slot: AvailabilityDTO): void {
-    if (slot.status === 'AVAILABLE') {
-      this.selectSlot.emit(slot);
+  onSelectSlot(slot: any): void {
+    if (!this.isSlotAvailable(slot)) {
+      return;
+    }
+
+    const enrichedSlot = {
+      ...slot,
+      doctorId: this.doctorId
+    };
+
+    // Mettre à jour le contexte
+    this.appointmentContext.setSelectedSlot(enrichedSlot);
+
+    const patientType = this.appointmentContext.getPatientType();
+    
+    console.log('Slot selected, patient type:', patientType); // Debug log
+
+    // Émettre l'événement approprié basé sur le type de patient
+    if (patientType === 'new' || patientType === 'guest' || !patientType) {
+      // Pour les nouveaux patients, invités ou si pas de type défini
+      console.log('Emitting showRegistration event'); // Debug log
+      this.showRegistration.emit(enrichedSlot);
+    } else if (patientType === 'existing') {
+      // Pour les patients existants
+      console.log('Emitting slotSelected event'); // Debug log
+      this.slotSelected.emit(enrichedSlot);
     }
   }
 
@@ -67,15 +127,14 @@ export class DoctorAvailabilityComponent implements OnInit {
     this.showAllSlots = !this.showAllSlots;
   }
 
-  getVisibleSlots(): AvailabilityDTO[] {
+  getVisibleSlots(): any[] {
     if (this.showAllSlots) {
       return this.availableSlots;
     }
     return this.availableSlots.slice(0, 6);
   }
 
-  isSlotAvailable(slot: AvailabilityDTO): boolean {
+  isSlotAvailable(slot: any): boolean {
     return slot.status === 'AVAILABLE' && new Date(slot.startTime) > new Date();
   }
 }
- 

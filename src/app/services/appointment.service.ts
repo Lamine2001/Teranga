@@ -113,4 +113,19 @@ export class AppointmentService {
   getUpcomingAppointments(): Observable<AppointmentResponseDTO[]> {
     return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/upcoming`);
   }
+
+  /**
+   * Get doctor availability slots
+   */
+  getDoctorAvailability(doctorId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/doctors/${doctorId}/availability`);
+  }
+
+  /**
+   * Alternative method name that might be used
+   * Get all availabilities for a specific doctor
+   */
+  getAvailabilities(doctorId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/availabilities?doctorId=${doctorId}`);
+  }
 }
