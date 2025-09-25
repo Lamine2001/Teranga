@@ -1,0 +1,75 @@
+<section id="home" class="hero hero-with-background" [class.image-loaded]="imageLoaded">
+  <!-- Préchargement de l'image avec priorité haute -->
+  <link rel="preload" as="image" href="/pic_12.jpg">
+  <img 
+    src="/pic_12.jpg" 
+    alt="Hero Background" 
+    class="preload-image" 
+    (load)="onImageLoad()" 
+    (error)="onImageError()"
+    loading="eager"
+    fetchpriority="high"
+    style="display: none;">
+  
+  <!-- Background placeholder avec image basse qualité -->
+  <div class="hero-background-placeholder">
+    <!-- Base64 encoded low-quality placeholder - replace with your actual low-quality image -->
+    <div class="placeholder-blur" [style.background-image]="'url(' + placeholderImage + ')'"></div>
+    @if (!imageLoaded) {
+      <div class="loading-indicator">
+        <div class="loading-spinner"></div>
+      </div>
+    }
+  </div>
+  
+  <!-- Background image -->
+  <div class="hero-background-image" [class.loaded]="imageLoaded"></div>
+  
+  <div class="hero-overlay">
+    <div class="container" style="position: relative; z-index: 10;">
+      <div class="hero-content" style="position: relative; z-index: 2;">
+        <div class="hero-text">
+          <h1 class="hero-title">
+          <span class="highlight">M-Santé</span>
+          </h1>
+          <h2 class="hero-subtitle text-spaced">
+            Votre bien-être, notre priorité
+          </h2>
+          <!-- <p class="hero-description">
+            Des consultations personnalisées avec nos professionnels qualifiés 
+            pour vous accompagner vers un mieux-être durable.
+          </p> -->
+          <div class="hero-actions">
+            <a href="/appointments/wizard" class="btn btn-primary btn-large">
+              Prendre rendez-vous
+            </a>
+            <a href="#about" class="btn btn-outline btn-large">
+              En savoir plus
+            </a>
+          </div>
+        </div>
+        <!-- <div class="hero-image">
+          <img src="assets/personne-partageant-des-sentiments-et-des-emotions-pendant-la-seance-de-therapie.jpg" alt="Personne partageant des sentiments et des émotions pendant la séance de thérapie" class="hero-photo" />
+        </div> -->
+      </div>
+    </div>
+  </div>
+  <div class="list-service" style="position: relative; z-index: 10;">
+    <h3 class="service-title">Les plus demandés</h3>
+    <ul>
+      <li class="service-item">
+        <a href="/services">Thérapie individuelle</a>
+      </li>
+      <li class="service-item">
+        <a href="/services">Coaching de vie</a>
+      </li>
+      <li class="service-item">
+        <a href="/services">Soutien psychologique en ligne</a>
+      </li>
+      <li class="service-item">
+        <a href="/services">Programmes de bien-être</a>
+      </li>
+    </ul>
+  </div>
+
+</section>

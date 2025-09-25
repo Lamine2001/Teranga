@@ -1,0 +1,73 @@
+<div class="consultation-mode-container">
+  <!-- Breadcrumb -->
+  <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+  <!-- Header -->
+  <div class="mode-header">
+    <h1><i class="fas fa-stethoscope"></i> Choisissez votre mode de consultation</h1>
+    <p>Sélectionnez le type de consultation qui vous convient le mieux</p>
+  </div>
+
+  <!-- Mode Selection -->
+  <div class="mode-selection">
+    <form [formGroup]="consultationForm">
+      <div class="modes-grid">
+        <div 
+          *ngFor="let mode of consultationModes"
+          class="mode-card"
+          [class.selected]="isSelected(mode.value)"
+          (click)="selectMode(mode.value)"
+        >
+          <div class="mode-icon">
+            <i [class]="mode.icon"></i>
+          </div>
+          
+          <div class="mode-content">
+            <h3>{{ mode.label }}</h3>
+            <p class="mode-description">{{ mode.description }}</p>
+            
+            <div class="mode-features">
+              <h4>Avantages :</h4>
+              <ul>
+                <li *ngFor="let feature of mode.features">
+                  <i class="fas fa-check-circle"></i>
+                  {{ feature }}
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="mode-selection-indicator">
+            <i class="fas fa-check-circle" *ngIf="isSelected(mode.value)"></i>
+            <i class="far fa-circle" *ngIf="!isSelected(mode.value)"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue Button -->
+      <div class="form-actions">
+        <button 
+          type="button"
+          class="btn btn-primary btn-large"
+          [disabled]="consultationForm.invalid"
+          (click)="onContinue()"
+        >
+          <i class="fas fa-arrow-right"></i>
+          Continuer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Help Section -->
+  <div class="help-section">
+    <div class="help-card">
+      <i class="fas fa-info-circle"></i>
+      <div class="help-content">
+        <h4>Besoin d'aide pour choisir ?</h4>
+        <p>Consultez notre guide pour choisir le mode de consultation qui vous convient le mieux selon votre situation.</p>
+        <a href="#" class="help-link">Voir le guide <i class="fas fa-external-link-alt"></i></a>
+      </div>
+    </div>
+  </div>
+</div>

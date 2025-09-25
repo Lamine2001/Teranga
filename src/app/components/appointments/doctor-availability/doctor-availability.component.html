@@ -1,0 +1,62 @@
+<div class="availability-section">
+  <hr class="divider">
+  
+  <div class="availability-header">
+    <p class="section-title">Prochaine disponibilité:</p>
+  </div>
+
+  <div class="availability-content">
+    <!-- Next Available Slot -->
+    <div class="next-slot" *ngIf="nextAvailableSlot">
+      <button class="slot-button primary" (click)="onSelectSlot(nextAvailableSlot)">
+        <i class="far fa-clock"></i>
+        <span class="slot-date">{{ formatDate(nextAvailableSlot.startTime) }}</span>
+        <span class="slot-time">{{ formatTime(nextAvailableSlot.startTime) }}</span>
+      </button>
+    </div>
+
+    <!-- No Availability Message -->
+    <div class="no-availability" *ngIf="!nextAvailableSlot && !isLoading">
+      <p>Aucune disponibilité pour le moment</p>
+    </div>
+
+    <!-- Show All Button -->
+    <div class="show-all-section" *ngIf="availableSlots.length > 0">
+      <i class="far fa-calendar"></i>
+      <button class="link-button" (click)="toggleShowAllSlots()">
+        {{ showAllSlots ? 'Masquer les disponibilités' : 'Afficher toutes les disponibilités' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- All Slots Grid -->
+  <div class="all-slots" *ngIf="showAllSlots">
+    <div class="slots-grid">
+      <button 
+        *ngFor="let slot of getVisibleSlots()" 
+        class="slot-item"
+        [class.available]="isSlotAvailable(slot)"
+        [class.unavailable]="!isSlotAvailable(slot)"
+        (click)="onSelectSlot(slot)"
+        [disabled]="!isSlotAvailable(slot)"
+      >
+        <div class="slot-date">{{ formatDate(slot.startTime) }}</div>
+        <div class="slot-time">{{ formatTimeRange(slot.startTime, slot.endTime) }}</div>
+        <div class="slot-status">
+          <span *ngIf="slot.status === 'AVAILABLE'" class="status-badge available">
+            <i class="fas fa-check-circle"></i> Disponible
+          </span>
+          <span *ngIf="slot.status === 'BOOKED'" class="status-badge booked">
+            <i class="fas fa-times-circle"></i> Réservé
+          </span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner-small"></div>
+    <span>Chargement des disponibilités...</span>
+  </div>
+</div>

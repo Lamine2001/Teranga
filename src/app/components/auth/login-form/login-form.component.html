@@ -1,0 +1,71 @@
+<div class="login-form-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>Connexion</h2>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          placeholder="Email"
+          [class.invalid]="isFieldInvalid('email')"
+          class="form-control">
+        <div class="error-message" *ngIf="isFieldInvalid('email')">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input 
+          [type]="showPassword ? 'text' : 'password'" 
+          id="password" 
+          formControlName="password" 
+          placeholder="Mot de passe"
+          [class.invalid]="isFieldInvalid('password')"
+          class="form-control">
+        <div class="error-message" *ngIf="isFieldInvalid('password')">
+          {{ getFieldError('password') }}
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message global-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Forgot Password Link -->
+      <div class="forgot-password-link">
+        <a href="javascript:void(0)" (click)="onForgotPassword()">Mot de passe oublié ?</a>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Connexion</span>
+        <span *ngIf="isLoading" class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          Connexion...
+        </span>
+      </button>
+
+      <!-- Register Link -->
+      <div class="register-link">
+        <p>Vous n'avez pas de compte ? 
+          <a href="javascript:void(0)" (click)="onSwitchToRegister()">Créer un compte</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<app-forgot-password-modal *ngIf="showForgotPasswordModal" (close)="closeForgotPasswordModal()"></app-forgot-password-modal>

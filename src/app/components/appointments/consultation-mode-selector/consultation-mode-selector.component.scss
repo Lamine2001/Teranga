@@ -1,0 +1,260 @@
+.consultation-mode-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+
+  .mode-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+      font-weight: 700;
+
+      i {
+        color: #3498db;
+        margin-right: 0.5rem;
+      }
+    }
+
+    p {
+      color: #7f8c8d;
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  .mode-selection {
+    margin-bottom: 3rem;
+
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+
+      .mode-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 1rem;
+        padding: 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+          border-color: #3498db;
+          transform: translateY(-5px);
+          box-shadow: 0 10px 25px rgba(52, 152, 219, 0.1);
+        }
+
+        &.selected {
+          border-color: #3498db;
+          background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+          transform: translateY(-5px);
+          box-shadow: 0 15px 35px rgba(52, 152, 219, 0.2);
+
+          .mode-icon i {
+            color: #3498db;
+            transform: scale(1.1);
+          }
+        }
+
+        .mode-icon {
+          text-align: center;
+          margin-bottom: 1.5rem;
+
+          i {
+            font-size: 3rem;
+            color: #95a5a6;
+            transition: all 0.3s ease;
+          }
+        }
+
+        .mode-content {
+          h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+          }
+
+          .mode-description {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+          }
+
+          .mode-features {
+            h4 {
+              color: #34495e;
+              margin-bottom: 0.5rem;
+              font-size: 1rem;
+              font-weight: 600;
+            }
+
+            ul {
+              list-style: none;
+              padding: 0;
+
+              li {
+                display: flex;
+                align-items: center;
+                margin-bottom: 0.5rem;
+                color: #5a6c7d;
+
+                i {
+                  color: #27ae60;
+                  margin-right: 0.5rem;
+                  font-size: 0.9rem;
+                }
+              }
+            }
+          }
+        }
+
+        .mode-selection-indicator {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+
+          i {
+            font-size: 1.5rem;
+            color: #95a5a6;
+
+            &.fa-check-circle {
+              color: #27ae60;
+            }
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      text-align: center;
+
+      .btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        i {
+          margin-left: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .help-section {
+    .help-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      i {
+        font-size: 2rem;
+        opacity: 0.9;
+      }
+
+      .help-content {
+        flex: 1;
+
+        h4 {
+          margin-bottom: 0.5rem;
+          font-size: 1.2rem;
+          font-weight: 600;
+        }
+
+        p {
+          margin-bottom: 1rem;
+          opacity: 0.9;
+          line-height: 1.6;
+        }
+
+        .help-link {
+          color: white;
+          text-decoration: none;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: opacity 0.3s ease;
+
+          &:hover {
+            opacity: 0.8;
+          }
+
+          i {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .consultation-mode-container {
+    padding: 1rem;
+
+    .mode-header {
+      margin-bottom: 2rem;
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+
+    .mode-selection {
+      .modes-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+
+        .mode-card {
+          padding: 1.5rem;
+
+          .mode-icon i {
+            font-size: 2.5rem;
+          }
+
+          .mode-content h3 {
+            font-size: 1.3rem;
+          }
+        }
+      }
+    }
+
+    .help-section {
+      .help-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+
+        i {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+}

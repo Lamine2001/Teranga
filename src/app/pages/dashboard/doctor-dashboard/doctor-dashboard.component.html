@@ -1,0 +1,325 @@
+<div class="doctor-dashboard">
+  <!-- Top Navigation Bar -->
+  <nav class="top-navbar">
+    <div class="navbar-content">
+      <button class="menu-toggle" (click)="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1 class="dashboard-title">Espace Médecin</h1>
+      <div class="navbar-right">
+        <div class="notifications">
+          <i class="fas fa-bell"></i>
+          <span class="badge" *ngIf="stats.unreadMessages > 0">{{ stats.unreadMessages }}</span>
+        </div>
+        <div class="user-info" *ngIf="doctor">
+          <span>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</span>
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <!-- Sidebar Menu -->
+    <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+      <div class="sidebar-header">
+        <img src="assets/logo.png" alt="Logo" class="logo" *ngIf="!isSidebarCollapsed">
+        <i class="fas fa-heartbeat logo-icon" *ngIf="isSidebarCollapsed"></i>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div *ngFor="let item of menuItems" class="menu-item-wrapper">
+          <!-- Main menu item -->
+          <div class="menu-item" 
+               [class.active]="isActiveSection(item.id)"
+               [class.has-submenu]="item.subItems && item.subItems.length > 0"
+               (click)="toggleMenuItem(item)">
+            <div class="menu-item-content">
+              <i [class]="item.icon"></i>
+              <span class="menu-label" *ngIf="!isSidebarCollapsed">{{ item.label }}</span>
+              <span class="menu-badge" *ngIf="item.badge && !isSidebarCollapsed">{{ item.badge }}</span>
+              <i class="fas fa-chevron-down submenu-indicator" 
+                 *ngIf="item.subItems && item.subItems.length > 0 && !isSidebarCollapsed"
+                 [class.expanded]="item.expanded"></i>
+            </div>
+          </div>
+
+          <!-- Submenu items -->
+          <div class="submenu" 
+               *ngIf="item.subItems && item.expanded && !isSidebarCollapsed">
+            <div *ngFor="let subItem of item.subItems" 
+                 class="submenu-item"
+                 [class.active]="isActiveSection(item.id, subItem.id)"
+                 (click)="selectMenuItem(item.id, subItem.id); $event.stopPropagation()">
+              <i [class]="subItem.icon || 'fas fa-circle'" class="submenu-icon"></i>
+              <span>{{ subItem.label }}</span>
+              <span class="submenu-badge" *ngIf="subItem.badge">{{ subItem.badge }}</span>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Section Header -->
+      <div class="section-header">
+        <h2>{{ getSectionTitle() }}</h2>
+        <div class="breadcrumb">
+          <span>Tableau de Bord</span>
+          <i class="fas fa-chevron-right"></i>
+          <span>{{ getSectionTitle() }}</span>
+        </div>
+      </div>
+
+      <!-- Content Container -->
+      <div class="content-container">
+        <!-- Overview Section -->
+        <div *ngIf="activeSection === 'overview'" class="section-content">
+          <!-- Statistics Cards -->
+          <div class="stats-grid">
+            <div class="stat-card patients">
+              <div class="stat-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-details">
+                <h3>{{ stats.totalPatients }}</h3>
+                <p>Patients Total</p>
+              </div>
+              <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i> 12%
+              </div>
+            </div>
+
+            <div class="stat-card appointments">
+              <div class="stat-icon">
+                <i class="fas fa-calendar-day"></i>
+              </div>
+              <div class="stat-details">
+                <h3>{{ stats.todayAppointments }}</h3>
+                <p>RDV Aujourd'hui</p>
+              </div>
+            </div>
+
+            <div class="stat-card pending">
+              <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="stat-details">
+                <h3>{{ stats.pendingAppointments }}</h3>
+                <p>En Attente</p>
+              </div>
+            </div>
+
+            <div class="stat-card consultations">
+              <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stat-details">
+                <h3>{{ stats.completedConsultations }}</h3>
+                <p>Consultations</p>
+              </div>
+              <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i> 8%
+              </div>
+            </div>
+
+            <div class="stat-card messages">
+              <div class="stat-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="stat-details">
+                <h3>{{ stats.unreadMessages }}</h3>
+                <p>Messages Non Lus</p>
+              </div>
+            </div>
+
+            <div class="stat-card prescriptions">
+              <div class="stat-icon">
+                <i class="fas fa-prescription"></i>
+              </div>
+              <div class="stat-details">
+                <h3>{{ stats.pendingPrescriptions }}</h3>
+                <p>Prescriptions en Attente</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <h3>Actions Rapides</h3>
+            <div class="action-buttons">
+              <button class="action-btn" (click)="selectMenuItem('appointments', 'new-appointment')">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Nouveau RDV</span>
+              </button>
+              <button class="action-btn" (click)="selectMenuItem('consultations', 'new-consultation')">
+                <i class="fas fa-user-plus"></i>
+                <span>Nouvelle Consultation</span>
+              </button>
+              <button class="action-btn" (click)="selectMenuItem('prescriptions', 'create-prescription')">
+                <i class="fas fa-file-medical"></i>
+                <span>Prescription</span>
+              </button>
+              <button class="action-btn" (click)="selectMenuItem('messaging', 'inbox')">
+                <i class="fas fa-envelope-open"></i>
+                <span>Messages</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Availability Management Section -->
+        <div *ngIf="activeSection === 'availability'" class="section-content">
+          <div [ngSwitch]="activeSubSection">
+            <!-- Create Availability -->
+            <div *ngSwitchCase="'create-availability'">
+              <app-create-availability
+                (availabilityCreated)="onAvailabilityCreated()"
+                (close)="activeSubSection = ''">
+              </app-create-availability>
+            </div>
+
+            <!-- View Availability -->
+            <div *ngSwitchCase="'view-availability'">
+              <app-view-availability></app-view-availability>
+            </div>
+
+            <!-- Block Availability -->
+            <div *ngSwitchCase="'block-availability'">
+              <app-view-availability></app-view-availability>
+            </div>
+
+            <!-- Delete Availability -->
+            <div *ngSwitchCase="'delete-availability'">
+              <app-view-availability></app-view-availability>
+            </div>
+
+            <!-- Default -->
+            <div *ngSwitchDefault class="feature-placeholder">
+              <i class="fas fa-calendar-check feature-icon"></i>
+              <h3>Gestion des Disponibilités</h3>
+              <p>Sélectionnez une option dans le menu pour gérer vos disponibilités</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointments Section -->
+        <div *ngIf="activeSection === 'appointments'" class="section-content">
+          <div class="feature-placeholder" [ngSwitch]="activeSubSection">
+            <div *ngSwitchCase="'today-appointments'">
+              <i class="fas fa-calendar-day feature-icon"></i>
+              <h3>Rendez-vous du Jour</h3>
+              <p>{{ stats.todayAppointments }} rendez-vous prévus aujourd'hui</p>
+              <button class="btn btn-primary" (click)="handleGetDoctorAppointments()">
+                Voir les Rendez-vous
+              </button>
+            </div>
+
+            <div *ngSwitchCase="'cancel-appointment'">
+              <i class="fas fa-times-circle feature-icon"></i>
+              <h3>Annuler un Rendez-vous</h3>
+              <p>Annulez ou reportez un rendez-vous</p>
+              <button class="btn btn-danger" (click)="handleCancelAppointment()">
+                Gérer les Annulations
+              </button>
+            </div>
+
+            <div *ngSwitchDefault>
+              <i class="fas fa-calendar-alt feature-icon"></i>
+              <h3>Gestion des Rendez-vous</h3>
+              <p>Sélectionnez une option pour gérer vos rendez-vous</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other sections placeholders -->
+        <div *ngIf="activeSection === 'consultations'" class="section-content">
+          <div class="feature-placeholder">
+            <i class="fas fa-stethoscope feature-icon"></i>
+            <h3>Gestion des Consultations</h3>
+            <p>Cette fonctionnalité sera bientôt disponible</p>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === 'prescriptions'" class="section-content">
+          <div class="feature-placeholder">
+            <i class="fas fa-prescription feature-icon"></i>
+            <h3>Système de Prescription Médicale</h3>
+            <p>Cette fonctionnalité sera bientôt disponible</p>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === 'medical-records'" class="section-content">
+          <div class="feature-placeholder">
+            <i class="fas fa-file-medical feature-icon"></i>
+            <h3>Gestion des Documents Médicaux</h3>
+            <p>Cette fonctionnalité sera bientôt disponible</p>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === 'messaging'" class="section-content">
+          <div class="feature-placeholder">
+            <i class="fas fa-comments feature-icon"></i>
+            <h3>Système de Messagerie</h3>
+            <p>Communiquez avec vos patients de manière sécurisée</p>
+            <p class="badge badge-info">{{ stats.unreadMessages }} messages non lus</p>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === 'patients'" class="section-content">
+          <div class="feature-placeholder">
+            <i class="fas fa-users feature-icon"></i>
+            <h3>Gestion des Patients</h3>
+            <p>Gérez les dossiers de vos {{ stats.totalPatients }} patients</p>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === 'profile'" class="section-content">
+          <div class="profile-section">
+            <div class="profile-card" *ngIf="doctor">
+              <div class="profile-header">
+                <i class="fas fa-user-circle profile-avatar"></i>
+                <div class="profile-info">
+                  <h3>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h3>
+                  <p>{{ doctor.speciality }}</p>
+                  <p class="text-muted">Licence: {{ doctor.licenseNumber }}</p>
+                </div>
+              </div>
+              <div class="profile-details">
+                <div class="detail-item">
+                  <label>Email:</label>
+                  <span>{{ doctor.email }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Téléphone:</label>
+                  <span>{{ doctor.phone || 'Non renseigné' }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Hôpital:</label>
+                  <span>{{ doctor.hospital }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Expérience:</label>
+                  <span>{{ doctor.yearsOfExperience }} ans</span>
+                </div>
+                <div class="detail-item">
+                  <label>Tarif Consultation:</label>
+                  <span>{{ doctor.consultationFee }} FCFA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === 'settings'" class="section-content">
+          <div class="feature-placeholder">
+            <i class="fas fa-cog feature-icon"></i>
+            <h3>Paramètres</h3>
+            <p>Configurez vos préférences et paramètres</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="top-banner">
+  <div class="container">
+    <div class="top-banner-content">
+      <div class="top-banner-left">
+        <a href="tel:+15148521234" class="phone-link">
+          <i class="phone-icon">📞</i>
+          <span>514 852-1234</span>
+        </a>
+        <span class="separator">|</span>
+        <span class="clinic-info">Clinique de Santé Mentale</span>
+      </div>
+      <div class="top-banner-right">
+        <div *ngIf="!isAuthenticated" class="auth-links">
+          <a routerLink="/auth" class="auth-link">
+            <i class="user-icon">👤</i>
+            <span>Connexion</span>
+          </a>
+        </div>
+        <div *ngIf="isAuthenticated" class="user-info-mini">
+          <span class="welcome">Bonjour {{ currentUser?.firstName }}</span>
+          <button class="logout-btn" (click)="logout()">Déconnexion</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header class="header" [class.scrolled]="isScrolled">
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <div class="logo">
+          <a routerLink="/home" class="logo-link">
+            <div class="logo-icon">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cerveau stylisé -->
+                <path d="M16 4C12.5 4 9.5 6.5 9 10C8.5 10.2 8 10.5 7.5 11C6.5 12 6 13.5 6 15C6 16.5 6.5 18 7.5 19C8 19.5 8.5 19.8 9 20C9.5 23.5 12.5 26 16 26C19.5 26 22.5 23.5 23 20C23.5 19.8 24 19.5 24.5 19C25.5 18 26 16.5 26 15C26 13.5 25.5 12 24.5 11C24 10.5 23.5 10.2 23 10C22.5 6.5 19.5 4 16 4Z" fill="url(#brainGradient)"/>
+                <!-- Croix médicale intégrée -->
+                <path d="M16 8V22M10 15H22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:var(--primary-color);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:var(--secondary-color);stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <span class="logo-text">M-Santé</span>
+            <span class="logo-subtitle">Bien-être psychologique</span>
+          </a>
+        </div>
+        <div class="nav-menu" [class.active]="isMenuOpen">
+          <a routerLink="/home" class="nav-link" (click)="closeMenu()">Accueil</a>
+          <a href="#about" class="nav-link" (click)="closeMenu()">À propos</a>
+          <a href="#services" class="nav-link" (click)="closeMenu()">Services</a>
+          <a href="#contact" class="nav-link" (click)="closeMenu()">Contact</a>
+          <a href="#rates" class="nav-link" (click)="closeMenu()">Tarifs</a>
+        </div>
+        
+        <div class="nav-actions">
+          <a href="#appointment" class="btn btn-appointment">
+            <i class="calendar-icon">📅</i>
+            <span>Prendre rendez-vous</span>
+          </a>
+        </div>
+        
+        <button class="mobile-menu-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
