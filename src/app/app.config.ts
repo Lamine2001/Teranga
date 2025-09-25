@@ -5,6 +5,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { mockHttpInterceptor } from './interceptors/mock-http.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(
       withFetch(),  // Enable fetch API for better SSR performance
-      withInterceptors([authInterceptor])
+      withInterceptors([mockHttpInterceptor, authInterceptor])
     ),
     provideAnimations()
   ]

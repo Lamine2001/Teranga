@@ -1,0 +1,319 @@
+<div class="modal-overlay" (click)="cancelBooking()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="fas fa-calendar-check"></i> Confirmer votre rendez-vous</h2>
+      <p>Vérifiez les détails et finalisez votre réservation</p>
+      <button class="close-btn" (click)="cancelBooking()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error Message -->
+      <div class="error-container" *ngIf="errorMessage">
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          {{ errorMessage }}
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <div class="success-container" *ngIf="successMessage">
+        <div class="success-message">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage }}
+        </div>
+      </div>
+
+      <!-- Booking Summary -->
+      <div class="booking-summary" *ngIf="!showPaymentSection">
+        <h3><i class="fas fa-user-md"></i> Résumé du rendez-vous</h3>
+        
+        <div class="summary-card">
+          <div class="doctor-info">
+            <div class="doctor-avatar">
+              <i class="fas fa-user-md"></i>
+            </div>
+            <div class="doctor-details">
+              <h4>{{ selectedSlot.doctorFirstName }} {{ selectedSlot.doctorLastName }}</h4>
+              <p class="specialty">{{ selectedSlot.doctorSpecialty }}</p>
+              <p class="department">{{ selectedSlot.doctorDepartment }}</p>
+            </div>
+          </div>
+
+          <div class="appointment-details">
+            <div class="detail-item">
+              <i class="fas fa-calendar"></i>
+              <span>{{ getDateDisplay(selectedSlot.appointmentTime) }}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-clock"></i>
+              <span>{{ getTimeRange(selectedSlot.appointmentTime, selectedSlot.endTime) }}</span>
+            </div>
+            <div class="detail-item">
+              <i [class]="getAppointmentTypeIcon(selectedSlot.appointmentType)"></i>
+              <span>{{ selectedSlot.appointmentType === 'virtual' ? 'Consultation en ligne' : 'Consultation sur site' }}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-money-bill-wave"></i>
+              <span>{{ formatCurrency(selectedSlot.consultationFee) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Form -->
+        <form [formGroup]="bookingForm" class="booking-form">
+          <h4><i class="fas fa-edit"></i> Détails de la consultation</h4>
+          
+          <div class="form-group">
+            <label for="reasonForVisit">Raison de la consultation *</label>
+            <textarea 
+              id="reasonForVisit" 
+              formControlName="reasonForVisit"
+              class="form-control"
+              [class.error]="isFieldInvalid('reasonForVisit')"
+              placeholder="Décrivez brièvement la raison de votre consultation..."
+              rows="3"
+            ></textarea>
+            <div class="error-message" *ngIf="isFieldInvalid('reasonForVisit')">
+              {{ getFieldError('reasonForVisit') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="symptoms">Symptômes (optionnel)</label>
+            <textarea 
+              id="symptoms" 
+              formControlName="symptoms"
+              class="form-control"
+              placeholder="Décrivez vos symptômes si applicable..."
+              rows="2"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="urgency">Niveau d'urgence *</label>
+              <select 
+                id="urgency" 
+                formControlName="urgency"
+                class="form-control"
+                [class.error]="isFieldInvalid('urgency')"
+              >
+                <option value="">Sélectionner le niveau</option>
+                <option *ngFor="let level of urgencyLevels" [value]="level.value">
+                  {{ level.label }} - {{ level.description }}
+                </option>
+              </select>
+              <div class="error-message" *ngIf="isFieldInvalid('urgency')">
+                {{ getFieldError('urgency') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="preferredLanguage">Langue préférée</label>
+              <select 
+                id="preferredLanguage" 
+                formControlName="preferredLanguage"
+                class="form-control"
+              >
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Virtual Appointment Requirements -->
+          <div *ngIf="isVirtualAppointment()" class="technical-requirements">
+            <h4><i class="fas fa-laptop"></i> Exigences techniques</h4>
+            <div class="requirements-grid">
+              <label class="checkbox-label" *ngFor="let req of technicalRequirements">
+                <input 
+                  type="checkbox" 
+                  [formControlName]="req.key"
+                  formControlName="technicalRequirements"
+                >
+                <span>{{ req.label }}</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label for="platformPreference">Plateforme préférée</label>
+              <select 
+                id="platformPreference" 
+                formControlName="platformPreference"
+                class="form-control"
+              >
+                <option value="zoom">Zoom</option>
+                <option value="google_meet">Google Meet</option>
+                <option value="teams">Microsoft Teams</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- On-site Appointment Requirements -->
+          <div *ngIf="isOnsiteAppointment()" class="onsite-requirements">
+            <h4><i class="fas fa-hospital"></i> Informations sur site</h4>
+            
+            <div class="form-group">
+              <label for="transportationMethod">Moyen de transport</label>
+              <select 
+                id="transportationMethod" 
+                formControlName="transportationMethod"
+                class="form-control"
+              >
+                <option value="personal">Véhicule personnel</option>
+                <option value="public">Transport public</option>
+                <option value="taxi">Taxi</option>
+                <option value="walking">À pied</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="accessibilityNeeds">Besoins d'accessibilité (optionnel)</label>
+              <textarea 
+                id="accessibilityNeeds" 
+                formControlName="accessibilityNeeds"
+                class="form-control"
+                placeholder="Décrivez vos besoins d'accessibilité si applicable..."
+                rows="2"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Reminder Preferences -->
+          <div class="reminder-preferences">
+            <h4><i class="fas fa-bell"></i> Préférences de rappel</h4>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reminderMethod">Méthode de rappel</label>
+                <select 
+                  id="reminderMethod" 
+                  formControlName="reminderMethod"
+                  class="form-control"
+                >
+                  <option *ngFor="let option of reminderOptions" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="reminderTiming">Timing du rappel</label>
+                <select 
+                  id="reminderTiming" 
+                  formControlName="reminderTiming"
+                  class="form-control"
+                >
+                  <option *ngFor="let timing of reminderTimings" [value]="timing.value">
+                    {{ timing.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Notes -->
+          <div class="form-group">
+            <label for="additionalNotes">Notes supplémentaires (optionnel)</label>
+            <textarea 
+              id="additionalNotes" 
+              formControlName="additionalNotes"
+              class="form-control"
+              placeholder="Toute information supplémentaire que vous souhaitez partager..."
+              rows="2"
+            ></textarea>
+          </div>
+        </form>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="cancelBooking()"
+          >
+            <i class="fas fa-times"></i>
+            Annuler
+          </button>
+
+          <button 
+            type="button" 
+            class="btn btn-primary"
+            (click)="onProceedToPayment()"
+            [disabled]="bookingForm.invalid"
+          >
+            <i class="fas fa-credit-card"></i>
+            Procéder au paiement
+          </button>
+        </div>
+      </div>
+
+      <!-- Payment Section -->
+      <div class="payment-section" *ngIf="showPaymentSection">
+        <h3><i class="fas fa-credit-card"></i> Paiement</h3>
+        
+        <form [formGroup]="paymentForm" class="payment-form">
+          <div class="payment-methods">
+            <h4>Sélectionnez votre mode de paiement</h4>
+            
+            <div class="payment-options">
+              <label class="payment-option" *ngFor="let method of paymentMethods">
+                <input 
+                  type="radio" 
+                  formControlName="paymentMethod" 
+                  [value]="method.value"
+                >
+                <div class="option-card">
+                  <i [class]="method.icon"></i>
+                  <div class="option-details">
+                    <h5>{{ method.label }}</h5>
+                    <p>{{ method.description }}</p>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Payment Amount -->
+          <div class="payment-summary">
+            <div class="amount-breakdown">
+              <div class="breakdown-item">
+                <span>Consultation</span>
+                <span>{{ formatCurrency(selectedSlot.consultationFee) }}</span>
+              </div>
+              <div class="breakdown-item total">
+                <span>Total</span>
+                <span>{{ formatCurrency(selectedSlot.consultationFee) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="form-actions">
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="onBackToBooking()"
+            >
+              <i class="fas fa-arrow-left"></i>
+              Retour
+            </button>
+
+            <button 
+              type="button" 
+              class="btn btn-success"
+              (click)="onSubmitBooking()"
+              [disabled]="paymentForm.invalid || isLoading"
+            >
+              <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+              <i class="fas fa-check" *ngIf="!isLoading"></i>
+              {{ isLoading ? 'Traitement...' : 'Confirmer et payer' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,6 +2,10 @@
   <div class="search-header">
     <h2><i class="fas fa-search"></i> Rechercher un Rendez-vous</h2>
     <p>Trouvez le créneau qui vous convient le mieux</p>
+    <div class="guest-notice" *ngIf="isGuestUser">
+      <i class="fas fa-info-circle"></i>
+      <span>Vous pouvez rechercher et réserver un rendez-vous sans compte. Un compte sera créé lors de la réservation.</span>
+    </div>
   </div>
 
   <!-- Search Form -->
@@ -40,6 +44,71 @@
 
       <div class="form-row">
         <div class="form-group">
+          <label for="appointmentType">
+            <i class="fas fa-video"></i> Type de consultation *
+          </label>
+          <div class="radio-group">
+            <label class="radio-label" *ngFor="let type of appointmentTypes">
+              <input 
+                type="radio" 
+                formControlName="appointmentType" 
+                [value]="type.value"
+              >
+              <span>
+                <i [class]="type.icon"></i>
+                {{ type.label }}
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="searchForm.get('appointmentType')?.value === 'onsite'">
+          <label for="location">
+            <i class="fas fa-map-marker-alt"></i> Ville
+          </label>
+          <select id="location" formControlName="location" class="form-control">
+            <option value="">Sélectionner une ville</option>
+            <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="doctorName">
+            <i class="fas fa-user-md"></i> Nom du médecin (optionnel)
+          </label>
+          <input 
+            type="text" 
+            id="doctorName" 
+            formControlName="doctorName"
+            class="form-control"
+            placeholder="Rechercher par nom"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>
+            <i class="fas fa-clock"></i> Heures préférées
+          </label>
+          <div class="time-preferences">
+            <label class="checkbox-label" *ngFor="let timeSlot of timeSlots">
+              <input 
+                type="checkbox" 
+                [value]="timeSlot.value"
+                (change)="onTimePreferenceChange($event, timeSlot.value)"
+              >
+              <span>
+                <i [class]="timeSlot.icon"></i>
+                {{ timeSlot.label }}
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" *ngIf="searchForm.get('appointmentType')?.value === 'onsite'">
           <label for="maxDistance">
             <i class="fas fa-map-marker-alt"></i> Distance maximale (km)
           </label>
@@ -50,27 +119,8 @@
             min="1" 
             max="100"
             class="form-control"
+            placeholder="10"
           >
-        </div>
-
-        <div class="form-group">
-          <label>
-            <i class="fas fa-clock"></i> Heures préférées
-          </label>
-          <div class="time-preferences">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="preferredTimes" value="09:00">
-              <span>09:00</span>
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="preferredTimes" value="14:00">
-              <span>14:00</span>
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="preferredTimes" value="16:00">
-              <span>16:00</span>
-            </label>
-          </div>
         </div>
       </div>
 
@@ -136,7 +186,7 @@
         <div class="slot-actions">
           <button 
             class="btn btn-success book-btn"
-            (click)="onBookAppointment(slot.id)"
+            (click)="onBookAppointment(slot)"
           >
             <i class="fas fa-calendar-plus"></i>
             Réserver
@@ -158,4 +208,20 @@
       <p>Essayez de modifier vos critères de recherche ou de sélectionner une autre date.</p>
     </div>
   </div>
+
+  <!-- Guest Registration Modal -->
+  <app-guest-registration-modal
+    *ngIf="showRegistrationModal"
+    (registrationComplete)="onRegistrationComplete($event)"
+    (registrationCancel)="onRegistrationCancel()"
+  ></app-guest-registration-modal>
+
+  <!-- Booking Confirmation Modal -->
+  <app-booking-confirmation
+    *ngIf="showBookingConfirmation && selectedSlot"
+    [selectedSlot]="selectedSlot"
+    [user]="newUser || authService.getCurrentUser()"
+    (bookingComplete)="onBookingComplete($event)"
+    (bookingCancel)="onBookingCancel()"
+  ></app-booking-confirmation>
 </div>

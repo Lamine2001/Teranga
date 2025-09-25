@@ -1,0 +1,470 @@
+<div class="modal-overlay" (click)="cancelRegistration()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="fas fa-user-plus"></i> Créer votre compte</h2>
+      <p>Pour réserver un rendez-vous, vous devez avoir un compte</p>
+      <button class="close-btn" (click)="cancelRegistration()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+        </div>
+        <span class="progress-text">Étape {{ currentSection }} sur {{ totalSections }}</span>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-container" *ngIf="errorMessage">
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          {{ errorMessage }}
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <div class="success-container" *ngIf="successMessage">
+        <div class="success-message">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage }}
+        </div>
+      </div>
+
+      <!-- Registration Form -->
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
+        
+        <!-- Section 1: Personal Information -->
+        <div class="form-section" *ngIf="currentSection === 1">
+          <h3><i class="fas fa-user"></i> Informations personnelles</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">Prénom *</label>
+              <input 
+                type="text" 
+                id="firstName" 
+                formControlName="firstName"
+                class="form-control"
+                [class.error]="isFieldInvalid('firstName')"
+                placeholder="Votre prénom"
+              >
+              <div class="error-message" *ngIf="isFieldInvalid('firstName')">
+                {{ getFieldError('firstName') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Nom *</label>
+              <input 
+                type="text" 
+                id="lastName" 
+                formControlName="lastName"
+                class="form-control"
+                [class.error]="isFieldInvalid('lastName')"
+                placeholder="Votre nom"
+              >
+              <div class="error-message" *ngIf="isFieldInvalid('lastName')">
+                {{ getFieldError('lastName') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email"
+              class="form-control"
+              [class.error]="isFieldInvalid('email')"
+              placeholder="votre.email@example.com"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('email')">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Téléphone *</label>
+              <input 
+                type="tel" 
+                id="phone" 
+                formControlName="phone"
+                class="form-control"
+                [class.error]="isFieldInvalid('phone')"
+                placeholder="+221 XX XXX XX XX"
+              >
+              <div class="error-message" *ngIf="isFieldInvalid('phone')">
+                {{ getFieldError('phone') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="dateOfBirth">Date de naissance *</label>
+              <input 
+                type="date" 
+                id="dateOfBirth" 
+                formControlName="dateOfBirth"
+                class="form-control"
+                [class.error]="isFieldInvalid('dateOfBirth')"
+                [max]="getMaxDate()"
+              >
+              <div class="error-message" *ngIf="isFieldInvalid('dateOfBirth')">
+                {{ getFieldError('dateOfBirth') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Genre *</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" formControlName="gender" value="M">
+                <span><i class="fas fa-male"></i> Masculin</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" formControlName="gender" value="F">
+                <span><i class="fas fa-female"></i> Féminin</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Contact Information -->
+        <div class="form-section" *ngIf="currentSection === 2">
+          <h3><i class="fas fa-map-marker-alt"></i> Informations de contact</h3>
+          
+          <div class="form-group">
+            <label for="address">Adresse complète *</label>
+            <textarea 
+              id="address" 
+              formControlName="address"
+              class="form-control"
+              [class.error]="isFieldInvalid('address')"
+              placeholder="Rue, numéro, quartier..."
+              rows="3"
+            ></textarea>
+            <div class="error-message" *ngIf="isFieldInvalid('address')">
+              {{ getFieldError('address') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="city">Ville *</label>
+            <select 
+              id="city" 
+              formControlName="city"
+              class="form-control"
+              [class.error]="isFieldInvalid('city')"
+            >
+              <option value="">Sélectionner une ville</option>
+              <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+            </select>
+            <div class="error-message" *ngIf="isFieldInvalid('city')">
+              {{ getFieldError('city') }}
+            </div>
+          </div>
+
+          <h4><i class="fas fa-phone-alt"></i> Contact d'urgence</h4>
+          
+          <div class="form-group">
+            <label for="emergencyContactName">Nom du contact *</label>
+            <input 
+              type="text" 
+              id="emergencyContactName" 
+              formControlName="emergencyContactName"
+              class="form-control"
+              [class.error]="isFieldInvalid('emergencyContactName')"
+              placeholder="Nom et prénom du contact"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('emergencyContactName')">
+              {{ getFieldError('emergencyContactName') }}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="emergencyContactPhone">Téléphone du contact *</label>
+              <input 
+                type="tel" 
+                id="emergencyContactPhone" 
+                formControlName="emergencyContactPhone"
+                class="form-control"
+                [class.error]="isFieldInvalid('emergencyContactPhone')"
+                placeholder="+221 XX XXX XX XX"
+              >
+              <div class="error-message" *ngIf="isFieldInvalid('emergencyContactPhone')">
+                {{ getFieldError('emergencyContactPhone') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="emergencyContactRelationship">Relation *</label>
+              <select 
+                id="emergencyContactRelationship" 
+                formControlName="emergencyContactRelationship"
+                class="form-control"
+                [class.error]="isFieldInvalid('emergencyContactRelationship')"
+              >
+                <option value="">Sélectionner la relation</option>
+                <option *ngFor="let relation of relationships" [value]="relation">{{ relation }}</option>
+              </select>
+              <div class="error-message" *ngIf="isFieldInvalid('emergencyContactRelationship')">
+                {{ getFieldError('emergencyContactRelationship') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Account Security -->
+        <div class="form-section" *ngIf="currentSection === 3">
+          <h3><i class="fas fa-lock"></i> Sécurité du compte</h3>
+          
+          <div class="form-group">
+            <label for="password">Mot de passe *</label>
+            <div class="password-input">
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                id="password" 
+                formControlName="password"
+                class="form-control"
+                [class.error]="isFieldInvalid('password')"
+                placeholder="Minimum 8 caractères"
+              >
+              <button 
+                type="button" 
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+              >
+                <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+            
+            <!-- Password Strength Indicator -->
+            <div class="password-strength" *ngIf="registrationForm.get('password')?.value">
+              <div class="strength-bar">
+                <div class="strength-fill" [class]="getPasswordStrengthClass()"></div>
+              </div>
+              <span class="strength-text" [class]="getPasswordStrengthClass()">
+                {{ getPasswordStrengthText() }}
+              </span>
+            </div>
+            
+            <div class="error-message" *ngIf="isFieldInvalid('password')">
+              {{ getFieldError('password') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirmer le mot de passe *</label>
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="confirmPassword" 
+              formControlName="confirmPassword"
+              class="form-control"
+              [class.error]="isFieldInvalid('confirmPassword')"
+              placeholder="Répétez votre mot de passe"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+              {{ getFieldError('confirmPassword') }}
+            </div>
+          </div>
+
+          <div class="password-requirements">
+            <h4>Exigences du mot de passe :</h4>
+            <ul>
+              <li>Au moins 8 caractères</li>
+              <li>Une lettre majuscule</li>
+              <li>Une lettre minuscule</li>
+              <li>Un chiffre</li>
+              <li>Un caractère spécial</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 4: Medical Information & Preferences -->
+        <div class="form-section" *ngIf="currentSection === 4">
+          <h3><i class="fas fa-heartbeat"></i> Informations médicales</h3>
+          
+          <div class="form-group">
+            <label>Antécédents médicaux (optionnel)</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-label" *ngFor="let condition of medicalConditions">
+                <input 
+                  type="checkbox" 
+                  [value]="condition"
+                  (change)="onMedicalHistoryChange($event, condition)"
+                >
+                <span>{{ condition }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="allergies">Allergies connues (optionnel)</label>
+            <textarea 
+              id="allergies" 
+              formControlName="allergies"
+              class="form-control"
+              placeholder="Listez vos allergies séparées par des virgules..."
+              rows="2"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="currentMedications">Médicaments actuels (optionnel)</label>
+            <textarea 
+              id="currentMedications" 
+              formControlName="currentMedications"
+              class="form-control"
+              placeholder="Listez vos médicaments actuels..."
+              rows="2"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="insuranceProvider">Assurance maladie</label>
+              <select 
+                id="insuranceProvider" 
+                formControlName="insuranceProvider"
+                class="form-control"
+              >
+                <option value="">Sélectionner une assurance</option>
+                <option *ngFor="let provider of insuranceProviders" [value]="provider">{{ provider }}</option>
+              </select>
+            </div>
+
+            <div class="form-group" *ngIf="registrationForm.get('insuranceProvider')?.value && registrationForm.get('insuranceProvider')?.value !== 'Aucune'">
+              <label for="insuranceNumber">Numéro d'assurance</label>
+              <input 
+                type="text" 
+                id="insuranceNumber" 
+                formControlName="insuranceNumber"
+                class="form-control"
+                placeholder="Numéro de carte d'assurance"
+              >
+            </div>
+          </div>
+
+          <h4><i class="fas fa-cog"></i> Préférences</h4>
+          
+          <div class="form-group">
+            <label for="preferredLanguage">Langue préférée</label>
+            <select 
+              id="preferredLanguage" 
+              formControlName="preferredLanguage"
+              class="form-control"
+            >
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Notifications</label>
+            <div class="notification-preferences">
+              <label class="checkbox-label" *ngFor="let option of notificationOptions">
+                <input 
+                  type="checkbox" 
+                  [formControlName]="option.value"
+                  formControlName="notificationPreferences"
+                >
+                <span><i [class]="option.icon"></i> {{ option.label }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="legal-section">
+            <div class="form-group">
+              <label class="checkbox-label legal-checkbox">
+                <input 
+                  type="checkbox" 
+                  formControlName="termsAccepted"
+                  [class.error]="isFieldInvalid('termsAccepted')"
+                >
+                <span>J'accepte les <a href="#" target="_blank">conditions d'utilisation</a> *</span>
+              </label>
+              <div class="error-message" *ngIf="isFieldInvalid('termsAccepted')">
+                {{ getFieldError('termsAccepted') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label legal-checkbox">
+                <input 
+                  type="checkbox" 
+                  formControlName="privacyPolicyAccepted"
+                  [class.error]="isFieldInvalid('privacyPolicyAccepted')"
+                >
+                <span>J'accepte la <a href="#" target="_blank">politique de confidentialité</a> *</span>
+              </label>
+              <div class="error-message" *ngIf="isFieldInvalid('privacyPolicyAccepted')">
+                {{ getFieldError('privacyPolicyAccepted') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label legal-checkbox">
+                <input 
+                  type="checkbox" 
+                  formControlName="marketingConsent"
+                >
+                <span>J'accepte de recevoir des communications marketing (optionnel)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="form-navigation">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="previousSection()"
+            [disabled]="currentSection === 1"
+          >
+            <i class="fas fa-arrow-left"></i>
+            Précédent
+          </button>
+
+          <button 
+            *ngIf="currentSection < totalSections"
+            type="button" 
+            class="btn btn-primary"
+            (click)="nextSection()"
+            [disabled]="!isCurrentSectionValid()"
+          >
+            Suivant
+            <i class="fas fa-arrow-right"></i>
+          </button>
+
+          <button 
+            *ngIf="currentSection === totalSections"
+            type="submit" 
+            class="btn btn-success"
+            [disabled]="registrationForm.invalid || isLoading"
+          >
+            <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+            <i class="fas fa-check" *ngIf="!isLoading"></i>
+            {{ isLoading ? 'Création...' : 'Créer le compte' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <p class="help-text">
+        <i class="fas fa-info-circle"></i>
+        Vous avez déjà un compte ? 
+        <a href="#" (click)="$event.preventDefault(); cancelRegistration()">
+          Se connecter
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

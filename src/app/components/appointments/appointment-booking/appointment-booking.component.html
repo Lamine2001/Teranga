@@ -1,0 +1,17 @@
+<div class="appointment-booking-container">
+  <div class="booking-header" *ngIf="selectedDoctor">
+    <h2>
+      <i class="fas fa-user-md"></i>
+      Dr. {{ selectedDoctor.firstName }} {{ selectedDoctor.lastName }}
+    </h2>
+    <p class="specialty">{{ selectedDoctor.specialty || 'Médecine générale' }}</p>
+  </div>
+
+  <!-- Afficher le formulaire d'inscription pour les nouveaux patients -->
+  <app-patient-registration
+    [selectedSlot]="selectedSlot"
+    (registrationComplete)="onRegistrationComplete($event)"
+    (goBack)="onGoBack()"
+  ></app-patient-registration>
+</div>
+  

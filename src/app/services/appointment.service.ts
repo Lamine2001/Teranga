@@ -18,6 +18,8 @@ export interface AppointmentResponseDTO {
   doctorDepartment: string;
   appointmentTime: string;
   endTime: string;
+  appointmentType?: 'virtual' | 'onsite';
+  consultationFee?: number;
   status: string;
   notes: string;
   createdAt: string;
@@ -28,13 +30,45 @@ export interface SearchAvailabilityRequestDTO {
   date: Date;
   specialty?: string;
   doctorId?: number;
+  doctorName?: string;
+  appointmentType?: 'virtual' | 'onsite';
   preferredTimes?: string[];
   maxDistance?: number;
+  location?: string;
 }
 
 export interface BookAppointmentRequestDTO {
   availabilityId: number;
+  patientId?: string;
+  appointmentType?: 'virtual' | 'onsite';
+  reasonForVisit?: string;
+  symptoms?: string;
+  urgency?: 'low' | 'medium' | 'high';
+  preferredLanguage?: string;
+  technicalRequirements?: {
+    hasStableInternet?: boolean;
+    hasWebcam?: boolean;
+    hasMicrophone?: boolean;
+    hasSpeaker?: boolean;
+    platformPreference?: string;
+  };
+  transportationMethod?: string;
+  accessibilityNeeds?: string;
+  reminderPreferences?: {
+    method: string;
+    timing: string;
+  };
+  additionalNotes?: string;
+  paymentData?: any;
+  paymentId?: string;
   notes?: string;
+}
+
+export interface BookingResponseDTO {
+  success: boolean;
+  appointment?: AppointmentResponseDTO;
+  error?: string;
+  message?: string;
 }
 
 @Injectable({
@@ -49,8 +83,12 @@ export class AppointmentService {
     return this.http.post<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/search`, request);
   }
 
-  bookAppointment(request: BookAppointmentRequestDTO): Observable<AppointmentResponseDTO> {
-    return this.http.post<AppointmentResponseDTO>(`${this.apiUrl}/appointments/book`, request);
+  searchAvailableSlotsPublic(request: SearchAvailabilityRequestDTO): Observable<AppointmentResponseDTO[]> {
+    return this.http.post<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/search-public`, request);
+  }
+
+  bookAppointment(request: BookAppointmentRequestDTO): Observable<BookingResponseDTO> {
+    return this.http.post<BookingResponseDTO>(`${this.apiUrl}/appointments/book`, request);
   }
 
   getPatientAppointments(): Observable<AppointmentResponseDTO[]> {
@@ -74,5 +112,20 @@ export class AppointmentService {
 
   getUpcomingAppointments(): Observable<AppointmentResponseDTO[]> {
     return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/upcoming`);
+  }
+
+  /**
+   * Get doctor availability slots
+   */
+  getDoctorAvailability(doctorId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/doctors/${doctorId}/availability`);
+  }
+
+  /**
+   * Alternative method name that might be used
+   * Get all availabilities for a specific doctor
+   */
+  getAvailabilities(doctorId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/availabilities?doctorId=${doctorId}`);
   }
 }
