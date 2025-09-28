@@ -8,6 +8,10 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { EditProfileComponent } from './components/user-profile/edit-profile/edit-profile.component';
 import { ChangePasswordComponent } from './components/user-profile/change-password/change-password.component';
 import { AuthGuard } from './guards/auth.guard';
+import { PatientTypeSelectorComponent } from './components/appointments/patient-type-selector/patient-type-selector.component';
+import { DoctorsListComponent } from './components/appointments/doctors-list/doctors-list.component';
+import { AppointmentBookingComponent } from './components/appointments/appointment-booking/appointment-booking.component';
+import { AppointmentWizardComponent } from './components/appointments/appointment-wizard/appointment-wizard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -17,6 +21,42 @@ export const routes: Routes = [
   { path: 'doctor-dashboard', component: DoctorDashboardComponent },
   { path: 'patient-dashboard', component: PatientDashboardComponent },
   { path: 'appointments/search', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+  
+  // New Booking Workflow Routes
+  {
+    path: 'book-appointment',
+    loadComponent: () => import('./components/appointments/appointment-workflow/appointment-workflow.component').then(m => m.AppointmentWorkflowComponent),
+    children: [
+      { path: '', redirectTo: 'mode', pathMatch: 'full' },
+      { path: 'mode', loadComponent: () => import('./components/appointments/consultation-mode-selector/consultation-mode-selector.component').then(m => m.ConsultationModeSelectorComponent) },
+      { path: 'patient-type', loadComponent: () => import('./components/appointments/patient-type-selector/patient-type-selector.component').then(m => m.PatientTypeSelectorComponent) },
+      { path: 'specialty', loadComponent: () => import('./components/appointments/specialty-selector/specialty-selector.component').then(m => m.SpecialtySelectorComponent) },
+      { path: 'professional', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+      { path: 'availability', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+      { path: 'information', loadComponent: () => import('./components/appointments/appointment-search/appointment-search.component').then(m => m.AppointmentSearchComponent) },
+      { path: 'confirmation', loadComponent: () => import('./components/appointments/booking-confirmation/booking-confirmation.component').then(m => m.BookingConfirmationComponent) }
+    ]
+  },
+  { path: 'appointments/patient-type', component: PatientTypeSelectorComponent },
+  {
+    path: 'appointments/doctors',
+    component: DoctorsListComponent
+  },
+  {
+    path: 'appointments/booking',
+    component: AppointmentBookingComponent
+  },
+  {
+    path: 'appointments/wizard',
+    component: AppointmentWizardComponent
+  },
+  // Rediriger l'ancienne route vers le wizard
+  {
+    path: 'appointments/consultation-mode',
+    redirectTo: 'appointments/wizard',
+    pathMatch: 'full'
+  },
+  
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ForgotPasswordComponent },
   { 
