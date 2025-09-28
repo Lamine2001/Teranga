@@ -327,7 +327,7 @@ export class BookingConfirmationComponent implements OnInit {
     };
 
     this.paymentService.processPayment(paymentData).subscribe({
-      next: (paymentResponse) => {
+      next: (paymentResponse: any) => {
         if (paymentResponse.success) {
           bookingData.paymentId = paymentResponse.paymentId;
           this.createAppointment(bookingData);
@@ -336,7 +336,7 @@ export class BookingConfirmationComponent implements OnInit {
           this.errorMessage = paymentResponse.error || 'Erreur lors du traitement du paiement';
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         this.isLoading = false;
         this.errorMessage = 'Erreur lors du traitement du paiement';
         console.error('Payment error:', error);
