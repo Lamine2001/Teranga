@@ -8,15 +8,14 @@ export interface User {
   gender?: string; // Add gender property
   address?: string; // Add address property
   city?: string; // Add city property
-  userType?: 'patient' | 'doctor' | string;
-  role?: string;  // Add role property for compatibility
+  userType?: 'PATIENT' | 'DOCTOR' | string;
   isActive?: boolean; // Add isActive property
   createdAt?: string; // Add createdAt property
   updatedAt?: string; // Add updatedAt property
 }
 
 export interface Doctor extends User {
-  userType: 'doctor';
+  userType: 'DOCTOR';
   specialization: string;
   licenseNumber: string;
   department: string;
@@ -24,7 +23,7 @@ export interface Doctor extends User {
 }
 
 export interface Patient extends User {
-  userType: 'patient';
+  userType: 'PATIENT';
   dateOfBirth: string; // Changed from Date to string to match User interface
   address: string;
   emergencyContact: {
@@ -38,7 +37,7 @@ export interface Patient extends User {
 export interface LoginCredentials {
   email: string;
   password: string;
-  userType: 'doctor' | 'patient';
+  userType?: 'DOCTOR' | 'PATIENT';
 }
 
 export interface RegisterData extends LoginCredentials {

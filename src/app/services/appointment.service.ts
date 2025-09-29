@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface AppointmentResponseDTO {
   id: number;
@@ -77,7 +79,10 @@ export interface BookingResponseDTO {
 export class AppointmentService {
   private readonly apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   searchAvailableSlots(request: SearchAvailabilityRequestDTO): Observable<AppointmentResponseDTO[]> {
     return this.http.post<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/search`, request);
@@ -127,5 +132,34 @@ export class AppointmentService {
    */
   getAvailabilities(doctorId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/availabilities?doctorId=${doctorId}`);
+  }
+
+  createAppointment(appointmentData: any): Observable<any> {
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    // Prepare the appointment request
+    const request = {
+      doctorId: appointmentData.doctorId,
+      slotId: appointmentData.slotId,
+      consultationType: appointmentData.consultationType || 'IN_PERSON',
+      notes: appointmentData.notes || ''
+    };
+
+    console.log('Creating appointment with data:', request);
+
+    return this.http.post(`${this.apiUrl}/appointments`, request, { headers }).pipe(
+      map(response => {
+        console.log('Appointment created:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('Error creating appointment:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

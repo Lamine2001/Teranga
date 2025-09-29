@@ -52,8 +52,8 @@ export class UserProfileComponent implements OnInit {
 
   goBack(): void {
     // Navigate back to the appropriate dashboard based on user role
-    const role = this.userProfile?.role?.toLowerCase();
-    if (role === 'doctor' || role === 'medecin' || role === 'role_doctor') {
+    const role = this.userProfile?.userType?.toUpperCase();
+    if (role === 'DOCTOR') {
       this.router.navigate(['/doctor-dashboard']);
     } else {
       this.router.navigate(['/patient-dashboard']);

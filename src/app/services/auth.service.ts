@@ -65,39 +65,28 @@ export class AuthService {
           console.log('User data found:', userData);
           
           // Map UserResponseDTO to User interface
-          // UserResponseDTO has: userId, firstName, lastName, phone, email, userType, isActive, createdAt
           const user: User = {
             id: userData.userId,
             email: userData.email,
             firstName: userData.firstName,
             lastName: userData.lastName,
             phone: userData.phone,
-            // IMPORTANT: Map userType from backend to both role and userType in frontend
-            role: userData.userType,  // backend sends userType (e.g., "DOCTOR", "PATIENT")
             userType: userData.userType,
             isActive: userData.isActive,
             createdAt: userData.createdAt
           } as User;
           
-          // Normalize the userType/role to lowercase for consistency
+          // Keep userType in uppercase format as stored in backend
           if (user.userType) {
-            const normalizedType = user.userType.toLowerCase();
-            // Handle both uppercase and lowercase versions
-            if (normalizedType === 'doctor' || normalizedType === 'docteur') {
-              user.role = 'doctor';
-              user.userType = 'doctor';
-            } else if (normalizedType === 'patient') {
-              user.role = 'patient';
-              user.userType = 'patient';
-            } else if (normalizedType === 'admin') {
-              user.role = 'admin';
-              user.userType = 'admin';
+            const normalizedType = user.userType.toUpperCase();
+            if (normalizedType === 'DOCTOR' || normalizedType === 'DOCTEUR') {
+              user.userType = 'DOCTOR';
+            } else if (normalizedType === 'PATIENT') {
+              user.userType = 'PATIENT';
             }
-            // Keep original if not recognized
           }
           
           console.log('Mapped user object:', user);
-          console.log('User role:', user.role);
           console.log('User type:', user.userType);
           
           // Clean and store token
@@ -158,30 +147,23 @@ export class AuthService {
             firstName: userData.firstName,
             lastName: userData.lastName,
             phone: userData.phone,
-            // Map userType from backend
-            role: userData.userType,
             userType: userData.userType,
             isActive: userData.isActive,
             createdAt: userData.createdAt
           } as User;
           
-          // Normalize the userType/role
+          // Keep userType in uppercase format
           if (user.userType) {
-            const normalizedType = user.userType.toLowerCase();
-            if (normalizedType === 'doctor' || normalizedType === 'docteur') {
-              user.role = 'doctor';
-              user.userType = 'doctor';
-            } else if (normalizedType === 'patient') {
-              user.role = 'patient';
-              user.userType = 'patient';
-            } else if (normalizedType === 'admin') {
-              user.role = 'admin';
-              user.userType = 'admin';
+            const normalizedType = user.userType.toUpperCase();
+            if (normalizedType === 'DOCTOR' || normalizedType === 'DOCTEUR') {
+              user.userType = 'DOCTOR';
+            } else if (normalizedType === 'PATIENT') {
+              user.userType = 'PATIENT';
             }
           }
           
           console.log('Registered user:', user);
-          console.log('User role:', user.role);
+          console.log('User userType:', user.userType);
           
           // Store token
           if (isPlatformBrowser(this.platformId)) {
@@ -241,12 +223,10 @@ export class AuthService {
   // Ajouter une méthode pour vérifier le rôle
   hasRole(role: string): boolean {
     const user = this.getCurrentUser();
-    console.log('Current user:', user); // Debug log
-    console.log('User role:', user?.role); // Debug log
-    console.log('User userType:', user?.userType); // Debug log
-    console.log('Checking for role:', role); // Debug log
+    console.log('Current user:', user);
+    console.log('User userType:', user?.userType);
+    console.log('Checking for role:', role);
     
-    // Vérifier d'abord dans userType (attribut principal pour le rôle)
     if (user?.userType) {
       // Si le rôle est stocké avec le préfixe ROLE_
       if (user.userType === `ROLE_${role}`) {
@@ -266,48 +246,28 @@ export class AuthService {
       }
     }
     
-    // Fallback: vérifier aussi dans role pour compatibilité
-    if (user?.role) {
-      // Si le rôle est stocké avec le préfixe ROLE_
-      if (user.role === `ROLE_${role}`) {
-        return true;
-      }
-      // Si le rôle est stocké sans préfixe
-      if (user.role === role) {
-        return true;
-      }
-      // Comparaison insensible à la casse
-      if (user.role.toUpperCase() === role.toUpperCase()) {
-        return true;
-      }
-      // Si le rôle contient ROLE_ et on compare sans
-      if (user.role.replace('ROLE_', '') === role) {
-        return true;
-      }
-    }
     return false;
   }
 
   isDoctor(): boolean {
-    // Essayer différentes variantes du rôle DOCTOR en vérifiant d'abord userType
     const user = this.getCurrentUser();
-    console.log('isDoctor() check - userType:', user?.userType, 'role:', user?.role);
+    console.log('isDoctor() check - userType:', user?.userType);
     
     if (!user?.userType) {
       return false;
     }
     
-    // Normaliser le userType en minuscules pour la comparaison
-    const normalizedUserType = user.userType.toLowerCase();
+    // Normaliser le userType en majuscules pour la comparaison
+    const normalizedUserType = user.userType.toUpperCase();
     
-    // Vérifier si l'utilisateur est un docteur (insensible à la casse)
-    return normalizedUserType === 'doctor' || 
-           normalizedUserType === 'medecin' || 
-           normalizedUserType === 'role_doctor' ||
-           normalizedUserType === 'role_medecin' ||
+    // Vérifier si l'utilisateur est un docteur
+    return normalizedUserType === 'DOCTOR' || 
+           normalizedUserType === 'MEDECIN' || 
+           normalizedUserType === 'ROLE_DOCTOR' ||
+           normalizedUserType === 'ROLE_MEDECIN' ||
            // Retirer le préfixe ROLE_ s'il existe
-           normalizedUserType.replace('role_', '') === 'doctor' ||
-           normalizedUserType.replace('role_', '') === 'medecin';
+           normalizedUserType.replace('ROLE_', '') === 'DOCTOR' ||
+           normalizedUserType.replace('ROLE_', '') === 'MEDECIN';
   }
 
   isPatient(): boolean {
@@ -370,21 +330,18 @@ export class AuthService {
               firstName: userData.firstName,
               lastName: userData.lastName,
               phone: userData.phone,
-              role: userData.userType,
               userType: userData.userType,
               isActive: userData.isActive,
               createdAt: userData.createdAt
             } as User;
             
-            // Normalize userType
+            // Keep userType in uppercase format as stored in backend
             if (user.userType) {
-              const normalizedType = user.userType.toLowerCase();
-              if (normalizedType === 'doctor' || normalizedType === 'docteur') {
-                user.role = 'doctor';
-                user.userType = 'doctor';
-              } else if (normalizedType === 'patient') {
-                user.role = 'patient';
-                user.userType = 'patient';
+              const normalizedType = user.userType.toUpperCase();
+              if (normalizedType === 'DOCTOR' || normalizedType === 'DOCTEUR') {
+                user.userType = 'DOCTOR';
+              } else if (normalizedType === 'PATIENT') {
+                user.userType = 'PATIENT';
               }
             }
             
@@ -416,7 +373,6 @@ export class AuthService {
         try {
           const user = JSON.parse(savedUser);
           console.log('Restored user from storage:', user);
-          console.log('User role from storage:', user.role);
           console.log('User type from storage:', user.userType);
           
           // Set user immediately to avoid delay
@@ -577,16 +533,11 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (!user) return null;
     
-    // Check both role and userType for compatibility
-    if ('role' in user && user.role) {
-      return user.role;
-    }
-    if ('userType' in user && user.userType) {
-      return user.userType;
-    }
-    return null;
+    // Return userType since that's where PATIENT or DOCTOR is stored
+    return user.userType || null;
   }
 }
+  
 
 
 

@@ -52,15 +52,14 @@ export class CreateAvailabilityComponent implements OnInit {
     // Debug: Afficher les informations de l'utilisateur
     const user = this.authService.getCurrentUser();
     console.log('Current user in component:', user);
-    console.log('User role:', user?.role);
     console.log('User userType:', user?.userType);
     console.log('Is doctor?', this.authService.isDoctor());
     
     // Vérifier que l'utilisateur est bien un docteur
     if (!this.authService.isDoctor()) {
       // Pour debug, afficher plus d'informations
-      this.error = `Seuls les médecins peuvent créer des disponibilités. Rôle actuel: ${user?.userType || user?.role || 'non défini'}`;
-      console.error('User is not a doctor. Current userType:', user?.userType, 'Current role:', user?.role);
+      this.error = `Seuls les médecins peuvent créer des disponibilités. Type d'utilisateur actuel: ${user?.userType || 'non défini'}`;
+      console.error('User is not a doctor. Current userType:', user?.userType);
     }
   }
 
@@ -79,7 +78,6 @@ export class CreateAvailabilityComponent implements OnInit {
     const user = this.authService.getCurrentUser();
     const token = this.authService.getToken();
     console.log('Submitting as user:', user);
-    console.log('User role on submit:', user?.role);
     console.log('User userType on submit:', user?.userType);
     console.log('Auth token:', token);
     console.log('Is authenticated:', this.authService.isAuthenticated());

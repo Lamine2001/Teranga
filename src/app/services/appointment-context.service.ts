@@ -37,9 +37,34 @@ export class AppointmentContextService {
     return this.contextSubject.value;
   }
 
+  saveContext(): void {
+    const currentContext = this.contextSubject.value;
+    if (currentContext) {
+      sessionStorage.setItem('appointmentServiceContext', JSON.stringify(currentContext));
+      console.log('Context saved to sessionStorage:', currentContext);
+    }
+  }
+
+  loadContext(): void {
+    const savedContext = sessionStorage.getItem('appointmentServiceContext');
+    if (savedContext) {
+      try {
+        const context = JSON.parse(savedContext);
+        this.contextSubject.next(context);
+        console.log('Context loaded from sessionStorage:', context);
+      } catch (error) {
+        console.error('Error loading context from sessionStorage:', error);
+      }
+    }
+  }
+
+  clearSavedContext(): void {
+    sessionStorage.removeItem('appointmentServiceContext');
+  }
+
   clearContext(): void {
     this.contextSubject.next({});
-    sessionStorage.removeItem('appointmentContext');
+    this.clearSavedContext();
   }
 
   getPatientType(): string | undefined {

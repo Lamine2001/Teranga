@@ -1,15 +1,15 @@
 export interface UserProfile {
-  id: number;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
   phone: string;
-  role: string;
+  userType: 'PATIENT' | 'DOCTOR';
   enabled: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   address?: string;
-  dateOfBirth?: Date;
+  dateOfBirth?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
   emergencyContactRelationship?: string;
@@ -23,7 +23,7 @@ export interface UpdateProfileRequest {
   lastName: string;
   phone: string;
   address?: string;
-  dateOfBirth?: Date;
+  dateOfBirth?: string;
   specialty?: string;
   licenseNumber?: string;
   emergencyContactName?: string;

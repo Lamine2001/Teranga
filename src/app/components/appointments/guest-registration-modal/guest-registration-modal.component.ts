@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
@@ -13,6 +13,7 @@ import { AuthService } from '../../../services/auth.service';
 export class GuestRegistrationModalComponent implements OnInit {
   @Output() registrationComplete = new EventEmitter<any>();
   @Output() registrationCancel = new EventEmitter<void>();
+  @Input() defaultUserType: 'PATIENT' | 'DOCTOR' = 'PATIENT'; // Add input for user type
 
   registrationForm: FormGroup;
   isLoading = false;
@@ -68,6 +69,7 @@ export class GuestRegistrationModalComponent implements OnInit {
       phone: ['', [Validators.required, Validators.pattern(/^\+221\s?\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/)]],
       dateOfBirth: ['', [Validators.required]],
       gender: ['', [Validators.required]],
+      userType: ['PATIENT', [Validators.required]], // Add userType form control
 
       // Section 2: Contact Information
       address: ['', [Validators.required]],
@@ -99,6 +101,9 @@ export class GuestRegistrationModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Set default user type
+    this.registrationForm.patchValue({ userType: this.defaultUserType });
+
     // Watch password changes for strength indicator
     this.registrationForm.get('password')?.valueChanges.subscribe(password => {
       this.passwordStrength = this.calculatePasswordStrength(password);
@@ -182,7 +187,8 @@ export class GuestRegistrationModalComponent implements OnInit {
           this.registrationForm.get('email'),
           this.registrationForm.get('phone'),
           this.registrationForm.get('dateOfBirth'),
-          this.registrationForm.get('gender')
+          this.registrationForm.get('gender'),
+          this.registrationForm.get('userType')
         ];
       case 2:
         return [
@@ -222,7 +228,7 @@ export class GuestRegistrationModalComponent implements OnInit {
         phone: formData.phone,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-        userType: 'patient' as 'patient' | 'doctor',
+        userType: formData.userType, // Use dynamic userType
         dateOfBirth: formData.dateOfBirth,
         gender: formData.gender,
         address: formData.address,
@@ -311,6 +317,7 @@ export class GuestRegistrationModalComponent implements OnInit {
       phone: 'Téléphone',
       dateOfBirth: 'Date de naissance',
       gender: 'Genre',
+      userType: 'Type d\'utilisateur',
       address: 'Adresse',
       city: 'Ville',
       emergencyContactName: 'Nom du contact d\'urgence',

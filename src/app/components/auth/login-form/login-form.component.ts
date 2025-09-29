@@ -73,7 +73,7 @@ export class LoginFormComponent implements OnInit {
 
   private redirectBasedOnRole(): void {
     const user = this.authService.getCurrentUser();
-    if (user?.userType === 'doctor') {
+    if (user?.userType === 'DOCTOR') {
       this.router.navigate(['/doctor-dashboard']);
     } else {
       this.router.navigate(['/patient-dashboard']);

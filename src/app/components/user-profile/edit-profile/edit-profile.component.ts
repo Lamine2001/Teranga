@@ -47,7 +47,7 @@ export class EditProfileComponent implements OnInit {
     this.loading = true;
     this.userProfileService.getCurrentUserProfile().subscribe({
       next: (profile) => {
-        this.isDoctor = profile.role === 'DOCTOR' || profile.role === 'MEDECIN';
+        this.isDoctor = profile.userType === 'DOCTOR';
         
         // Format date for input field
         let formattedDate = '';

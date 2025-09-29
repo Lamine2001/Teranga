@@ -139,16 +139,9 @@
           </div>
         </div>
         
-        <a class="btn-primary"
-           [routerLink]="['/login']"
-           [queryParams]="{ 
-             redirect: '/appointments/wizard',
-             step: 'confirmation',
-             doctorId: context.selectedDoctor?.id,
-             slotId: context.selectedSlot?.id
-           }">
+        <button class="btn-primary" (click)="navigateToLogin()">
           <i class="fas fa-sign-in-alt"></i> Se connecter pour confirmer
-        </a>
+        </button>
         
         <div class="alternative-options">
           <p>Pas encore de compte ?</p>
@@ -416,3 +409,4 @@
     </button>
   </div>
 </div>
+
