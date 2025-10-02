@@ -113,9 +113,9 @@ export class AppointmentService {
     });
     
     console.log('Headers:', headers.keys());
-    console.log('Making POST request to:', `${this.apiUrl}/book`);
-    
-    return this.http.post<any>(`${this.apiUrl}/book`, request, { headers }).pipe(
+    console.log('Making POST request to:', `${this.apiUrl}/appointments/book`);
+
+    return this.http.post<any>(`${this.apiUrl}/appointments/book`, request, { headers }).pipe(
       tap(response => {
         console.log('API Response received:', response);
       }),
