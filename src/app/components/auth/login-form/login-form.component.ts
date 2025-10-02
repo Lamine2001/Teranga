@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { ForgotPasswordModalComponent } from '../forgot-password-modal/forgot-password-modal.component';
 
@@ -20,11 +20,17 @@ export class LoginFormComponent implements OnInit {
   errorMessage = '';
   showPassword = false;
   showForgotPasswordModal = false;
+  
+  // Nouvelles propriétés pour gérer le retour vers wizard
+  redirectUrl: string | null = null;
+  appointmentMode = false;
+  queryParams: any = {};
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -33,9 +39,21 @@ export class LoginFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Capturer les paramètres de redirection
+    this.route.queryParams.subscribe(params => {
+      this.redirectUrl = params['redirect'] || params['returnTo'] || null;
+      this.appointmentMode = params['appointmentMode'] === 'true';
+      this.queryParams = params;
+      
+      console.log('=== LOGIN FORM INIT ===');
+      console.log('Redirect URL:', this.redirectUrl);
+      console.log('Appointment Mode:', this.appointmentMode);
+      console.log('All Query params:', this.queryParams);
+    });
+    
     // Check if user is already authenticated
     if (this.authService.isAuthenticated()) {
-      this.redirectBasedOnRole();
+      this.handleRedirection();
     }
   }
 
@@ -46,14 +64,20 @@ export class LoginFormComponent implements OnInit {
 
       const credentials = {
         email: this.loginForm.get('email')?.value,
-        password: this.loginForm.get('password')?.value,
-        userType: this.loginForm.get('userType')?.value
+        password: this.loginForm.get('password')?.value
       };
+
+      console.log('=== LOGIN SUBMIT ===');
+      console.log('Redirect URL:', this.redirectUrl);
+      console.log('Appointment Mode:', this.appointmentMode);
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          if (response.success) {
-            this.redirectBasedOnRole();
+          console.log('=== LOGIN RESPONSE ===');
+          console.log('Response:', response);
+          
+          if (response.success && response.user) {
+            this.handleRedirection(response.user);
           } else {
             this.errorMessage = response.error || 'Login failed';
           }
@@ -71,12 +95,59 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
-  private redirectBasedOnRole(): void {
-    const user = this.authService.getCurrentUser();
-    if (user?.userType === 'DOCTOR') {
-      this.router.navigate(['/doctor-dashboard']);
+  private handleRedirection(user?: any): void {
+    const currentUser = user || this.authService.getCurrentUser();
+    
+    console.log('=== HANDLING REDIRECTION ===');
+    console.log('Current user:', currentUser);
+    console.log('Appointment mode:', this.appointmentMode);
+    console.log('Redirect URL:', this.redirectUrl);
+    
+    // PRIORITÉ 1: Mode appointment avec wizard
+    if (this.appointmentMode && this.redirectUrl === '/appointments/wizard') {
+      console.log('=== APPOINTMENT MODE REDIRECT ===');
+      console.log('Redirecting back to wizard with appointment mode');
+      
+      // Utiliser setTimeout pour s'assurer que l'auth est propagée
+      setTimeout(() => {
+        const navigationUrl = '/appointments/wizard?appointmentMode=true&sessionId=' + 
+                            (this.queryParams['sessionId'] || Date.now().toString());
+        console.log('Navigating to:', navigationUrl);
+        
+        this.router.navigateByUrl(navigationUrl).then(
+          (success) => {
+            console.log('Navigation to wizard successful:', success);
+            if (!success) {
+              // Fallback avec window.location
+              window.location.href = navigationUrl;
+            }
+          },
+          (error) => {
+            console.error('Navigation to wizard failed:', error);
+            // Fallback direct
+            window.location.href = navigationUrl;
+          }
+        );
+      }, 200);
+      
+      return; // Important: sortir de la fonction
+    }
+    
+    // Redirection standard basée sur le rôle
+    if (currentUser?.userType) {
+      const userType = currentUser.userType.toUpperCase();
+      console.log('Standard navigation for user type:', userType);
+      
+      if (userType === 'DOCTOR') {
+        this.router.navigate(['/doctor-dashboard']);
+      } else if (userType === 'PATIENT') {
+        this.router.navigate(['/patient-dashboard']);
+      } else {
+        this.router.navigate(['/']);
+      }
     } else {
-      this.router.navigate(['/patient-dashboard']);
+      console.log('No userType found, default navigation');
+      this.router.navigate(['/']);
     }
   }
 

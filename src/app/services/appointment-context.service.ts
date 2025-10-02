@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface AppointmentContext {
@@ -7,6 +8,8 @@ export interface AppointmentContext {
   selectedDoctor?: any;
   selectedSlot?: any;
   patientData?: any;
+  confirmedAppointment?: any; // Ajout pour stocker le rendez-vous confirmé
+  confirmationCode?: string; // Pour les réservations guest
 }
 
 @Injectable({
@@ -16,11 +19,11 @@ export class AppointmentContextService {
   private contextSubject = new BehaviorSubject<AppointmentContext>({});
   public context$: Observable<AppointmentContext> = this.contextSubject.asObservable();
 
-  constructor() {
-    // Restaurer le contexte depuis sessionStorage si disponible
-    const savedContext = sessionStorage.getItem('appointmentContext');
-    if (savedContext) {
-      this.contextSubject.next(JSON.parse(savedContext));
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    // Initialiser seulement côté client
+    if (isPlatformBrowser(this.platformId)) {
+      // Code d'initialisation qui utilise sessionStorage
+      this.loadContext();
     }
   }
 
@@ -29,37 +32,57 @@ export class AppointmentContextService {
     const newContext = { ...currentContext, ...updates };
     this.contextSubject.next(newContext);
     
-    // Sauvegarder dans sessionStorage
-    sessionStorage.setItem('appointmentContext', JSON.stringify(newContext));
+    // Sauvegarder dans sessionStorage seulement côté client
+    if (isPlatformBrowser(this.platformId)) {
+      this.saveContext();
+    }
   }
 
   getContext(): AppointmentContext {
     return this.contextSubject.value;
   }
 
-  saveContext(): void {
-    const currentContext = this.contextSubject.value;
-    if (currentContext) {
-      sessionStorage.setItem('appointmentServiceContext', JSON.stringify(currentContext));
-      console.log('Context saved to sessionStorage:', currentContext);
+  private loadContext(): void {
+    // Cette méthode ne sera appelée que côté client
+    if (isPlatformBrowser(this.platformId) && typeof sessionStorage !== 'undefined') {
+      try {
+        const savedContext = sessionStorage.getItem('appointmentContext');
+        if (savedContext) {
+          const parsedContext = JSON.parse(savedContext);
+          this.contextSubject.next(parsedContext);
+          console.log('Context loaded from sessionStorage:', parsedContext);
+        }
+      } catch (error) {
+        console.error('Error loading context from sessionStorage:', error);
+        // Nettoyer en cas d'erreur
+        this.clearSavedContext();
+      }
     }
   }
 
-  loadContext(): void {
-    const savedContext = sessionStorage.getItem('appointmentServiceContext');
-    if (savedContext) {
+  saveContext(): void {
+    if (isPlatformBrowser(this.platformId) && typeof sessionStorage !== 'undefined') {
       try {
-        const context = JSON.parse(savedContext);
-        this.contextSubject.next(context);
-        console.log('Context loaded from sessionStorage:', context);
+        const currentContext = this.contextSubject.value;
+        if (currentContext && Object.keys(currentContext).length > 0) {
+          sessionStorage.setItem('appointmentContext', JSON.stringify(currentContext));
+          console.log('Context saved to sessionStorage:', currentContext);
+        }
       } catch (error) {
-        console.error('Error loading context from sessionStorage:', error);
+        console.error('Error saving context to sessionStorage:', error);
       }
     }
   }
 
   clearSavedContext(): void {
-    sessionStorage.removeItem('appointmentServiceContext');
+    if (isPlatformBrowser(this.platformId) && typeof sessionStorage !== 'undefined') {
+      try {
+        sessionStorage.removeItem('appointmentContext');
+        console.log('Context cleared from sessionStorage');
+      } catch (error) {
+        console.error('Error clearing context from sessionStorage:', error);
+      }
+    }
   }
 
   clearContext(): void {

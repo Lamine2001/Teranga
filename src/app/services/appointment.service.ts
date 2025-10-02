@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -92,8 +92,38 @@ export class AppointmentService {
     return this.http.post<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/search-public`, request);
   }
 
-  bookAppointment(request: BookAppointmentRequestDTO): Observable<BookingResponseDTO> {
-    return this.http.post<BookingResponseDTO>(`${this.apiUrl}/appointments/book`, request);
+  /**
+   * Réservation pour un patient existant connecté
+   */
+  bookAppointment(request: any): Observable<any> {
+    console.log('=== APPOINTMENT SERVICE - bookAppointment ===');
+    console.log('Request:', request);
+    
+    // Récupérer le token depuis le localStorage
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || sessionStorage.getItem('token');
+    console.log('Token found:', !!token);
+    
+    if (!token) {
+      console.error('No token found for authenticated request!');
+    }
+    
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    });
+    
+    console.log('Headers:', headers.keys());
+    console.log('Making POST request to:', `${this.apiUrl}/book`);
+    
+    return this.http.post<any>(`${this.apiUrl}/book`, request, { headers }).pipe(
+      tap(response => {
+        console.log('API Response received:', response);
+      }),
+      catchError(error => {
+        console.error('API Error:', error);
+        throw error;
+      })
+    );
   }
 
   getPatientAppointments(): Observable<AppointmentResponseDTO[]> {
@@ -161,5 +191,32 @@ export class AppointmentService {
         return throwError(() => error);
       })
     );
+  }
+
+  /**
+   * Inscription et réservation en une seule étape pour un nouveau patient
+   */
+  registerAndBook(request: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    console.log('Calling register-and-book API:', request);
+    
+    return this.http.post<any>(`${this.apiUrl}/appointments/register-and-book`, request, { headers });
+  }
+
+  /**
+   * Réservation pour un invité (sans création de compte)
+   */
+  bookAsGuest(request: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    console.log('Calling guest booking API:', request);
+    
+    // Utiliser l'URL correcte du backend
+    return this.http.post<any>(`${this.apiUrl}/appointments/book-as-guest`, request, { headers });
   }
 }

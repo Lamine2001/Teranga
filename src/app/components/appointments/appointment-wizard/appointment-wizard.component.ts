@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, ActivatedRoute, RouterLink, NavigationStart } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { DoctorsListComponent } from '../doctors-list/doctors-list.component';
@@ -53,7 +53,8 @@ export class AppointmentWizardComponent implements OnInit, OnDestroy {
     private appointmentService: AppointmentService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
@@ -67,32 +68,86 @@ export class AppointmentWizardComponent implements OnInit, OnDestroy {
     // Récupérer le contexte existant
     this.context = this.appointmentContextService.getContext();
     
-    // Vérifier d'abord si on a un contexte sauvegardé (retour de login)
-    const savedContext = sessionStorage.getItem('appointmentContext');
-    if (savedContext && this.authService.isAuthenticated()) {
-      console.log('Found saved context after login, restoring...');
-      const context = JSON.parse(savedContext);
+    // Vérifier les query params AVANT de vérifier le contexte sauvegardé
+    const queryParams = this.route.snapshot.queryParams;
+    console.log('Query params on init:', queryParams);
+    
+    // Si on revient avec appointmentMode=true, restaurer immédiatement le contexte
+    if (queryParams['appointmentMode'] === 'true' && isPlatformBrowser(this.platformId)) {
+      console.log('=== DETECTED RETURN FROM AUTH ===');
       
-      // Restaurer le contexte complet
-      this.context = {
-        consultationMode: context.consultationMode,
-        selectedDoctor: context.doctorDetails,
-        selectedSlot: context.slotDetails,
-        patientType: context.patientType
-      };
-      
-      // Appeler createAppointmentAfterLogin directement
-      if (context.doctorId && context.slotId) {
-        console.log('Calling createAppointmentAfterLogin from saved context');
-        // Petit délai pour s'assurer que le composant est bien initialisé
-        setTimeout(() => {
-          this.createAppointmentAfterLogin(context.doctorId, context.slotId);
-        }, 100);
+      const savedContext = sessionStorage.getItem('appointmentContext');
+      if (savedContext && this.authService.isAuthenticated()) {
+        console.log('Found saved context and user is authenticated');
+        
+        try {
+          const context = JSON.parse(savedContext);
+          console.log('Restoring context:', context);
+          console.log('Doctor details:', context.doctorDetails);
+          console.log('Slot details:', context.slotDetails);
+          
+          // CORRECTION: Utiliser les bonnes propriétés depuis le contexte sauvegardé
+          this.context = {
+            consultationMode: context.consultationMode,
+            selectedDoctor: context.doctorDetails, // Utiliser doctorDetails
+            selectedSlot: context.slotDetails,     // Utiliser slotDetails
+            patientType: context.patientType || 'existing'
+          };
+          
+          console.log('Context after restoration:', this.context);
+          
+          // Vérifier que nous avons bien les données nécessaires
+          if (!this.context.selectedDoctor || !this.context.selectedSlot) {
+            console.error('Context restoration failed - missing data:', {
+              doctor: !!this.context.selectedDoctor,
+              slot: !!this.context.selectedSlot
+            });
+            this.showError('Données de réservation perdues. Veuillez recommencer.');
+            sessionStorage.removeItem('appointmentContext');
+            this.router.navigate(['/appointments/wizard']);
+            return;
+          }
+          
+          // Mettre à jour le service SANS déclencher la sauvegarde qui écrase les données
+          this.appointmentContextService.updateContext(this.context);
+          
+          // Nettoyer le contexte sauvegardé immédiatement
+          sessionStorage.removeItem('appointmentContext');
+          
+          // Nettoyer l'URL
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true
+          });
+          
+          // Faire la réservation pour le patient connecté
+          this.createAppointmentAfterLogin();
+          
+          // IMPORTANT: Ne pas continuer avec les autres vérifications
+          return;
+        } catch (error) {
+          console.error('Error restoring context:', error);
+          sessionStorage.removeItem('appointmentContext');
+          this.router.navigate(['/appointments/wizard']);
+          return; // IMPORTANT: Ajouter return ici aussi
+        }
+      } else {
+        if (!savedContext) {
+          console.error('No saved context found in sessionStorage');
+        }
+        if (!this.authService.isAuthenticated()) {
+          console.error('User not authenticated');
+        }
       }
-    } else {
-      // Déterminer l'étape actuelle basée sur le contexte
-      this.determineCurrentStep();
     }
+    
+    // SUPPRIMER TOUTE LA SECTION DUPLIQUÉE CI-DESSOUS
+    // Si pas de retour depuis auth, déterminer l'étape normalement
+    this.determineCurrentStep();
+    
+    // Récupérer le contexte existant (déjà fait au début)
+    this.context = this.appointmentContextService.getContext();
     
     // S'abonner aux changements de contexte
     const contextSub = this.appointmentContextService.context$.subscribe(context => {
@@ -127,24 +182,6 @@ export class AppointmentWizardComponent implements OnInit, OnDestroy {
       }
     });
     this.subscriptions.add(routerSub);
-
-    // Vérifier si on revient de la page de connexion avec des paramètres
-    this.route.queryParams.subscribe(params => {
-      console.log('Query params received:', params);
-      
-      if (params['step'] === 'confirmation' && params['doctorId'] && params['slotId']) {
-        console.log('Returning from login with appointment params:', params);
-        
-        // Vérifier si l'utilisateur est connecté
-        if (this.authService.isAuthenticated()) {
-          console.log('User is authenticated, creating appointment...');
-          // Petit délai pour s'assurer que tout est initialisé
-          setTimeout(() => {
-            this.createAppointmentAfterLogin(params['doctorId'], params['slotId']);
-          }, 500);
-        }
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -248,50 +285,395 @@ export class AppointmentWizardComponent implements OnInit, OnDestroy {
   }
 
   onSubmitRegistration(): void {
-    if (this.registrationForm.valid) {
-      this.isLoading = true;
+    // Valider le formulaire
+    if (!this.registrationForm.valid) {
+      this.markFormGroupTouched(this.registrationForm);
+      return;
+    }
+
+    // Pour les nouveaux patients, vérifier que les mots de passe correspondent
+    if (this.context.patientType === 'new') {
+      const password = this.registrationForm.get('password')?.value;
+      const confirmPassword = this.registrationForm.get('confirmPassword')?.value;
       
-      const formData = this.registrationForm.value;
+      if (password !== confirmPassword) {
+        this.showError('Les mots de passe ne correspondent pas');
+        return;
+      }
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const formData = this.registrationForm.value;
+
+    if (this.context.patientType === 'new') {
+      // SCÉNARIO 1: Nouveau patient - Inscription + Réservation
+      const request = {
+        patientData: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
+          gender: formData.gender,
+          address: formData.address || '',
+          city: formData.city || '',
+          postalCode: formData.postalCode || ''
+        },
+        availabilityId: this.context.selectedSlot?.id || '',
+        appointmentType: this.context.consultationMode === 'video' ? 'virtual' : 'onsite',
+        notes: ''
+      };
+
+      console.log('Sending registration and booking request:', request);
+
+      // Appel API pour inscription + réservation
+      this.appointmentService.registerAndBook(request).subscribe({
+        next: (response) => {
+          console.log('Registration and booking successful:', response);
+          
+          // Stocker le token si présent
+          if (response.token) {
+            if (isPlatformBrowser(this.platformId)) {
+              localStorage.setItem('token', response.token);
+              localStorage.setItem('authToken', response.token);
+              sessionStorage.setItem('token', response.token);
+            }
+          }
+          
+          // Stocker les infos patient
+          if (response.patient && isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('patientInfo', JSON.stringify(response.patient));
+            localStorage.setItem('currentUser', JSON.stringify(response.patient));
+          }
+          
+          // Mettre à jour le contexte avec les données du rendez-vous confirmé
+          this.context = {
+            ...this.context,
+            confirmedAppointment: response.appointment,
+            patientData: response.patient
+          };
+          
+          this.isLoading = false;
+          this.currentStep = 'confirmation';
+          this.showSuccess('Compte créé et rendez-vous confirmé !');
+          
+          // Redirection après 3 secondes
+          setTimeout(() => {
+            this.appointmentContextService.clearContext();
+            if (isPlatformBrowser(this.platformId)) {
+              sessionStorage.removeItem('appointmentContext');
+            }
+            this.router.navigate(['/appointments']);
+          }, 3000);
+        },
+        error: (error) => {
+          console.error('Registration/Booking error:', error);
+          this.isLoading = false;
+          
+          if (error?.status === 409) {
+            this.showError('Cet email est déjà utilisé ou le créneau n\'est plus disponible');
+          } else if (error?.status === 400) {
+            this.showError(error?.error?.message || 'Données invalides. Veuillez vérifier le formulaire.');
+          } else if (error?.status === 500) {
+            this.showError('Erreur serveur. Veuillez réessayer plus tard.');
+          } else {
+            this.showError('Une erreur est survenue. Veuillez réessayer.');
+          }
+        }
+      });
       
-      // Simuler l'enregistrement (remplacer par un appel API réel)
-      setTimeout(() => {
-        this.isLoading = false;
-        
-        // TODO: Stocker les données du patient dans le contexte
-        // Pour l'instant, nous passons directement à la confirmation
-        // Une fois que la propriété 'patient' ou 'patientInfo' sera ajoutée à AppointmentContext,
-        // décommenter la ligne suivante:
-        // this.appointmentContextService.updateContext({ patient: formData });
-        
-        // Pour l'instant, stocker les données localement
-        this.context = {
-          ...this.context,
-          patientData: formData  // Stocker localement pour l'affichage dans la confirmation
-        };
-        
-        this.currentStep = 'confirmation';
-        
-        // Redirection après confirmation
-        setTimeout(() => {
-          this.appointmentContextService.clearContext();
-          this.router.navigate(['/appointments']);
-        }, 3000);
-      }, 1500);
-    } else {
-      // Marquer tous les champs comme touchés pour afficher les erreurs
-      Object.keys(this.registrationForm.controls).forEach(key => {
-        this.registrationForm.get(key)?.markAsTouched();
+    } else if (this.context.patientType === 'guest') {
+      // SCÉNARIO 2: Guest - Réservation sans compte
+      const request = {
+        guestInfo: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone
+        },
+        availabilityId: this.context.selectedSlot?.id || '',
+        appointmentType: this.context.consultationMode === 'video' ? 'virtual' : 'onsite',
+        notes: ''
+      };
+
+      console.log('Sending guest booking request:', request);
+
+      this.appointmentService.bookAsGuest(request).subscribe({
+        next: (response) => {
+          console.log('Guest booking successful:', response);
+          
+          this.context = {
+            ...this.context,
+            confirmedAppointment: response.appointment,
+            confirmationCode: response.confirmationCode
+          };
+          
+          // Pour les invités, stocker le code de confirmation
+          if (response.confirmationCode && isPlatformBrowser(this.platformId)) {
+            sessionStorage.setItem('guestConfirmationCode', response.confirmationCode);
+          }
+          
+          this.isLoading = false;
+          this.currentStep = 'confirmation';
+          this.showSuccess('Rendez-vous confirmé !');
+          
+          setTimeout(() => {
+            this.appointmentContextService.clearContext();
+            this.router.navigate(['/']);
+          }, 5000);
+        },
+        error: (error) => {
+          console.error('Guest booking error:', error);
+          this.isLoading = false;
+          this.showError(error?.error?.message || 'Erreur lors de la réservation');
+        }
       });
     }
+  }
+
+  // Ajouter ces méthodes utilitaires
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+      
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  private showError(message: string): void {
+    this.errorMessage = message;
+    console.error('Error:', message);
+    // Peut ajouter une notification toast ici
+  }
+
+  private showSuccess(message: string): void {
+    console.log('Success:', message);
+    // Peut ajouter une notification toast ici
+  }
+
+  errorMessage = ''; // Ajouter cette propriété
+
+  private bookAppointment(): void {
+    // Logique pour réserver le rendez-vous pour un patient existant
+    this.currentStep = 'confirmation';
+  }
+
+  private createAppointmentAfterLogin(): void {
+    console.log('=== CREATING APPOINTMENT AFTER LOGIN ===');
+    console.log('Current context:', this.context);
+    console.log('Selected doctor:', this.context.selectedDoctor);
+    console.log('Selected slot:', this.context.selectedSlot);
+    
+    if (!this.context.selectedSlot || !this.context.selectedDoctor) {
+      console.error('Missing required context data after login');
+      this.showError('Contexte de réservation perdu. Veuillez recommencer.');
+      this.router.navigate(['/appointments/wizard']);
+      return;
+    }
+
+    // IMPORTANT: Définir currentStep AVANT de lancer l'appel API
+    this.currentStep = 'confirmation';
+    
+    // Afficher un état de chargement
+    this.isLoading = true;
+    this.errorMessage = '';
+    
+    // Forcer la mise à jour de la vue immédiatement pour afficher le loader
+    this.cdr.detectChanges();
+    
+    // Préparer la requête avec les bonnes données
+    const request = {
+      availabilityId: this.context.selectedSlot.id || this.context.selectedSlot.availabilityId || '',
+      appointmentType: this.context.consultationMode === 'video' ? 'virtual' : 'onsite',
+      notes: ''
+    };
+
+    console.log('=== BOOKING REQUEST ===');
+    console.log('Request object:', request);
+    console.log('API URL will be:', 'http://localhost:8080/api/appointments/book');
+    
+    // Vérifier le token
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+    console.log('Auth token available:', !!token);
+    if (token) {
+      console.log('Token preview:', token.substring(0, 20) + '...');
+    }
+
+    // Appel API pour réservation
+    console.log('Making API call to book appointment...');
+    this.appointmentService.bookAppointment(request).subscribe({
+      next: (response) => {
+        console.log('=== BOOKING SUCCESS ===');
+        console.log('Appointment created successfully:', response);
+        
+        // Mettre à jour le contexte avec le rendez-vous confirmé
+        this.context = {
+          ...this.context,
+          confirmedAppointment: response
+        };
+        
+        this.isLoading = false;
+        this.errorMessage = ''; // S'assurer que l'erreur est vide
+        this.showSuccess('Rendez-vous confirmé !');
+        
+        // Forcer la mise à jour de la vue
+        this.cdr.detectChanges();
+        
+        // Redirection après 5 secondes
+        setTimeout(() => {
+          console.log('Redirecting to appointments list...');
+          this.appointmentContextService.clearContext();
+          this.router.navigate(['/appointments']);
+        }, 5000);
+      },
+      error: (error) => {
+        console.error('=== BOOKING ERROR ===');
+        console.error('Error creating appointment:', error);
+        console.error('Error status:', error?.status);
+        console.error('Error response:', error?.error);
+        
+        this.isLoading = false;
+        
+        if (error?.status === 401) {
+          this.showError('Session expirée. Veuillez vous reconnecter.');
+          // Ne pas naviguer automatiquement, laisser l'utilisateur voir le message
+          setTimeout(() => {
+            this.navigateToLogin();
+          }, 2000);
+        } else if (error?.status === 409) {
+          this.showError('Ce créneau n\'est plus disponible.');
+          // Retourner à la sélection du créneau après 2 secondes
+          setTimeout(() => {
+            this.currentStep = 'slot-selection';
+            this.cdr.detectChanges();
+          }, 2000);
+        } else if (error?.status === 400) {
+          this.showError(error?.error?.message || 'Données invalides');
+        } else if (error?.status === 0) {
+          this.showError('Impossible de contacter le serveur. Vérifiez votre connexion.');
+        } else {
+          this.showError('Erreur lors de la création du rendez-vous. Veuillez réessayer.');
+        }
+        
+        // Forcer la mise à jour après erreur
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Supprimer ou déprécier l'ancienne méthode
+  private bookAppointmentForExistingPatient(): void {
+    // Rediriger vers la nouvelle méthode
+    this.createAppointmentAfterLogin();
   }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
-  private bookAppointment(): void {
-    // Logique pour réserver le rendez-vous pour un patient existant
-    this.currentStep = 'confirmation';
+  navigateToLogin(): void {
+    console.log('=== NAVIGATION TO AUTH DEBUG ===');
+    console.log('Current route:', this.router.url);
+    console.log('Current context:', this.context);
+    console.log('Selected doctor:', this.context.selectedDoctor);
+    console.log('Selected slot:', this.context.selectedSlot);
+    
+    // Vérifier que nous avons les données nécessaires
+    if (!this.context.selectedDoctor || !this.context.selectedSlot) {
+      console.error('Missing required context data:', {
+        doctor: !!this.context.selectedDoctor,
+        slot: !!this.context.selectedSlot
+      });
+      this.showError('Veuillez sélectionner un médecin et un créneau avant de continuer');
+      return;
+    }
+    
+    // Sauvegarder seulement côté client
+    if (isPlatformBrowser(this.platformId)) {
+      // IMPORTANT: Sauvegarder avec une structure cohérente
+      const appointmentContext = {
+        consultationMode: this.context.consultationMode,
+        patientType: 'existing',
+        // Sauvegarder l'ID pour référence
+        doctorId: this.context.selectedDoctor.id || this.context.selectedDoctor.userId,
+        slotId: this.context.selectedSlot.id || this.context.selectedSlot.availabilityId,
+        // Sauvegarder les objets complets avec les bons noms de propriété
+        doctorDetails: this.context.selectedDoctor,
+        slotDetails: this.context.selectedSlot,
+        // Métadonnées
+        step: 'confirmation',
+        returnUrl: '/appointments/wizard',
+        timestamp: Date.now()
+      };
+      
+      console.log('Saving appointment context with structure:', appointmentContext);
+      console.log('Doctor details being saved:', appointmentContext.doctorDetails);
+      console.log('Slot details being saved:', appointmentContext.slotDetails);
+      
+      try {
+        // Sauvegarder dans sessionStorage
+        const contextString = JSON.stringify(appointmentContext);
+        sessionStorage.setItem('appointmentContext', contextString);
+        
+        // Vérifier immédiatement que la sauvegarde a fonctionné
+        const saved = sessionStorage.getItem('appointmentContext');
+        if (saved) {
+          const parsedSaved = JSON.parse(saved);
+          console.log('✓ Context saved successfully');
+          console.log('✓ Saved doctor:', parsedSaved.doctorDetails);
+          console.log('✓ Saved slot:', parsedSaved.slotDetails);
+        } else {
+          console.error('✗ Failed to save context to sessionStorage');
+        }
+      } catch (error) {
+        console.error('Error saving context:', error);
+        this.showError('Erreur lors de la sauvegarde. Veuillez réessayer.');
+        return;
+      }
+    }
+    
+    // Navigation avec les paramètres nécessaires
+    const sessionId = Date.now().toString();
+    const queryParams = {
+      returnTo: '/appointments/wizard',
+      appointmentMode: 'true',
+      sessionId: sessionId
+    };
+    
+    console.log('Navigating to auth with params:', queryParams);
+    
+    // Utiliser navigate avec queryParams
+    this.router.navigate(['/auth'], { 
+      queryParams: queryParams,
+      queryParamsHandling: 'merge'
+    }).then(
+      (success) => {
+        if (success) {
+          console.log('✓ Navigation to auth successful');
+        } else {
+          console.error('✗ Navigation to auth returned false');
+        }
+      },
+      (error) => {
+        console.error('✗ Navigation to auth failed:', error);
+        // Fallback avec navigateByUrl
+        const url = `/auth?returnTo=${encodeURIComponent('/appointments/wizard')}&appointmentMode=true&sessionId=${sessionId}`;
+        console.log('Trying fallback navigation to:', url);
+        
+        this.router.navigateByUrl(url).catch(() => {
+          if (isPlatformBrowser(this.platformId)) {
+            console.log('Using window.location as last resort');
+            window.location.href = url;
+          }
+        });
+      }
+    );
   }
 
   onGoBack(): void {
@@ -316,13 +698,17 @@ export class AppointmentWizardComponent implements OnInit, OnDestroy {
   }
 
   getVisibleSteps(): WizardStep[] {
-    // Filtrer les étapes en fonction du contexte
+    // Filtrer et adapter les étapes en fonction du contexte
     let visibleSteps = [...this.steps];
     
-    // Masquer l'étape registration uniquement si on n'est pas encore arrivé à cette étape
-    // et que le patient est existant
-    if (this.context.patientType === 'existing' && this.currentStep !== 'registration') {
-      visibleSteps = visibleSteps.filter(s => s.id !== 'registration');
+    // Pour les patients existants, changer le label de l'étape registration
+    if (this.context.patientType === 'existing') {
+      visibleSteps = visibleSteps.map(step => {
+        if (step.id === 'registration') {
+          return { ...step, label: 'Connexion', icon: 'fas fa-sign-in-alt' };
+        }
+        return step;
+      });
     }
     
     return visibleSteps;
@@ -332,110 +718,5 @@ export class AppointmentWizardComponent implements OnInit, OnDestroy {
     // Utiliser getVisibleSteps() pour obtenir le bon numéro d'étape
     const visibleSteps = this.getVisibleSteps();
     return visibleSteps.findIndex(s => s.id === stepId) + 1;
-  }
-
-  navigateToLogin(): void {
-    console.log('=== NAVIGATION TO AUTH DEBUG ===');
-    console.log('Current route:', this.router.url);
-    console.log('Navigating to auth with context:', this.context);
-    
-    // Sauvegarder le contexte complet dans sessionStorage
-    if (this.context.selectedDoctor && this.context.selectedSlot) {
-      const appointmentContext = {
-        consultationMode: this.context.consultationMode,
-        patientType: 'existing',
-        doctorId: this.context.selectedDoctor.id,
-        slotId: this.context.selectedSlot.id,
-        doctorDetails: this.context.selectedDoctor,
-        slotDetails: this.context.selectedSlot,
-        step: 'confirmation',
-        returnUrl: '/appointments/wizard'
-      };
-      
-      console.log('Saving appointment context:', appointmentContext);
-      sessionStorage.setItem('appointmentContext', JSON.stringify(appointmentContext));
-      
-      // Sauvegarder aussi dans le service de contexte
-      this.appointmentContextService.saveContext();
-    }
-    
-    // Navigation vers /auth avec les paramètres de requête
-    try {
-      console.log('Attempting navigation to /auth');
-      this.router.navigate(['/auth'], {
-        queryParams: {
-          redirect: '/appointments/wizard',
-          doctorId: this.context.selectedDoctor?.id,
-          slotId: this.context.selectedSlot?.id,
-          patientType: 'existing',
-          step: 'confirmation'
-        }
-      }).then(
-        (success) => {
-          console.log('Navigation success:', success);
-        },
-        (error) => {
-          console.error('Navigation error:', error);
-          this.router.navigateByUrl('/auth');
-        }
-      );
-    } catch (error) {
-      console.error('Navigation exception:', error);
-      window.location.href = '/auth';
-    }
-  }
-
-  private createAppointmentAfterLogin(doctorId: string, slotId: string): void {
-    console.log('=== CREATE APPOINTMENT AFTER LOGIN ===');
-    console.log('Doctor ID:', doctorId);
-    console.log('Slot ID:', slotId);
-    console.log('Current step before:', this.currentStep);
-    
-    // Récupérer les détails depuis le contexte sauvegardé
-    const savedContext = sessionStorage.getItem('appointmentContext');
-    
-    if (savedContext) {
-      const context = JSON.parse(savedContext);
-      console.log('Restored context:', context);
-      
-      // Restaurer le contexte complet IMMÉDIATEMENT
-      this.context = {
-        consultationMode: context.consultationMode,
-        selectedDoctor: context.doctorDetails,
-        selectedSlot: context.slotDetails,
-        patientType: context.patientType
-      };
-      
-      // Restaurer dans le service aussi
-      if (context.doctorDetails) {
-        this.appointmentContextService.setSelectedDoctor(context.doctorDetails);
-      }
-      if (context.slotDetails) {
-        this.appointmentContextService.setSelectedSlot(context.slotDetails);
-      }
-    }
-    
-    // Passer directement à la confirmation sans délai
-    console.log('Setting current step to confirmation');
-    this.currentStep = 'confirmation';
-    
-    // Forcer la mise à jour de la vue
-    this.cdr.detectChanges();
-    
-    // Nettoyer le sessionStorage
-    sessionStorage.removeItem('appointmentContext');
-    
-    console.log('Current step after:', this.currentStep);
-    console.log('Context for confirmation:', this.context);
-    
-    // Simuler que le rendez-vous a été créé avec succès
-    this.isLoading = false;
-    
-    // Redirection après 5 secondes
-    setTimeout(() => {
-      console.log('Redirecting to appointments list...');
-      this.appointmentContextService.clearContext();
-      this.router.navigate(['/appointments']);
-    }, 5000);
   }
 }

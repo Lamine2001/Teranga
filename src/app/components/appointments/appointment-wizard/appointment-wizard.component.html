@@ -161,6 +161,12 @@
           <p>Veuillez remplir vos informations pour finaliser la réservation</p>
         </div>
 
+        <!-- Affichage du message d'erreur -->
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-triangle"></i>
+          {{ errorMessage }}
+        </div>
+
         <form [formGroup]="registrationForm" (ngSubmit)="onSubmitRegistration()">
           <!-- Informations personnelles -->
           <div class="form-section">
@@ -369,7 +375,29 @@
 
     <!-- Étape 6: Confirmation -->
     <div *ngIf="currentStep === 'confirmation'" class="step-content">
-      <div class="confirmation-container">
+      <!-- Afficher le loader pendant la création du rendez-vous -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin fa-3x"></i>
+        </div>
+        <h3>Création de votre rendez-vous en cours...</h3>
+        <p>Veuillez patienter quelques instants</p>
+      </div>
+
+      <!-- Afficher le message d'erreur si présent -->
+      <div *ngIf="errorMessage && !isLoading" class="error-container">
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Erreur</h3>
+          <p>{{ errorMessage }}</p>
+          <button class="btn-secondary" (click)="onGoBack()">
+            <i class="fas fa-arrow-left"></i> Retour
+          </button>
+        </div>
+      </div>
+
+      <!-- Afficher la confirmation seulement si pas de loading et pas d'erreur -->
+      <div *ngIf="!isLoading && !errorMessage" class="confirmation-container">
         <div class="confirmation-icon">
           <i class="fas fa-check-circle"></i>
         </div>
@@ -388,6 +416,12 @@
           <div class="summary-item" *ngIf="context.selectedSlot">
             <i class="fas fa-clock"></i>
             <span>{{ context.selectedSlot.startTime | date:'HH:mm' }}</span>
+          </div>
+          
+          <!-- Afficher les détails du rendez-vous confirmé si disponible -->
+          <div class="summary-item" *ngIf="context.confirmedAppointment?.appointmentId">
+            <i class="fas fa-hashtag"></i>
+            <span>Référence: {{ context.confirmedAppointment.appointmentId }}</span>
           </div>
         </div>
         
