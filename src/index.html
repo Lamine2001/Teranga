@@ -11,10 +11,180 @@
   
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Styles pour le loader global -->
+  <style>
+    /* Loader global pour le site */
+    #global-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+
+    #global-loader.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-logo {
+      font-size: 3rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 2rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .loader-logo .highlight {
+      color: #4CAF50;
+    }
+
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    .loader-text {
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 400;
+      opacity: 0.9;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .loader-subtext {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Animation de pulsation pour le logo */
+    .loader-logo {
+      animation: pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+
+    /* Masquer le contenu principal pendant le chargement */
+    app-root {
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
+
+    app-root.loaded {
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .loader-logo {
+        font-size: 2.5rem;
+      }
+      
+      .loader-spinner {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <!-- Loader global -->
+  <div id="global-loader">
+    <div class="loader-logo">
+      <span class="highlight">M</span>-Santé
+    </div>
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Chargement de votre plateforme de santé</div>
+    <div class="loader-subtext">Veuillez patienter...</div>
+  </div>
+
   <app-root></app-root>
-</body>
-</html>
+
+  <script>
+    // Script pour gérer le loader global
+    document.addEventListener('DOMContentLoaded', function() {
+      const loader = document.getElementById('global-loader');
+      const appRoot = document.querySelector('app-root');
+      
+      // Fonction pour cacher le loader
+      function hideLoader() {
+        if (loader) {
+          loader.classList.add('fade-out');
+          setTimeout(() => {
+            loader.style.display = 'none';
+          }, 500);
+        }
+        
+        if (appRoot) {
+          appRoot.classList.add('loaded');
+        }
+      }
+
+      // Cacher le loader quand Angular est prêt
+      function checkAngularReady() {
+        // Vérifier si Angular est chargé et l'app est initialisée
+        if (window.ng && appRoot && appRoot.children.length > 0) {
+          // Attendre un peu plus pour s'assurer que tout est rendu
+          setTimeout(hideLoader, 800);
+        } else {
+          // Réessayer après 100ms
+          setTimeout(checkAngularReady, 100);
+        }
+      }
+
+      // Commencer la vérification
+      checkAngularReady();
+
+      // Fallback: cacher le loader après 5 secondes maximum
+      setTimeout(hideLoader, 5000);
+
+      // Écouter l'événement de chargement complet de la fenêtre
+      window.addEventListener('load', function() {
+        setTimeout(hideLoader, 500);
+      });
+    });
+
+    // Alternative: écouter les événements Angular si disponibles
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'angular-ready') {
+        const loader = document.getElementById('global-loader');
+        const appRoot = document.querySelector('app-root');
+        
+        if (loader) {
+          loader.classList.add('fade-out');
+          setTimeout(() => {
+            loader.style.display = 'none';
+          }, 500);
+        }
+        
+        if (appRoot) {
+          appRoot.classList.add('loaded');
+        }
+      }
+    });
+  </script>
 </body>
 </html>

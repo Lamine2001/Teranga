@@ -1,23 +1,30 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [],
+  imports: [CommonModule], // Ajouter CommonModule pour *ngIf
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })
 export class HeroComponent implements OnInit {
   imageLoaded = false;
-  // Optional: Set to empty string if you don't have a placeholder image yet
-  placeholderImage = ''; // You can add base64 image later if needed
+  imageError = false;
+  loadingImage: SafeUrl; // Utiliser SafeUrl pour la sécurité
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private sanitizer: DomSanitizer
+  ) {
+    // Sécuriser l'URL de l'image de chargement
+    this.loadingImage = this.sanitizer.bypassSecurityTrustUrl('/loadingA.png');
+  }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Préchargement anticipé de l'image seulement côté client
+      // Précharger l'image de manière optimisée
       this.preloadImage();
     } else {
       // Côté serveur, on considère l'image comme chargée
@@ -27,21 +34,15 @@ export class HeroComponent implements OnInit {
 
   private preloadImage(): void {
     const img = new Image();
-    img.src = '/pic_12.jpg';
-    // Add minimum loading time for smoother UX (optional)
-    const minLoadTime = 300;
-    const startTime = Date.now();
-
     img.onload = () => {
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, minLoadTime - elapsedTime);
-
-      setTimeout(() => {
-        this.onImageLoad();
-      }, remainingTime);
+      this.imageLoaded = true;
     };
-
-    img.onerror = () => this.onImageError();
+    img.onerror = () => {
+      this.imageError = true;
+      console.warn('Erreur de chargement de l\'image hero');
+    };
+    // Commencer le chargement immédiatement
+    img.src = '/pic_12.jpg';
   }
 
   onImageLoad(): void {
@@ -49,8 +50,7 @@ export class HeroComponent implements OnInit {
   }
 
   onImageError(): void {
-    console.error('Failed to load hero background image');
-    // Keep the gradient background if image fails
-    this.imageLoaded = false;
+    this.imageError = true;
+    console.warn('Erreur de chargement de l\'image hero');
   }
 }
