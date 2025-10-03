@@ -48,12 +48,34 @@
 
   <!-- Upcoming Appointments -->
   <div class="appointments-section">
-    <h2><i class="fas fa-clock"></i> Prochains Rendez-vous</h2>
+    <div class="section-header">
+      <h2><i class="fas fa-clock"></i> Prochains Rendez-vous</h2>
+      <button class="btn-link" (click)="onViewAppointmentsClick()">
+        Voir tous <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
     
-    <div class="appointments-list" *ngIf="!isLoading && upcomingAppointments.length > 0">
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="error && !isLoading">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ error }}
+      <button class="btn-retry" (click)="loadUpcomingAppointments()">
+        <i class="fas fa-sync-alt"></i> Réessayer
+      </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement des rendez-vous...</p>
+    </div>
+
+    <!-- Appointments List -->
+    <div class="appointments-list" *ngIf="!isLoading && !error && upcomingAppointments.length > 0">
       <div 
-        *ngFor="let appointment of upcomingAppointments" 
+        *ngFor="let appointment of upcomingAppointments.slice(0, 3)" 
         class="appointment-card"
+        [class.virtual]="appointment.appointmentType === 'virtual'"
       >
         <div class="appointment-header">
           <div class="doctor-info">
@@ -62,36 +84,65 @@
             </div>
             <div class="doctor-details">
               <h4>Dr. {{ appointment.doctorFirstName }} {{ appointment.doctorLastName }}</h4>
-              <p class="specialty">{{ appointment.doctorSpecialty }}</p>
+              <p class="specialty">{{ appointment.doctorSpecialty || 'Médecine Générale' }}</p>
+              <p class="department" *ngIf="appointment.doctorDepartment">{{ appointment.doctorDepartment }}</p>
             </div>
           </div>
           <div class="appointment-status" [class]="'status-' + appointment.status.toLowerCase()">
-            {{ appointment.status }}
+            {{ getStatusLabel(appointment.status) }}
           </div>
         </div>
         
         <div class="appointment-details">
-          <div class="time-info">
-            <i class="fas fa-calendar"></i>
-            <span>{{ getDateDisplay(appointment.appointmentTime) }}</span>
+          <div class="detail-row">
+            <div class="time-info">
+              <i class="fas fa-calendar"></i>
+              <span>{{ getDateDisplay(appointment.appointmentTime) }}</span>
+            </div>
+            <div class="time-info">
+              <i class="fas fa-clock"></i>
+              <span>{{ getTimeDisplay(appointment.appointmentTime) }} - {{ getTimeDisplay(appointment.endTime) }}</span>
+            </div>
           </div>
-          <div class="time-info">
-            <i class="fas fa-clock"></i>
-            <span>{{ getTimeDisplay(appointment.appointmentTime) }}</span>
+          
+          <div class="detail-row">
+            <div class="appointment-type">
+              <i [class]="appointment.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
+              <span>{{ appointment.appointmentType === 'virtual' ? 'Téléconsultation' : 'En cabinet' }}</span>
+            </div>
+            <div class="consultation-fee" *ngIf="appointment.consultationFee">
+              <i class="fas fa-money-bill-wave"></i>
+              <span>{{ appointment.consultationFee }} FCFA</span>
+            </div>
           </div>
+
+          <div class="appointment-notes" *ngIf="appointment.notes">
+            <i class="fas fa-sticky-note"></i>
+            <p>{{ appointment.notes }}</p>
+          </div>
+        </div>
+
+        <div class="appointment-actions">
+          <button class="btn-action btn-primary" *ngIf="appointment.appointmentType === 'virtual' && isAppointmentToday(appointment.appointmentTime)">
+            <i class="fas fa-video"></i> Rejoindre
+          </button>
+          <button class="btn-action btn-secondary" (click)="viewAppointmentDetails(appointment)">
+            <i class="fas fa-eye"></i> Détails
+          </button>
+          <button class="btn-action btn-outline" *ngIf="canCancelAppointment(appointment)" (click)="cancelAppointment(appointment)">
+            <i class="fas fa-times"></i> Annuler
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="no-appointments" *ngIf="!isLoading && upcomingAppointments.length === 0">
+    <div class="no-appointments" *ngIf="!isLoading && !error && upcomingAppointments.length === 0">
       <i class="fas fa-calendar-times"></i>
       <h3>Aucun rendez-vous à venir</h3>
       <p>Prenez votre premier rendez-vous en cliquant sur le bouton ci-dessus</p>
-    </div>
-
-    <div class="loading-spinner" *ngIf="isLoading">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>Chargement des rendez-vous...</p>
+      <button class="btn-primary" (click)="onRendezVousClick()">
+        <i class="fas fa-calendar-plus"></i> Prendre un rendez-vous
+      </button>
     </div>
   </div>
 
@@ -104,8 +155,18 @@
           <i class="fas fa-calendar-check"></i>
         </div>
         <div class="summary-content">
-          <h3>Rendez-vous Total</h3>
+          <h3>Rendez-vous à Venir</h3>
           <p class="summary-number">{{ upcomingAppointments.length }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-history"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Historique</h3>
+          <p class="summary-number">{{ appointmentHistory.length }}</p>
         </div>
       </div>
       

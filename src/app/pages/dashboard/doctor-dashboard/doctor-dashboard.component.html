@@ -205,30 +205,35 @@
         </div>
 
         <!-- Appointments Section -->
-        <div *ngIf="activeSection === 'appointments'" class="section-content">
-          <div class="feature-placeholder" [ngSwitch]="activeSubSection">
-            <div *ngSwitchCase="'today-appointments'">
-              <i class="fas fa-calendar-day feature-icon"></i>
-              <h3>Rendez-vous du Jour</h3>
-              <p>{{ stats.todayAppointments }} rendez-vous prévus aujourd'hui</p>
-              <button class="btn btn-primary" (click)="handleGetDoctorAppointments()">
-                Voir les Rendez-vous
-              </button>
-            </div>
+        <div *ngIf="activeSection === 'appointments'">
+          <!-- Today's Appointments -->
+          <div *ngIf="activeSubSection === 'today-appointments'">
+            <app-doctor-appointments type="today"></app-doctor-appointments>
+          </div>
 
-            <div *ngSwitchCase="'cancel-appointment'">
-              <i class="fas fa-times-circle feature-icon"></i>
+          <!-- Upcoming Appointments -->
+          <div *ngIf="activeSubSection === 'upcoming-appointments'">
+            <app-doctor-appointments type="upcoming"></app-doctor-appointments>
+          </div>
+
+          <!-- Appointment History -->
+          <div *ngIf="activeSubSection === 'appointment-history'">
+            <app-doctor-appointments type="history"></app-doctor-appointments>
+          </div>
+
+          <!-- Cancel Appointment -->
+          <div *ngIf="activeSubSection === 'cancel-appointment'">
+            <div class="cancel-appointment-section">
               <h3>Annuler un Rendez-vous</h3>
-              <p>Annulez ou reportez un rendez-vous</p>
-              <button class="btn btn-danger" (click)="handleCancelAppointment()">
-                Gérer les Annulations
-              </button>
-            </div>
-
-            <div *ngSwitchDefault>
-              <i class="fas fa-calendar-alt feature-icon"></i>
-              <h3>Gestion des Rendez-vous</h3>
-              <p>Sélectionnez une option pour gérer vos rendez-vous</p>
+              <p>Pour annuler un rendez-vous, veuillez consulter vos rendez-vous du jour ou à venir et cliquer sur le bouton "Annuler" du rendez-vous concerné.</p>
+              <div class="action-buttons">
+                <button class="btn-primary" (click)="selectMenuItem('appointments', 'today-appointments')">
+                  <i class="fas fa-calendar-day"></i> Voir les rendez-vous du jour
+                </button>
+                <button class="btn-secondary" (click)="selectMenuItem('appointments', 'upcoming-appointments')">
+                  <i class="fas fa-calendar-week"></i> Voir les rendez-vous à venir
+                </button>
+              </div>
             </div>
           </div>
         </div>
