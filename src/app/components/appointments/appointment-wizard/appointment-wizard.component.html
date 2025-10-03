@@ -81,13 +81,13 @@
     </div>
 
     <!-- Étape 3: Sélection du médecin (utilise le composant doctors-list existant) -->
-    <div *ngIf="currentStep === 'doctor-selection'" class="step-content">
-      <div class="step-header">
+     <div *ngIf="currentStep === 'doctor-selection'" class="step-content">
+      <!-- <div class="step-header">
         <h2><i class="fas fa-user-md"></i> Choisissez votre médecin</h2>
         <p>Sélectionnez le praticien avec qui vous souhaitez prendre rendez-vous</p>
-      </div>
+      </div> -->
       <app-doctors-list></app-doctors-list>
-    </div>
+    </div> 
 
     <!-- Étape 4: Sélection du créneau -->
     <div *ngIf="currentStep === 'slot-selection'" class="step-content">
