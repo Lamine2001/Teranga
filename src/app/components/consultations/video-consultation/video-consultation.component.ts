@@ -40,7 +40,7 @@ export class VideoConsultationComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
+    public router: Router,
     private consultationService: ConsultationService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}

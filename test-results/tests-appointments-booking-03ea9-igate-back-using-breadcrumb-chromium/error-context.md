@@ -1,0 +1,228 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "📞 514 852-1234" [ref=e8] [cursor=pointer]:
+          - /url: tel:+15148521234
+          - generic [ref=e9]: 📞
+          - generic [ref=e10]: 514 852-1234
+        - generic [ref=e11]: "|"
+        - generic [ref=e12]: Clinique de Santé Mentale
+      - link "👤 Connexion" [ref=e15] [cursor=pointer]:
+        - /url: /auth
+        - generic [ref=e16]: 👤
+        - generic [ref=e17]: Connexion
+    - banner [ref=e18]:
+      - navigation [ref=e19]:
+        - generic [ref=e21]:
+          - link "M-Santé Bien-être psychologique" [ref=e23] [cursor=pointer]:
+            - /url: /home
+            - img [ref=e25]
+            - generic [ref=e28]: M-Santé
+            - generic [ref=e29]: Bien-être psychologique
+          - generic [ref=e30]:
+            - link "Accueil" [ref=e31] [cursor=pointer]:
+              - /url: /home
+            - link "À propos" [ref=e32] [cursor=pointer]:
+              - /url: "#about"
+            - link "Services" [ref=e33] [cursor=pointer]:
+              - /url: "#services"
+            - link "Contact" [ref=e34] [cursor=pointer]:
+              - /url: "#contact"
+            - link "Tarifs" [ref=e35] [cursor=pointer]:
+              - /url: "#rates"
+          - link "📅 Prendre rendez-vous" [ref=e37] [cursor=pointer]:
+            - /url: /appointments/wizard
+            - generic [ref=e38]: 📅
+            - generic [ref=e39]: Prendre rendez-vous
+  - main [ref=e40]:
+    - generic [ref=e42]:
+      - generic [ref=e47]: Étape 3 sur 7 •
+      - generic [ref=e49]:
+        - generic [ref=e50] [cursor=pointer]:
+          - generic [ref=e52]: "1"
+          - generic [ref=e53]: Mode de consultation
+        - generic [ref=e55] [cursor=pointer]:
+          - generic [ref=e57]: "2"
+          - generic [ref=e58]: Type de patient
+        - generic [ref=e60] [cursor=pointer]:
+          - generic [ref=e62]: "3"
+          - generic [ref=e63]: Spécialité
+        - generic [ref=e65]:
+          - generic [ref=e67]: "4"
+          - generic [ref=e68]: Professionnel
+        - generic [ref=e70]:
+          - generic [ref=e72]: "5"
+          - generic [ref=e73]: Disponibilités
+        - generic [ref=e75]:
+          - generic [ref=e77]: "6"
+          - generic [ref=e78]: Informations
+        - generic [ref=e80]:
+          - generic [ref=e82]: "7"
+          - generic [ref=e83]: Confirmation
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - generic [ref=e90]: 
+              - generic [ref=e91]: Consultation en cabinet
+            - generic [ref=e92]:
+              - generic [ref=e93]: 
+              - generic [ref=e94]: Nouveau patient
+          - heading " Choisissez votre spécialité" [level=1] [ref=e95]:
+            - generic [ref=e96]: 
+            - text: Choisissez votre spécialité
+          - paragraph [ref=e97]: Sélectionnez le domaine médical qui correspond à vos besoins
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101] [cursor=pointer]:
+              - generic [ref=e103]: 
+              - generic [ref=e104]:
+                - heading "Psychologie" [level=3] [ref=e105]
+                - paragraph [ref=e106]: Accompagnement psychologique et thérapie
+              - generic [ref=e108]: 
+            - generic [ref=e109] [cursor=pointer]:
+              - generic [ref=e111]: 
+              - generic [ref=e112]:
+                - heading "Coaching de vie" [level=3] [ref=e113]
+                - paragraph [ref=e114]: Développement personnel et professionnel
+              - generic [ref=e116]: 
+            - generic [ref=e117] [cursor=pointer]:
+              - generic [ref=e119]: 
+              - generic [ref=e120]:
+                - heading "Médecine générale" [level=3] [ref=e121]
+                - paragraph [ref=e122]: Consultation médicale générale
+              - generic [ref=e124]: 
+            - generic [ref=e125] [cursor=pointer]:
+              - generic [ref=e127]: 
+              - generic [ref=e128]:
+                - heading "Cardiologie" [level=3] [ref=e129]
+                - paragraph [ref=e130]: Spécialiste du cœur et des vaisseaux
+              - generic [ref=e132]: 
+            - generic [ref=e133] [cursor=pointer]:
+              - generic [ref=e135]: 
+              - generic [ref=e136]:
+                - heading "Dermatologie" [level=3] [ref=e137]
+                - paragraph [ref=e138]: Spécialiste de la peau et des muqueuses
+              - generic [ref=e140]: 
+            - generic [ref=e141] [cursor=pointer]:
+              - generic [ref=e143]: 
+              - generic [ref=e144]:
+                - heading "Pédiatrie" [level=3] [ref=e145]
+                - paragraph [ref=e146]: Médecine pour enfants et adolescents
+              - generic [ref=e148]: 
+            - generic [ref=e149] [cursor=pointer]:
+              - generic [ref=e151]: 
+              - generic [ref=e152]:
+                - heading "Gynécologie" [level=3] [ref=e153]
+                - paragraph [ref=e154]: Santé de la femme et reproduction
+              - generic [ref=e156]: 
+            - generic [ref=e157] [cursor=pointer]:
+              - generic [ref=e159]:
+                - heading "Neurologie" [level=3] [ref=e160]
+                - paragraph [ref=e161]: Spécialiste du système nerveux
+              - generic [ref=e163]: 
+            - generic [ref=e164] [cursor=pointer]:
+              - generic [ref=e166]: 
+              - generic [ref=e167]:
+                - heading "Orthopédie" [level=3] [ref=e168]
+                - paragraph [ref=e169]: Spécialiste des os et articulations
+              - generic [ref=e171]: 
+          - button " Voir les professionnels" [disabled] [ref=e173]:
+            - generic [ref=e174]: 
+            - text: Voir les professionnels
+        - generic [ref=e176]:
+          - generic [ref=e177]: 
+          - generic [ref=e178]:
+            - heading "Vous ne trouvez pas votre spécialité ?" [level=4] [ref=e179]
+            - paragraph [ref=e180]: Utilisez notre moteur de recherche pour trouver le professionnel qui vous convient.
+            - generic [ref=e181]:
+              - textbox "Rechercher une spécialité ou un professionnel..." [ref=e182]
+              - button " Rechercher" [ref=e183] [cursor=pointer]:
+                - generic [ref=e184]: 
+                - text: Rechercher
+      - generic [ref=e185]:
+        - button " Recommencer" [ref=e186] [cursor=pointer]:
+          - generic [ref=e187]: 
+          - text: Recommencer
+        - generic [ref=e188]:
+          - generic [ref=e189]: 
+          - text: Besoin d'aide ?
+          - link "Contactez-nous" [ref=e190] [cursor=pointer]:
+            - /url: "#"
+  - contentinfo [ref=e192]:
+    - generic [ref=e193]:
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - img [ref=e199]
+              - heading "M-Santé" [level=3] [ref=e202]
+            - paragraph [ref=e203]: Votre espace de bien-être psychologique et de développement personnel.
+          - paragraph [ref=e205]: Centre de Santé Mentale — Soins personnalisés et bienveillants
+        - generic [ref=e206]:
+          - heading "Navigation" [level=4] [ref=e207]
+          - list [ref=e208]:
+            - listitem [ref=e209]:
+              - link "À propos" [ref=e210] [cursor=pointer]:
+                - /url: "#about"
+            - listitem [ref=e211]:
+              - link "Services" [ref=e212] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=e213]:
+              - link "Contact" [ref=e214] [cursor=pointer]:
+                - /url: "#contact"
+            - listitem [ref=e215]:
+              - link "Tarifs" [ref=e216] [cursor=pointer]:
+                - /url: "#rates"
+        - generic [ref=e217]:
+          - heading "Contact" [level=4] [ref=e218]
+          - generic [ref=e219]:
+            - paragraph [ref=e220]:
+              - strong [ref=e221]: "Téléphone:"
+              - link "514 852-1234" [ref=e222] [cursor=pointer]:
+                - /url: tel:+15148521234
+            - paragraph [ref=e223]:
+              - strong [ref=e224]: "Email:"
+              - link "contact@mindcare.ca" [ref=e225] [cursor=pointer]:
+                - /url: mailto:contact@mindcare.ca
+            - paragraph [ref=e226]:
+              - strong [ref=e227]: "Adresse:"
+              - text: 2150 Rue Saint-Urbain, Suite 300
+              - text: Montréal (Québec) H2X 2N9
+            - paragraph [ref=e228]:
+              - strong [ref=e229]: "Heures d'ouverture:"
+              - text: "Lundi - Vendredi: 8h - 18h"
+              - text: "Samedi: 9h - 16h"
+        - generic [ref=e230]:
+          - heading "Suivez-nous" [level=4] [ref=e231]
+          - generic [ref=e232]:
+            - link "📘 Facebook" [ref=e233] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e234]: 📘
+              - text: Facebook
+            - link "📷 Instagram" [ref=e235] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e236]: 📷
+              - text: Instagram
+            - link "🐦 Twitter" [ref=e237] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e238]: 🐦
+              - text: Twitter
+          - link "Consulter maintenant" [ref=e240] [cursor=pointer]:
+            - /url: "#appointment"
+      - generic [ref=e243]:
+        - paragraph [ref=e244]: © 2025 MindCare - Centre de Santé Mentale. Tous droits réservés.
+        - generic [ref=e245]:
+          - link "Politique de confidentialité" [ref=e246] [cursor=pointer]:
+            - /url: "#privacy"
+          - generic [ref=e247]: "|"
+          - link "Conditions d'utilisation" [ref=e248] [cursor=pointer]:
+            - /url: "#terms"
+          - generic [ref=e249]: "|"
+          - link "Code d'éthique" [ref=e250] [cursor=pointer]:
+            - /url: "#ethics"
+```

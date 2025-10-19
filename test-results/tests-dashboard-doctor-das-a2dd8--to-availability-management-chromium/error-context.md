@@ -1,0 +1,131 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "📞 514 852-1234" [ref=e8] [cursor=pointer]:
+          - /url: tel:+15148521234
+          - generic [ref=e9]: 📞
+          - generic [ref=e10]: 514 852-1234
+        - generic [ref=e11]: "|"
+        - generic [ref=e12]: Clinique de Santé Mentale
+      - link "👤 Connexion" [ref=e15] [cursor=pointer]:
+        - /url: /auth
+        - generic [ref=e16]: 👤
+        - generic [ref=e17]: Connexion
+    - banner [ref=e18]:
+      - navigation [ref=e19]:
+        - generic [ref=e21]:
+          - link "M-Santé Bien-être psychologique" [ref=e23] [cursor=pointer]:
+            - /url: /home
+            - img [ref=e25]
+            - generic [ref=e28]: M-Santé
+            - generic [ref=e29]: Bien-être psychologique
+          - generic [ref=e30]:
+            - link "Accueil" [ref=e31] [cursor=pointer]:
+              - /url: /home
+            - link "À propos" [ref=e32] [cursor=pointer]:
+              - /url: "#about"
+            - link "Services" [ref=e33] [cursor=pointer]:
+              - /url: "#services"
+            - link "Contact" [ref=e34] [cursor=pointer]:
+              - /url: "#contact"
+            - link "Tarifs" [ref=e35] [cursor=pointer]:
+              - /url: "#rates"
+          - link "📅 Prendre rendez-vous" [ref=e37] [cursor=pointer]:
+            - /url: /appointments/wizard
+            - generic [ref=e38]: 📅
+            - generic [ref=e39]: Prendre rendez-vous
+  - main [ref=e40]:
+    - generic [ref=e47]:
+      - heading "Connexion" [level=2] [ref=e49]
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: Email
+          - textbox "Email" [ref=e53]: doctor.test@msante.sn
+        - generic [ref=e54]:
+          - generic [ref=e55]: Mot de passe
+          - textbox "Mot de passe" [ref=e56]: Doctor@123
+        - generic [ref=e57]: ⚠️ Erreur interne du serveur
+        - link "Mot de passe oublié ?" [ref=e59] [cursor=pointer]:
+          - /url: javascript:void(0)
+        - button "Connexion" [ref=e60] [cursor=pointer]
+        - paragraph [ref=e62]:
+          - text: Vous n'avez pas de compte ?
+          - link "Créer un compte" [ref=e63] [cursor=pointer]:
+            - /url: javascript:void(0)
+  - contentinfo [ref=e65]:
+    - generic [ref=e66]:
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - img [ref=e72]
+              - heading "M-Santé" [level=3] [ref=e75]
+            - paragraph [ref=e76]: Votre espace de bien-être psychologique et de développement personnel.
+          - paragraph [ref=e78]: Centre de Santé Mentale — Soins personnalisés et bienveillants
+        - generic [ref=e79]:
+          - heading "Navigation" [level=4] [ref=e80]
+          - list [ref=e81]:
+            - listitem [ref=e82]:
+              - link "À propos" [ref=e83] [cursor=pointer]:
+                - /url: "#about"
+            - listitem [ref=e84]:
+              - link "Services" [ref=e85] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=e86]:
+              - link "Contact" [ref=e87] [cursor=pointer]:
+                - /url: "#contact"
+            - listitem [ref=e88]:
+              - link "Tarifs" [ref=e89] [cursor=pointer]:
+                - /url: "#rates"
+        - generic [ref=e90]:
+          - heading "Contact" [level=4] [ref=e91]
+          - generic [ref=e92]:
+            - paragraph [ref=e93]:
+              - strong [ref=e94]: "Téléphone:"
+              - link "514 852-1234" [ref=e95] [cursor=pointer]:
+                - /url: tel:+15148521234
+            - paragraph [ref=e96]:
+              - strong [ref=e97]: "Email:"
+              - link "contact@mindcare.ca" [ref=e98] [cursor=pointer]:
+                - /url: mailto:contact@mindcare.ca
+            - paragraph [ref=e99]:
+              - strong [ref=e100]: "Adresse:"
+              - text: 2150 Rue Saint-Urbain, Suite 300
+              - text: Montréal (Québec) H2X 2N9
+            - paragraph [ref=e101]:
+              - strong [ref=e102]: "Heures d'ouverture:"
+              - text: "Lundi - Vendredi: 8h - 18h"
+              - text: "Samedi: 9h - 16h"
+        - generic [ref=e103]:
+          - heading "Suivez-nous" [level=4] [ref=e104]
+          - generic [ref=e105]:
+            - link "📘 Facebook" [ref=e106] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e107]: 📘
+              - text: Facebook
+            - link "📷 Instagram" [ref=e108] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e109]: 📷
+              - text: Instagram
+            - link "🐦 Twitter" [ref=e110] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e111]: 🐦
+              - text: Twitter
+          - link "Consulter maintenant" [ref=e113] [cursor=pointer]:
+            - /url: "#appointment"
+      - generic [ref=e116]:
+        - paragraph [ref=e117]: © 2025 MindCare - Centre de Santé Mentale. Tous droits réservés.
+        - generic [ref=e118]:
+          - link "Politique de confidentialité" [ref=e119] [cursor=pointer]:
+            - /url: "#privacy"
+          - generic [ref=e120]: "|"
+          - link "Conditions d'utilisation" [ref=e121] [cursor=pointer]:
+            - /url: "#terms"
+          - generic [ref=e122]: "|"
+          - link "Code d'éthique" [ref=e123] [cursor=pointer]:
+            - /url: "#ethics"
+```

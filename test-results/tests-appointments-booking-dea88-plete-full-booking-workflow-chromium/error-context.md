@@ -1,0 +1,172 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "📞 514 852-1234" [ref=e8] [cursor=pointer]:
+          - /url: tel:+15148521234
+          - generic [ref=e9]: 📞
+          - generic [ref=e10]: 514 852-1234
+        - generic [ref=e11]: "|"
+        - generic [ref=e12]: Clinique de Santé Mentale
+      - link "👤 Connexion" [ref=e15] [cursor=pointer]:
+        - /url: /auth
+        - generic [ref=e16]: 👤
+        - generic [ref=e17]: Connexion
+    - banner [ref=e18]:
+      - navigation [ref=e19]:
+        - generic [ref=e21]:
+          - link "M-Santé Bien-être psychologique" [ref=e23] [cursor=pointer]:
+            - /url: /home
+            - img [ref=e25]
+            - generic [ref=e28]: M-Santé
+            - generic [ref=e29]: Bien-être psychologique
+          - generic [ref=e30]:
+            - link "Accueil" [ref=e31] [cursor=pointer]:
+              - /url: /home
+            - link "À propos" [ref=e32] [cursor=pointer]:
+              - /url: "#about"
+            - link "Services" [ref=e33] [cursor=pointer]:
+              - /url: "#services"
+            - link "Contact" [ref=e34] [cursor=pointer]:
+              - /url: "#contact"
+            - link "Tarifs" [ref=e35] [cursor=pointer]:
+              - /url: "#rates"
+          - link "📅 Prendre rendez-vous" [ref=e37] [cursor=pointer]:
+            - /url: /appointments/wizard
+            - generic [ref=e38]: 📅
+            - generic [ref=e39]: Prendre rendez-vous
+  - main [ref=e40]:
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - heading " Êtes-vous déjà patient ?" [level=1] [ref=e44]:
+            - generic [ref=e45]: 
+            - text: Êtes-vous déjà patient ?
+          - paragraph [ref=e46]: Sélectionnez votre statut pour continuer
+        - generic [ref=e48]:
+          - generic [ref=e49] [cursor=pointer]:
+            - generic [ref=e51]: 
+            - generic [ref=e52]:
+              - heading "Nouveau patient" [level=3] [ref=e53]
+              - paragraph [ref=e54]: Je n'ai jamais consulté dans cet établissement
+            - button "Voir les médecins " [ref=e55]:
+              - text: Voir les médecins
+              - generic [ref=e56]: 
+          - generic [ref=e57] [cursor=pointer]:
+            - generic [ref=e59]: 
+            - generic [ref=e60]:
+              - heading "Patient existant" [level=3] [ref=e61]
+              - paragraph [ref=e62]: J'ai déjà un dossier médical dans cet établissement
+            - button "Se connecter " [ref=e63]:
+              - text: Se connecter
+              - generic [ref=e64]: 
+          - generic [ref=e65] [cursor=pointer]:
+            - generic [ref=e67]: 
+            - generic [ref=e68]:
+              - heading "Continuer sans compte" [level=3] [ref=e69]
+              - paragraph [ref=e70]: Réserver rapidement sans créer de compte
+            - button "Voir les médecins " [ref=e71]:
+              - text: Voir les médecins
+              - generic [ref=e72]: 
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - generic [ref=e76]: 
+            - heading "Sécurité garantie" [level=4] [ref=e77]
+            - paragraph [ref=e78]: Vos données personnelles et médicales sont protégées par un chiffrement de niveau bancaire.
+          - generic [ref=e79]:
+            - generic [ref=e80]: 
+            - heading "Processus rapide" [level=4] [ref=e81]
+            - paragraph [ref=e82]: Inscription et prise de rendez-vous en moins de 5 minutes.
+          - generic [ref=e83]:
+            - generic [ref=e84]: 
+            - heading "Support 24/7" [level=4] [ref=e85]
+            - paragraph [ref=e86]: Notre équipe est disponible pour vous aider à tout moment.
+      - generic [ref=e88]:
+        - generic [ref=e89]:
+          - generic [ref=e90]: 
+          - heading "Sécurité garantie" [level=4] [ref=e91]
+          - paragraph [ref=e92]: Vos données personnelles et médicales sont protégées par un chiffrement de niveau bancaire.
+        - generic [ref=e93]:
+          - generic [ref=e94]: 
+          - heading "Processus rapide" [level=4] [ref=e95]
+          - paragraph [ref=e96]: Inscription et prise de rendez-vous en moins de 5 minutes.
+        - generic [ref=e97]:
+          - generic [ref=e98]: 
+          - heading "Support 24/7" [level=4] [ref=e99]
+          - paragraph [ref=e100]: Notre équipe est disponible pour vous aider à tout moment.
+  - contentinfo [ref=e102]:
+    - generic [ref=e103]:
+      - generic [ref=e104]:
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - img [ref=e109]
+              - heading "M-Santé" [level=3] [ref=e112]
+            - paragraph [ref=e113]: Votre espace de bien-être psychologique et de développement personnel.
+          - paragraph [ref=e115]: Centre de Santé Mentale — Soins personnalisés et bienveillants
+        - generic [ref=e116]:
+          - heading "Navigation" [level=4] [ref=e117]
+          - list [ref=e118]:
+            - listitem [ref=e119]:
+              - link "À propos" [ref=e120] [cursor=pointer]:
+                - /url: "#about"
+            - listitem [ref=e121]:
+              - link "Services" [ref=e122] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=e123]:
+              - link "Contact" [ref=e124] [cursor=pointer]:
+                - /url: "#contact"
+            - listitem [ref=e125]:
+              - link "Tarifs" [ref=e126] [cursor=pointer]:
+                - /url: "#rates"
+        - generic [ref=e127]:
+          - heading "Contact" [level=4] [ref=e128]
+          - generic [ref=e129]:
+            - paragraph [ref=e130]:
+              - strong [ref=e131]: "Téléphone:"
+              - link "514 852-1234" [ref=e132] [cursor=pointer]:
+                - /url: tel:+15148521234
+            - paragraph [ref=e133]:
+              - strong [ref=e134]: "Email:"
+              - link "contact@mindcare.ca" [ref=e135] [cursor=pointer]:
+                - /url: mailto:contact@mindcare.ca
+            - paragraph [ref=e136]:
+              - strong [ref=e137]: "Adresse:"
+              - text: 2150 Rue Saint-Urbain, Suite 300
+              - text: Montréal (Québec) H2X 2N9
+            - paragraph [ref=e138]:
+              - strong [ref=e139]: "Heures d'ouverture:"
+              - text: "Lundi - Vendredi: 8h - 18h"
+              - text: "Samedi: 9h - 16h"
+        - generic [ref=e140]:
+          - heading "Suivez-nous" [level=4] [ref=e141]
+          - generic [ref=e142]:
+            - link "📘 Facebook" [ref=e143] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e144]: 📘
+              - text: Facebook
+            - link "📷 Instagram" [ref=e145] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e146]: 📷
+              - text: Instagram
+            - link "🐦 Twitter" [ref=e147] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e148]: 🐦
+              - text: Twitter
+          - link "Consulter maintenant" [ref=e150] [cursor=pointer]:
+            - /url: "#appointment"
+      - generic [ref=e153]:
+        - paragraph [ref=e154]: © 2025 MindCare - Centre de Santé Mentale. Tous droits réservés.
+        - generic [ref=e155]:
+          - link "Politique de confidentialité" [ref=e156] [cursor=pointer]:
+            - /url: "#privacy"
+          - generic [ref=e157]: "|"
+          - link "Conditions d'utilisation" [ref=e158] [cursor=pointer]:
+            - /url: "#terms"
+          - generic [ref=e159]: "|"
+          - link "Code d'éthique" [ref=e160] [cursor=pointer]:
+            - /url: "#ethics"
+```
