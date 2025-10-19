@@ -1,0 +1,160 @@
+<div class="consultation-details-container">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin fa-3x"></i>
+    <p>Chargement de la consultation...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <i class="fas fa-exclamation-triangle fa-3x"></i>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+  </div>
+
+  <!-- Consultation Details -->
+  <div *ngIf="consultation && !isLoading">
+    <!-- Header -->
+    <div class="details-header">
+      <div class="header-left">
+        <button class="btn-back" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+        <h1><i class="fas fa-file-medical"></i> Détails de la Consultation</h1>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary" (click)="downloadReport()">
+          <i class="fas fa-download"></i> Télécharger le rapport
+        </button>
+      </div>
+    </div>
+
+    <!-- Consultation Info Card -->
+    <div class="info-card">
+      <div class="info-header">
+        <h2>Informations Générales</h2>
+        <span class="status-badge" [ngClass]="getStatusClass(consultation.status)">
+          {{ getStatusLabel(consultation.status) }}
+        </span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <i class="fas fa-calendar"></i>
+          <div>
+            <label>Date</label>
+            <p>{{ formatDate(consultation.startTime) }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <label>Heure</label>
+            <p>{{ formatTime(consultation.startTime) }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="fas fa-hourglass-half"></i>
+          <div>
+            <label>Durée</label>
+            <p>{{ formatDuration(consultation.startTime, consultation.endTime) }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i [class]="getConsultationTypeIcon(consultation.consultationType)"></i>
+          <div>
+            <label>Type</label>
+            <p>{{ getConsultationTypeLabel(consultation.consultationType) }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="fas fa-user-md"></i>
+          <div>
+            <label>Médecin</label>
+            <p>Dr. {{ consultation.doctorFirstName }} {{ consultation.doctorLastName }}</p>
+            <small>{{ consultation.doctorSpecialty }}</small>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="fas fa-user"></i>
+          <div>
+            <label>Patient</label>
+            <p>{{ consultation.patientFirstName }} {{ consultation.patientLastName }}</p>
+            <small>{{ consultation.patientEmail }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consultation Notes (Read-only or Editable) -->
+    <div class="notes-section">
+      <app-consultation-notes
+        [consultation]="consultation"
+        [readOnly]="consultation.status === 'completed' || consultation.status === 'cancelled'"
+      ></app-consultation-notes>
+    </div>
+
+    <!-- Prescriptions Display -->
+    <div class="prescriptions-section" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
+      <h2><i class="fas fa-prescription"></i> Ordonnances</h2>
+      <div class="prescription-list">
+        <div class="prescription-card" *ngFor="let prescription of consultation.prescriptions">
+          <div class="prescription-header">
+            <h3>{{ prescription.medicationName }}</h3>
+            <span class="refillable" *ngIf="prescription.refillable">
+              <i class="fas fa-redo"></i> Renouvelable ({{ prescription.refillsAllowed }}x)
+            </span>
+          </div>
+          <div class="prescription-details">
+            <div class="detail-row">
+              <strong>Dosage:</strong> {{ prescription.dosage }}
+            </div>
+            <div class="detail-row">
+              <strong>Fréquence:</strong> {{ prescription.frequency }}
+            </div>
+            <div class="detail-row">
+              <strong>Durée:</strong> {{ prescription.duration }}
+            </div>
+            <div class="detail-row">
+              <strong>Instructions:</strong> {{ prescription.instructions }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab Tests Display -->
+    <div class="labtests-section" *ngIf="consultation.labTests && consultation.labTests.length > 0">
+      <h2><i class="fas fa-flask"></i> Analyses Prescrites</h2>
+      <div class="labtest-list">
+        <div class="labtest-card" *ngFor="let labTest of consultation.labTests">
+          <div class="labtest-header">
+            <h3>{{ labTest.testName }}</h3>
+            <span class="urgency-badge" [ngClass]="'urgency-' + labTest.urgency">
+              {{ labTest.urgency }}
+            </span>
+          </div>
+          <div class="labtest-details">
+            <div class="detail-row">
+              <strong>Type:</strong> {{ labTest.testType }}
+            </div>
+            <div class="detail-row" *ngIf="labTest.instructions">
+              <strong>Instructions:</strong> {{ labTest.instructions }}
+            </div>
+            <div class="detail-row" *ngIf="labTest.labName">
+              <strong>Laboratoire:</strong> {{ labTest.labName }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

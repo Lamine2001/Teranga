@@ -1,0 +1,337 @@
+<div class="consultation-notes-container">
+  <!-- Header -->
+  <div class="notes-header">
+    <h2><i class="fas fa-notes-medical"></i> Notes de Consultation</h2>
+    <div class="auto-save-indicator" *ngIf="lastSaved && !readOnly">
+      <i class="fas fa-check-circle"></i>
+      Dernière sauvegarde: {{ lastSaved | date:'HH:mm:ss' }}
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+  
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Notes Form -->
+  <form [formGroup]="notesForm" class="notes-form">
+    
+    <!-- Chief Complaint -->
+    <div class="form-section">
+      <h3><i class="fas fa-comment-medical"></i> Motif de Consultation</h3>
+      <div class="form-group">
+        <label for="chiefComplaint">Motif principal *</label>
+        <textarea
+          id="chiefComplaint"
+          formControlName="chiefComplaint"
+          rows="2"
+          placeholder="Ex: Douleur thoracique, Fièvre persistante..."
+          [class.is-invalid]="isFieldInvalid('chiefComplaint')"
+        ></textarea>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('chiefComplaint')">
+          {{ getFieldError('chiefComplaint') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Symptoms -->
+    <div class="form-section">
+      <h3><i class="fas fa-heartbeat"></i> Symptômes</h3>
+      <div class="form-group">
+        <label for="symptoms">Description des symptômes *</label>
+        <textarea
+          id="symptoms"
+          formControlName="symptoms"
+          rows="3"
+          placeholder="Décrivez les symptômes en détail..."
+          [class.is-invalid]="isFieldInvalid('symptoms')"
+        ></textarea>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('symptoms')">
+          {{ getFieldError('symptoms') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Physical Examination -->
+    <div class="form-section">
+      <h3><i class="fas fa-stethoscope"></i> Examen Physique</h3>
+      <div class="form-group">
+        <label for="physicalExamination">Résultats de l'examen physique</label>
+        <textarea
+          id="physicalExamination"
+          formControlName="physicalExamination"
+          rows="3"
+          placeholder="Tension artérielle, température, auscultation..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Diagnosis -->
+    <div class="form-section">
+      <h3><i class="fas fa-diagnoses"></i> Diagnostic</h3>
+      
+      <!-- Common Conditions Quick Select -->
+      <div class="quick-select" *ngIf="!readOnly">
+        <label>Conditions courantes:</label>
+        <div class="condition-chips">
+          <button
+            type="button"
+            class="chip"
+            *ngFor="let condition of commonConditions"
+            (click)="selectCommonCondition(condition)"
+          >
+            {{ condition }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="diagnosis">Diagnostic *</label>
+        <textarea
+          id="diagnosis"
+          formControlName="diagnosis"
+          rows="3"
+          placeholder="Diagnostic médical complet..."
+          [class.is-invalid]="isFieldInvalid('diagnosis')"
+        ></textarea>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('diagnosis')">
+          {{ getFieldError('diagnosis') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Treatment Plan -->
+    <div class="form-section">
+      <h3><i class="fas fa-procedures"></i> Plan de Traitement</h3>
+      <div class="form-group">
+        <label for="treatment">Traitement recommandé *</label>
+        <textarea
+          id="treatment"
+          formControlName="treatment"
+          rows="3"
+          placeholder="Plan de traitement détaillé..."
+          [class.is-invalid]="isFieldInvalid('treatment')"
+        ></textarea>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('treatment')">
+          {{ getFieldError('treatment') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Prescriptions -->
+    <div class="form-section">
+      <h3><i class="fas fa-prescription"></i> Ordonnances</h3>
+      
+      <!-- Common Medications Quick Select -->
+      <div class="quick-select" *ngIf="!readOnly">
+        <label>Médicaments courants:</label>
+        <div class="medication-chips">
+          <button
+            type="button"
+            class="chip"
+            *ngFor="let medication of commonMedications"
+            (click)="selectCommonMedication(medication)"
+          >
+            {{ medication }}
+          </button>
+        </div>
+      </div>
+
+      <div formArrayName="prescriptions">
+        <div *ngFor="let prescription of prescriptions.controls; let i = index" 
+             [formGroupName]="i" 
+             class="prescription-item">
+          <div class="prescription-header">
+            <h4>Prescription #{{ i + 1 }}</h4>
+            <button type="button" class="btn-remove" (click)="removePrescription(i)" *ngIf="!readOnly">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="prescription-grid">
+            <div class="form-group">
+              <label>Médicament *</label>
+              <input type="text" formControlName="medicationName" placeholder="Nom du médicament">
+            </div>
+
+            <div class="form-group">
+              <label>Dosage *</label>
+              <input type="text" formControlName="dosage" placeholder="Ex: 500mg">
+            </div>
+
+            <div class="form-group">
+              <label>Fréquence *</label>
+              <select formControlName="frequency">
+                <option value="Une fois par jour">Une fois par jour</option>
+                <option value="Deux fois par jour">Deux fois par jour</option>
+                <option value="Trois fois par jour">Trois fois par jour</option>
+                <option value="Quatre fois par jour">Quatre fois par jour</option>
+                <option value="Au besoin">Au besoin</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Durée *</label>
+              <input type="text" formControlName="duration" placeholder="Ex: 7 jours">
+            </div>
+
+            <div class="form-group full-width">
+              <label>Instructions</label>
+              <textarea formControlName="instructions" rows="2" placeholder="Instructions spéciales..."></textarea>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" formControlName="refillable">
+                Renouvellement autorisé
+              </label>
+            </div>
+
+            <div class="form-group" *ngIf="prescription.get('refillable')?.value">
+              <label>Nombre de renouvellements</label>
+              <input type="number" formControlName="refillsAllowed" min="0" max="12">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-add" (click)="addPrescription()" *ngIf="!readOnly">
+        <i class="fas fa-plus"></i> Ajouter une prescription
+      </button>
+    </div>
+
+    <!-- Lab Tests -->
+    <div class="form-section">
+      <h3><i class="fas fa-flask"></i> Analyses de Laboratoire</h3>
+      
+      <div formArrayName="labTests">
+        <div *ngFor="let labTest of labTests.controls; let i = index" 
+             [formGroupName]="i" 
+             class="labtest-item">
+          <div class="labtest-header">
+            <h4>Analyse #{{ i + 1 }}</h4>
+            <button type="button" class="btn-remove" (click)="removeLabTest(i)" *ngIf="!readOnly">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="labtest-grid">
+            <div class="form-group">
+              <label>Nom de l'analyse *</label>
+              <input type="text" formControlName="testName" placeholder="Ex: Hémogramme complet">
+            </div>
+
+            <div class="form-group">
+              <label>Type *</label>
+              <select formControlName="testType">
+                <option value="blood">Analyse de sang</option>
+                <option value="urine">Analyse d'urine</option>
+                <option value="imaging">Imagerie</option>
+                <option value="biopsy">Biopsie</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Urgence *</label>
+              <select formControlName="urgency">
+                <option value="routine">Routine</option>
+                <option value="urgent">Urgent</option>
+                <option value="stat">STAT (Immédiat)</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Instructions</label>
+              <textarea formControlName="instructions" rows="2" placeholder="Instructions pour le laboratoire..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-add" (click)="addLabTest()" *ngIf="!readOnly">
+        <i class="fas fa-plus"></i> Ajouter une analyse
+      </button>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="form-section">
+      <h3><i class="fas fa-lightbulb"></i> Recommandations</h3>
+      <div class="form-group">
+        <label for="recommendations">Recommandations au patient</label>
+        <textarea
+          id="recommendations"
+          formControlName="recommendations"
+          rows="3"
+          placeholder="Conseils, précautions, changements de mode de vie..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Follow-up -->
+    <div class="form-section">
+      <h3><i class="fas fa-calendar-plus"></i> Suivi</h3>
+      <div class="form-group">
+        <label for="followUpDate">Date de suivi</label>
+        <input
+          type="date"
+          id="followUpDate"
+          formControlName="followUpDate"
+          [min]="getTomorrowDate()"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="followUpInstructions">Instructions pour le suivi</label>
+        <textarea
+          id="followUpInstructions"
+          formControlName="followUpInstructions"
+          rows="2"
+          placeholder="Instructions pour le prochain rendez-vous..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Additional Notes -->
+    <div class="form-section">
+      <h3><i class="fas fa-sticky-note"></i> Notes Additionnelles</h3>
+      <div class="form-group">
+        <label for="additionalNotes">Notes supplémentaires</label>
+        <textarea
+          id="additionalNotes"
+          formControlName="additionalNotes"
+          rows="3"
+          placeholder="Informations complémentaires..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions" *ngIf="!readOnly">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="saveNotes(false)"
+        [disabled]="isSaving || notesForm.invalid"
+      >
+        <i class="fas fa-save"></i>
+        {{ isSaving ? 'Sauvegarde...' : 'Sauvegarder' }}
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="endConsultation()"
+        [disabled]="isLoading || notesForm.invalid"
+      >
+        <i class="fas fa-check-circle"></i>
+        {{ isLoading ? 'Traitement...' : 'Terminer la Consultation' }}
+      </button>
+    </div>
+  </form>
+</div>
+

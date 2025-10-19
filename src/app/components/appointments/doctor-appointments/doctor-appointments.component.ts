@@ -2,6 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 interface Appointment {
   id: number;
@@ -93,7 +95,9 @@ interface Appointment {
           </div>
 
           <div class="appointment-actions">
-            <button class="btn-action btn-primary" *ngIf="appointment.appointmentType === 'virtual' && type === 'today'">
+            <button class="btn-action btn-primary" 
+                    *ngIf="appointment.appointmentType === 'virtual' && type === 'today'"
+                    (click)="startVideoConsultation(appointment)">
               <i class="fas fa-video"></i> Démarrer
             </button>
             <button class="btn-action btn-secondary" (click)="viewDetails(appointment)">
@@ -317,9 +321,12 @@ export class DoctorAppointmentsComponent implements OnInit {
   isLoading = false;
   error = '';
   
-  private apiUrl = 'http://localhost:8080/api/appointments/doctor';
+  private readonly apiUrl = `${environment.apiUrl}/appointments/doctor`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadAppointments();
@@ -368,8 +375,13 @@ export class DoctorAppointmentsComponent implements OnInit {
   }
 
   viewDetails(appointment: Appointment) {
-    console.log('View appointment details:', appointment);
-    // TODO: Implement view details modal or navigation
+    // Navigate to consultation details
+    this.router.navigate(['/consultations', appointment.id]);
+  }
+
+  startVideoConsultation(appointment: Appointment) {
+    // Navigate to video consultation room
+    this.router.navigate(['/consultations/video', appointment.id]);
   }
 
   cancelAppointment(appointment: Appointment) {
@@ -379,7 +391,7 @@ export class DoctorAppointmentsComponent implements OnInit {
         'Authorization': token ? `Bearer ${token}` : ''
       });
 
-      this.http.delete(`http://localhost:8080/api/appointments/${appointment.id}`, { headers }).subscribe({
+      this.http.delete(`${environment.apiUrl}/appointments/${appointment.id}`, { headers }).subscribe({
         next: () => {
           this.loadAppointments();
         },

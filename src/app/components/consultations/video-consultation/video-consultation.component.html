@@ -1,0 +1,136 @@
+<div class="video-consultation-container">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin fa-3x"></i>
+    <p>Initialisation de la consultation vidéo...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <i class="fas fa-exclamation-triangle fa-3x"></i>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="router.navigate(['/doctor-dashboard'])">
+      <i class="fas fa-home"></i> Retour au tableau de bord
+    </button>
+  </div>
+
+  <!-- Video Consultation Interface -->
+  <div class="video-interface" *ngIf="!isLoading && !errorMessage && consultation">
+    <!-- Header -->
+    <div class="video-header">
+      <div class="header-info">
+        <h2><i class="fas fa-video"></i> Consultation Vidéo</h2>
+        <p class="patient-name">
+          Patient: {{ consultation.patientFirstName }} {{ consultation.patientLastName }}
+        </p>
+      </div>
+      <div class="header-stats">
+        <span class="call-duration">
+          <i class="fas fa-clock"></i>
+          {{ formatDuration(callDuration) }}
+        </span>
+        <button class="btn btn-secondary" (click)="toggleNotesPanel()">
+          <i class="fas fa-notes-medical"></i>
+          {{ showNotesPanel ? 'Masquer' : 'Afficher' }} les notes
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="video-content" [class.notes-visible]="showNotesPanel">
+      <!-- Video Container -->
+      <div class="video-container">
+        <div id="jitsi-container"></div>
+        
+        <!-- Call Controls -->
+        <div class="call-controls" *ngIf="isCallActive">
+          <button class="control-btn" [class.active]="isMuted" (click)="toggleMute()">
+            <i [class]="isMuted ? 'fas fa-microphone-slash' : 'fas fa-microphone'"></i>
+            <span>{{ isMuted ? 'Activer micro' : 'Couper micro' }}</span>
+          </button>
+
+          <button class="control-btn" [class.active]="isVideoOff" (click)="toggleVideo()">
+            <i [class]="isVideoOff ? 'fas fa-video-slash' : 'fas fa-video'"></i>
+            <span>{{ isVideoOff ? 'Activer vidéo' : 'Couper vidéo' }}</span>
+          </button>
+
+          <button class="control-btn end-call" (click)="handleCallEnded()">
+            <i class="fas fa-phone-slash"></i>
+            <span>Terminer l'appel</span>
+          </button>
+        </div>
+
+        <!-- Call Not Started -->
+        <div class="call-placeholder" *ngIf="!isCallActive">
+          <i class="fas fa-video fa-3x"></i>
+          <p>La consultation vidéo est prête</p>
+          <button class="btn btn-primary btn-lg" (click)="loadJitsi()">
+            <i class="fas fa-play"></i> Démarrer la consultation
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes Panel (Sidebar) -->
+      <div class="notes-panel" *ngIf="showNotesPanel">
+        <div class="notes-panel-header">
+          <h3><i class="fas fa-notes-medical"></i> Notes de Consultation</h3>
+          <button class="btn-close" (click)="toggleNotesPanel()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="notes-panel-content">
+          <app-consultation-notes
+            *ngIf="consultation"
+            [consultation]="consultation"
+            [readOnly]="false"
+            (consultationEnded)="onConsultationEnded()"
+          ></app-consultation-notes>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Info Panel -->
+    <div class="quick-info" *ngIf="!showNotesPanel">
+      <div class="info-item">
+        <i class="fas fa-user"></i>
+        <div>
+          <label>Patient</label>
+          <p>{{ consultation.patientFirstName }} {{ consultation.patientLastName }}</p>
+        </div>
+      </div>
+
+      <div class="info-item" *ngIf="consultation.chiefComplaint">
+        <i class="fas fa-comment-medical"></i>
+        <div>
+          <label>Motif</label>
+          <p>{{ consultation.chiefComplaint }}</p>
+        </div>
+      </div>
+
+      <div class="info-item" *ngIf="consultation.symptoms">
+        <i class="fas fa-heartbeat"></i>
+        <div>
+          <label>Symptômes</label>
+          <p>{{ consultation.symptoms }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call Instructions -->
+    <div class="call-instructions" *ngIf="!isCallActive">
+      <div class="instruction-card">
+        <i class="fas fa-info-circle"></i>
+        <div>
+          <h4>Instructions pour la téléconsultation</h4>
+          <ul>
+            <li>Assurez-vous que votre caméra et micro fonctionnent</li>
+            <li>Trouvez un endroit calme et privé</li>
+            <li>Préparez vos notes et dossier médical</li>
+            <li>Cliquez sur "Démarrer" pour rejoindre la consultation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

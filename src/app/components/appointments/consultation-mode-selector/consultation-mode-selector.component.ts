@@ -1,8 +1,9 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Output, EventEmitter, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent, BreadcrumbItem } from '../../shared/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 
 export interface ConsultationMode {
   value: 'cabinet' | 'video';
@@ -23,11 +24,7 @@ export class ConsultationModeSelectorComponent implements OnInit {
   @Output() modeSelected = new EventEmitter<'cabinet' | 'video'>();
 
   consultationForm: FormGroup;
-  
-  breadcrumbItems: BreadcrumbItem[] = [
-    { label: 'Accueil', route: '/', icon: 'fas fa-home' },
-    { label: 'Prendre rendez-vous', active: true, icon: 'fas fa-calendar-plus' }
-  ];
+  breadcrumbItems: BreadcrumbItem[] = [];
 
   consultationModes: ConsultationMode[] = [
     {
@@ -60,14 +57,18 @@ export class ConsultationModeSelectorComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private breadcrumbService: BreadcrumbService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.consultationForm = this.fb.group({
       mode: ['', [Validators.required]]
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.breadcrumbItems = this.breadcrumbService.getWorkflowBreadcrumbs('mode');
+  }
 
   selectMode(mode: 'cabinet' | 'video'): void {
     this.consultationForm.patchValue({ mode });
@@ -86,13 +87,15 @@ export class ConsultationModeSelectorComponent implements OnInit {
     if (this.consultationForm.valid) {
       const selectedMode = this.getSelectedMode();
       if (selectedMode) {
-        // Stocker le mode sélectionné dans sessionStorage pour l'utiliser plus tard
-        sessionStorage.setItem('consultationMode', selectedMode);
+        // Save to breadcrumbService
+        this.breadcrumbService.saveWorkflowState({ consultationMode: selectedMode });
+        this.breadcrumbService.markStepCompleted('mode');
         
-        // Naviguer vers l'étape du choix du type de patient
-        this.router.navigate(['/appointments/patient-type'], {
-          queryParams: { mode: selectedMode }
-        });
+        // Navigate to next step
+        this.router.navigate(['/book-appointment/patient-type']);
+        
+        // Emit event for parent components
+        this.modeSelected.emit(selectedMode);
       }
     }
   }

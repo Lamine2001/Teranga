@@ -1,0 +1,162 @@
+<div class="consultation-history-container">
+  <!-- Header -->
+  <div class="history-header">
+    <h1><i class="fas fa-history"></i> Historique des Consultations</h1>
+    <button class="btn btn-secondary" (click)="exportHistory()">
+      <i class="fas fa-file-export"></i> Exporter
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <form [formGroup]="filterForm">
+      <div class="filters-grid">
+        <div class="form-group">
+          <label>Date début</label>
+          <input type="date" formControlName="startDate">
+        </div>
+
+        <div class="form-group">
+          <label>Date fin</label>
+          <input type="date" formControlName="endDate">
+        </div>
+
+        <div class="form-group">
+          <label>Statut</label>
+          <select formControlName="status">
+            <option value="">Tous</option>
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Type</label>
+          <select formControlName="consultationType">
+            <option value="">Tous</option>
+            <option *ngFor="let option of consultationTypeOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group search-group">
+          <label>Rechercher</label>
+          <input
+            type="text"
+            formControlName="searchQuery"
+            placeholder="Patient, médecin, diagnostic..."
+          >
+        </div>
+
+        <div class="form-group filter-actions">
+          <button type="button" class="btn btn-outline" (click)="clearFilters()">
+            <i class="fas fa-times"></i> Réinitialiser
+          </button>
+          <button type="button" class="btn btn-primary" (click)="loadConsultations()">
+            <i class="fas fa-search"></i> Rechercher
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <p>Chargement de l'historique...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !errorMessage && filteredConsultations.length === 0">
+    <i class="fas fa-folder-open fa-3x"></i>
+    <p>Aucune consultation trouvée</p>
+  </div>
+
+  <!-- Consultations List -->
+  <div class="consultations-list" *ngIf="!isLoading && filteredConsultations.length > 0">
+    <div class="consultation-card" *ngFor="let consultation of filteredConsultations" (click)="viewConsultation(consultation)">
+      <div class="card-header">
+        <div class="consultation-info">
+          <div class="date-time">
+            <i class="fas fa-calendar"></i>
+            <span class="date">{{ formatDate(consultation.startTime) }}</span>
+            <span class="time">{{ formatTime(consultation.startTime) }}</span>
+          </div>
+          <span class="status-badge" [ngClass]="getStatusClass(consultation.status)">
+            {{ getStatusLabel(consultation.status) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="participants">
+          <div class="participant doctor">
+            <i class="fas fa-user-md"></i>
+            <div>
+              <label>Médecin</label>
+              <p>Dr. {{ consultation.doctorFirstName }} {{ consultation.doctorLastName }}</p>
+              <small>{{ consultation.doctorSpecialty }}</small>
+            </div>
+          </div>
+
+          <div class="participant patient" *ngIf="userRole === 'doctor'">
+            <i class="fas fa-user"></i>
+            <div>
+              <label>Patient</label>
+              <p>{{ consultation.patientFirstName }} {{ consultation.patientLastName }}</p>
+              <small>{{ consultation.patientEmail }}</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="consultation-details">
+          <div class="detail-item">
+            <i [class]="getConsultationTypeIcon(consultation.consultationType)"></i>
+            <span>{{ getConsultationTypeLabel(consultation.consultationType) }}</span>
+          </div>
+
+          <div class="detail-item" *ngIf="consultation.chiefComplaint">
+            <i class="fas fa-comment-medical"></i>
+            <span>{{ consultation.chiefComplaint }}</span>
+          </div>
+
+          <div class="detail-item" *ngIf="consultation.diagnosis">
+            <i class="fas fa-diagnoses"></i>
+            <span>{{ consultation.diagnosis }}</span>
+          </div>
+        </div>
+
+        <div class="consultation-stats" *ngIf="consultation.prescriptions || consultation.labTests">
+          <span class="stat" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
+            <i class="fas fa-prescription"></i>
+            {{ consultation.prescriptions.length }} ordonnance(s)
+          </span>
+          <span class="stat" *ngIf="consultation.labTests && consultation.labTests.length > 0">
+            <i class="fas fa-flask"></i>
+            {{ consultation.labTests.length }} analyse(s)
+          </span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn-view">
+          <i class="fas fa-eye"></i> Voir les détails
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary" *ngIf="!isLoading && filteredConsultations.length > 0">
+    <p>{{ filteredConsultations.length }} consultation(s) trouvée(s)</p>
+  </div>
+</div>
+

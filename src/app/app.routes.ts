@@ -74,5 +74,23 @@ export const routes: Routes = [
     component: ChangePasswordComponent,
     canActivate: [AuthGuard]
   },
+  
+  // Consultation Routes
+  {
+    path: 'consultations/history',
+    loadComponent: () => import('./components/consultations/consultation-history/consultation-history.component').then(m => m.ConsultationHistoryComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'consultations/video/:id',
+    loadComponent: () => import('./components/consultations/video-consultation/video-consultation.component').then(m => m.VideoConsultationComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'consultations/:id',
+    loadComponent: () => import('./components/consultations/consultation-details/consultation-details.component').then(m => m.ConsultationDetailsComponent),
+    canActivate: [AuthGuard]
+  },
+  
   { path: '**', redirectTo: '/home' }
 ];
