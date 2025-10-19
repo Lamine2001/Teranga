@@ -82,6 +82,10 @@ export class ConsultationManagementComponent implements OnInit {
     this.router.navigate(['/appointments/search']);
   }
 
+  navigateToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
   joinActiveConsultation(consultation: Consultation): void {
     if (consultation.consultationType === 'virtual') {
       this.router.navigate(['/consultations/video', consultation.appointmentId]);
