@@ -18,6 +18,7 @@ export class PatientDashboardComponent implements OnInit {
   appointmentHistory: any[] = [];
   isLoading = false;
   error = '';
+  showAllAppointments = false; // Nouvelle propriété pour gérer l'affichage
 
   private apiUrl = 'http://localhost:8080/api/appointments/patient';
 
@@ -103,7 +104,34 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   onViewAppointmentsClick(): void {
-    this.router.navigate(['/appointments']);
+    // Afficher tous les rendez-vous (ne pas basculer, juste afficher tous)
+    this.showAllAppointments = true;
+  }
+
+  // Nouvelle méthode pour revenir à la vue limitée
+  onShowLimitedAppointments(): void {
+    this.showAllAppointments = false;
+  }
+
+  // Modifier cette méthode pour avoir une logique plus claire
+  getDisplayedAppointments(): any[] {
+    if (this.showAllAppointments) {
+      // Afficher tous les rendez-vous
+      return this.upcomingAppointments;
+    } else {
+      // Afficher seulement les 3 premiers (vue par défaut)
+      return this.upcomingAppointments.slice(0, 3);
+    }
+  }
+
+  // Modifier pour ne plus basculer mais indiquer l'état
+  getViewButtonText(): string {
+    return this.showAllAppointments ? 'Voir moins' : 'Voir tous';
+  }
+
+  // Méthode pour savoir si on peut afficher le bouton "Voir moins"
+  canShowLess(): boolean {
+    return this.showAllAppointments && this.upcomingAppointments.length > 3;
   }
 
   getDateDisplay(date: any): string {

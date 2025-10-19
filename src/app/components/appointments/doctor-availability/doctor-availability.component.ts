@@ -108,18 +108,22 @@ export class DoctorAvailabilityComponent implements OnInit {
     this.appointmentContext.setSelectedSlot(enrichedSlot);
 
     const patientType = this.appointmentContext.getPatientType();
+    const context = this.appointmentContext.getContext();
     
     console.log('Slot selected, patient type:', patientType); // Debug log
+    console.log('Current context:', context); // Debug log
 
-    // Émettre l'événement approprié basé sur le type de patient
-    if (patientType === 'new' || patientType === 'guest' || !patientType) {
+    // Vérifier si on est dans appointment-search (toujours 'existing')
+    // ou si le contexte indique explicitement qu'on est en mode 'existing'
+    if (patientType === 'existing' || context.consultationMode) {
+      // Si on a un mode de consultation défini, on est dans appointment-search
+      // donc toujours émettre slotSelected pour rester dans le composant
+      console.log('Emitting slotSelected event (appointment-search context)'); // Debug log
+      this.slotSelected.emit(enrichedSlot);
+    } else if (patientType === 'new' || patientType === 'guest' || !patientType) {
       // Pour les nouveaux patients, invités ou si pas de type défini
       console.log('Emitting showRegistration event'); // Debug log
       this.showRegistration.emit(enrichedSlot);
-    } else if (patientType === 'existing') {
-      // Pour les patients existants
-      console.log('Emitting slotSelected event'); // Debug log
-      this.slotSelected.emit(enrichedSlot);
     }
   }
 

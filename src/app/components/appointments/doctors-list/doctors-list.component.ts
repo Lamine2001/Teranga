@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,6 +17,12 @@ import { DoctorAvailabilityComponent } from '../doctor-availability/doctor-avail
   styleUrls: ['./doctors-list.component.scss']
 })
 export class DoctorsListComponent implements OnInit, OnDestroy {
+  @Input() consultationMode?: string;
+  @Input() specialty?: string;
+  @Input() location?: string;
+  @Output() slotSelected = new EventEmitter<{ slot: any, doctor: any }>();
+  @Output() showRegistration = new EventEmitter<any>();
+  
   searchForm: FormGroup;
   doctors: any[] = [];
   filteredDoctors: any[] = [];
@@ -146,12 +152,20 @@ export class DoctorsListComponent implements OnInit, OnDestroy {
       selectedSlot: slot
     });
     
-    // Naviguer vers la page de booking
-    this.router.navigate(['/appointments/booking']).then(success => {
-      console.log('Navigation success:', success);
-    }).catch(error => {
-      console.error('Navigation error:', error);
-    });
+    // Déterminer où naviguer en fonction du contexte
+    const patientType = currentContext.patientType;
+    
+    if (patientType === 'existing') {
+      // Si on est dans appointment-search, émettre l'événement au lieu de naviguer
+      this.slotSelected.emit({ slot, doctor });
+    } else {
+      // Pour les nouveaux patients ou wizard, naviguer vers la bonne route
+      this.router.navigate(['/appointments/wizard']).then(success => {
+        console.log('Navigation to wizard success:', success);
+      }).catch(error => {
+        console.error('Navigation error:', error);
+      });
+    }
   }
 
   onSelectTimeSlot(slot: any, doctor: any): void {
@@ -160,19 +174,27 @@ export class DoctorsListComponent implements OnInit, OnDestroy {
     
     const currentContext = this.appointmentContextService.getContext();
     
+    // Mettre à jour le contexte
     this.appointmentContextService.updateContext({
       consultationMode: currentContext.consultationMode,
-      patientType: 'existing',
+      patientType: currentContext.patientType || 'existing',
       selectedDoctor: doctor,
       selectedSlot: slot
     });
     
-    // Naviguer vers la page de booking
-    this.router.navigate(['/appointments/booking']).then(success => {
-      console.log('Navigation success:', success);
-    }).catch(error => {
-      console.error('Navigation error:', error);
-    });
+    // Si on est dans le contexte appointment-search, émettre un événement au lieu de naviguer
+    if (currentContext.patientType === 'existing' || currentContext.consultationMode) {
+      // Émettre l'événement pour que le composant parent gère l'affichage
+      console.log('Emitting slotSelected event from doctors-list');
+      this.slotSelected.emit({ slot, doctor });
+    } else {
+      // Sinon, naviguer vers le wizard
+      this.router.navigate(['/appointments/wizard']).then(success => {
+        console.log('Navigation to wizard success:', success);
+      }).catch(error => {
+        console.error('Navigation error:', error);
+      });
+    }
   }
 }
 
