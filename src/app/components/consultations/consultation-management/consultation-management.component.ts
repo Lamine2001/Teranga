@@ -54,6 +54,22 @@ export class ConsultationManagementComponent implements OnInit {
       error: (error) => {
         console.error('Error loading statistics:', error);
         this.isLoadingStats = false;
+        
+        // Use default values if API is not ready
+        this.consultationSummary = {
+          totalConsultations: 0,
+          completedConsultations: 0,
+          averageDuration: 0,
+          patientSatisfactionAverage: 0,
+          consultationsByType: { virtual: 0, onsite: 0 }
+        };
+        
+        // Log helpful error message
+        if (error.status === 403) {
+          console.warn('API endpoint not yet implemented or insufficient permissions');
+        } else if (error.status === 404) {
+          console.warn('Consultation statistics endpoint not found - backend may need to implement /api/consultations/doctor/{id}/summary');
+        }
       }
     });
   }
@@ -65,6 +81,14 @@ export class ConsultationManagementComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading active consultations:', error);
+        // Set empty array if API is not ready
+        this.activeConsultations = [];
+        
+        if (error.status === 403) {
+          console.warn('Active consultations endpoint requires authentication or is not implemented');
+        } else if (error.status === 404) {
+          console.warn('Active consultations endpoint not found - backend may need to implement /api/consultations/active');
+        }
       }
     });
   }
