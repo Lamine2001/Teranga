@@ -337,6 +337,72 @@
   text-decoration: underline;
 }
 
+/* Appointment Actions Buttons */
+.appointment-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+}
+
+.btn-action {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-action:active {
+  transform: translateY(0);
+}
+
+.btn-action.btn-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+}
+
+.btn-action.btn-primary:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+}
+
+.btn-action.btn-secondary {
+  background: linear-gradient(135deg, #6c757d, #545b62);
+  color: white;
+}
+
+.btn-action.btn-secondary:hover {
+  background: linear-gradient(135deg, #545b62, #3d4347);
+}
+
+.btn-action.btn-outline {
+  background: transparent;
+  color: #dc3545;
+  border: 2px solid #dc3545;
+}
+
+.btn-action.btn-outline:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-action i {
+  font-size: 12px;
+}
+
+/* Responsive adjustments for buttons */
 @media (max-width: 768px) {
   .dashboard-header {
     flex-direction: column;
@@ -355,5 +421,15 @@
   .appointment-details {
     flex-direction: column;
     gap: 0.5rem;
+  }
+  
+  .appointment-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn-action {
+    width: 100%;
+    justify-content: center;
   }
 }

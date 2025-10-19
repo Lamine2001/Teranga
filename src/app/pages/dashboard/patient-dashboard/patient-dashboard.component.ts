@@ -129,6 +129,11 @@ export class PatientDashboardComponent implements OnInit {
     return this.showAllAppointments ? 'Voir moins' : 'Voir tous';
   }
 
+  // Nouvelle méthode pour vérifier s'il y a plus de 3 rendez-vous
+  hasMoreThanThreeAppointments(): boolean {
+    return this.upcomingAppointments.length > 3;
+  }
+
   // Méthode pour savoir si on peut afficher le bouton "Voir moins"
   canShowLess(): boolean {
     return this.showAllAppointments && this.upcomingAppointments.length > 3;
