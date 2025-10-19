@@ -7,6 +7,7 @@ import { User } from '../../../interfaces/user';
 import { CreateAvailabilityComponent } from '../../../components/availability/create-availability/create-availability.component';
 import { ViewAvailabilityComponent } from '../../../components/availability/view-availability/view-availability.component';
 import { DoctorAppointmentsComponent } from '../../../components/appointments/doctor-appointments/doctor-appointments.component';
+import { ConsultationManagementComponent } from '../../../components/consultations/consultation-management/consultation-management.component';
 
 interface DoctorProfile extends User {
   speciality?: string;
@@ -51,7 +52,8 @@ interface DashboardStats {
     FormsModule,
     CreateAvailabilityComponent,
     ViewAvailabilityComponent,
-    DoctorAppointmentsComponent
+    DoctorAppointmentsComponent,
+    ConsultationManagementComponent
   ],
   templateUrl: './doctor-dashboard.component.html',
   styleUrls: ['./doctor-dashboard.component.css']

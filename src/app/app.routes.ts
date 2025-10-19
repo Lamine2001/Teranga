@@ -77,6 +77,11 @@ export const routes: Routes = [
   
   // Consultation Routes
   {
+    path: 'consultations/management',
+    loadComponent: () => import('./components/consultations/consultation-management/consultation-management.component').then(m => m.ConsultationManagementComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'consultations/history',
     loadComponent: () => import('./components/consultations/consultation-history/consultation-history.component').then(m => m.ConsultationHistoryComponent),
     canActivate: [AuthGuard]

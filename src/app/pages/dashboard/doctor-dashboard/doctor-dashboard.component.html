@@ -238,13 +238,9 @@
           </div>
         </div>
 
-        <!-- Other sections placeholders -->
+        <!-- Consultations Section -->
         <div *ngIf="activeSection === 'consultations'" class="section-content">
-          <div class="feature-placeholder">
-            <i class="fas fa-stethoscope feature-icon"></i>
-            <h3>Gestion des Consultations</h3>
-            <p>Cette fonctionnalité sera bientôt disponible</p>
-          </div>
+          <app-consultation-management></app-consultation-management>
         </div>
 
         <div *ngIf="activeSection === 'prescriptions'" class="section-content">
