@@ -310,13 +310,10 @@ export class AuthService {
   }
 
   // Méthode pour vérifier la validité du token
-  verifyToken(): Observable<{ valid: boolean; user?: User }> {
+  verifyToken(): Observable<{ valid: boolean; user?: User; status?: number }> {
     const token = this.getAuthToken();
     if (!token) {
-      return new Observable(observer => {
-        observer.next({ valid: false });
-        observer.complete();
-      });
+      return of({ valid: false });
     }
 
     return this.http.get<any>(`${this.apiUrl}/verify`, this.getAuthHeaders())
@@ -349,9 +346,11 @@ export class AuthService {
           }
           return { valid: false };
         }),
-        catchError(() => {
-          this.clearUserData();
-          return of({ valid: false });
+        catchError((error) => {
+          console.warn('Token verification failed:', error);
+          // ✅ FIX: Don't clear user data on network errors
+          // Only return status to let caller decide
+          return of({ valid: false, status: error.status });
         })
       );
   }
@@ -375,25 +374,37 @@ export class AuthService {
           console.log('Restored user from storage:', user);
           console.log('User type from storage:', user.userType);
           
-          // Set user immediately to avoid delay
+          // ✅ Set user immediately to avoid delay
           this.currentUserSubject.next(user);
           this.isAuthenticatedSubject.next(true);
           
-          // Then verify with backend (optional)
+          // ✅ IMPROVED: Verify token but don't force logout on errors
           this.verifyToken().subscribe({
             next: (result) => {
               if (result.valid && result.user) {
-                // Update with fresh data from server
-                console.log('Token verified, user from server:', result.user);
+                // ✅ Update with fresh data from server
+                console.log('Token verified, updating user from server');
                 this.currentUserSubject.next(result.user);
                 this.isAuthenticatedSubject.next(true);
-              } else {
+              } else if (result.status === 401) {
+                // ✅ Only logout on explicit 401 Unauthorized
+                console.log('Token invalid (401), logging out');
                 this.clearUserData();
+                this.router.navigate(['/auth']);
+              } else {
+                // ✅ Keep local user for other errors (network, 500, etc.)
+                console.warn('Token verification failed, keeping local user (status:', result.status, ')');
               }
             },
-            error: () => {
-              // Keep local user if verification fails (offline mode)
-              console.warn('Token verification failed, keeping local user');
+            error: (error) => {
+              // ✅ Keep local user if verification fails (offline mode)
+              console.warn('Token verification error, keeping local user:', error);
+              // Only logout on explicit 401
+              if (error.status === 401) {
+                console.log('Unauthorized, logging out');
+                this.clearUserData();
+                this.router.navigate(['/auth']);
+              }
             }
           });
         } catch (e) {
