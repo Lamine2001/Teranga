@@ -153,34 +153,160 @@
         }
 
         &.search-input-group {
-          .input-with-button {
-            display: flex;
-            gap: 10px;
+          .autocomplete-wrapper {
+            position: relative;
 
-            input {
-              flex: 1;
-            }
-
-            .btn {
-              padding: 12px 24px;
-              background: #007bff;
-              color: white;
-              border: none;
-              border-radius: 6px;
-              cursor: pointer;
+            .input-with-button {
               display: flex;
-              align-items: center;
-              gap: 8px;
-              white-space: nowrap;
-              transition: background 0.2s;
+              gap: 10px;
 
-              &:hover:not(:disabled) {
-                background: #0056b3;
+              input {
+                flex: 1;
               }
 
-              &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
+              .btn {
+                padding: 12px 24px;
+                background: #007bff;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                white-space: nowrap;
+                transition: background 0.2s;
+
+                &:hover:not(:disabled) {
+                  background: #0056b3;
+                }
+
+                &:disabled {
+                  opacity: 0.6;
+                  cursor: not-allowed;
+                }
+              }
+            }
+
+            .autocomplete-dropdown {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 100px; // Leave space for button
+              background: white;
+              border: 2px solid #007bff;
+              border-radius: 8px;
+              margin-top: 5px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              z-index: 1000;
+              max-height: 400px;
+              overflow-y: auto;
+
+              .autocomplete-header {
+                padding: 12px 15px;
+                background: #f8f9fa;
+                border-bottom: 1px solid #e9ecef;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #495057;
+
+                i {
+                  color: #007bff;
+                }
+              }
+
+              .autocomplete-item {
+                padding: 12px 15px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+                border-bottom: 1px solid #f0f0f0;
+
+                &:last-child {
+                  border-bottom: none;
+                }
+
+                &:hover {
+                  background: #e7f3ff;
+                  padding-left: 20px;
+                }
+
+                .patient-avatar-small {
+                  width: 40px;
+                  height: 40px;
+                  background: #007bff;
+                  color: white;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 18px;
+                  flex-shrink: 0;
+                }
+
+                .patient-info-small {
+                  flex: 1;
+
+                  .patient-name {
+                    font-weight: 600;
+                    color: #333;
+                    font-size: 15px;
+                    margin-bottom: 4px;
+                  }
+
+                  .patient-details {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    font-size: 13px;
+                    color: #6c757d;
+
+                    span {
+                      display: flex;
+                      align-items: center;
+                      gap: 5px;
+
+                      i {
+                        color: #007bff;
+                        font-size: 11px;
+                      }
+                    }
+                  }
+                }
+
+                > i {
+                  color: #007bff;
+                  font-size: 16px;
+                  flex-shrink: 0;
+                }
+              }
+            }
+
+            .autocomplete-loading {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 100px;
+              background: white;
+              border: 2px solid #007bff;
+              border-radius: 8px;
+              margin-top: 5px;
+              padding: 15px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              z-index: 1000;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              color: #007bff;
+              font-size: 14px;
+
+              i {
+                font-size: 18px;
               }
             }
           }

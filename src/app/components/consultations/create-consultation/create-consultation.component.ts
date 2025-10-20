@@ -2,11 +2,13 @@
  * Create Consultation Component
  * Allows doctors to create and manage consultations with patient history
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
 import { ConsultationService } from '../../../services/consultation.service';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
@@ -42,12 +44,17 @@ interface PreviousConsultation {
   templateUrl: './create-consultation.component.html',
   styleUrls: ['./create-consultation.component.scss']
 })
-export class CreateConsultationComponent implements OnInit {
+export class CreateConsultationComponent implements OnInit, OnDestroy {
   // Patient selection
   searchPatientForm: FormGroup;
   selectedPatient: PatientInfo | null = null;
   searchResults: PatientInfo[] = [];
   isSearching = false;
+  
+  // Autocomplete
+  private searchTerms = new Subject<string>();
+  private readonly MIN_SEARCH_LENGTH = 4;
+  showAutocomplete = false;
   
   // Consultation
   currentConsultation: Consultation | null = null;
@@ -86,6 +93,9 @@ export class CreateConsultationComponent implements OnInit {
   ngOnInit(): void {
     this.currentDoctor = this.authService.getCurrentUser();
     
+    // Setup autocomplete for patient search
+    this.setupAutocomplete();
+    
     // Check if patient ID or appointment ID is provided in route params
     this.route.params.subscribe(params => {
       const appointmentId = params['appointmentId'];
@@ -97,6 +107,68 @@ export class CreateConsultationComponent implements OnInit {
         this.loadPatientById(+params['patientId']);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.searchTerms.complete();
+  }
+
+  /**
+   * Setup autocomplete with debounce and minimum character check
+   */
+  private setupAutocomplete(): void {
+    this.searchTerms.pipe(
+      // Wait 300ms after each keystroke
+      debounceTime(300),
+      // Only search if term is at least MIN_SEARCH_LENGTH characters
+      filter(term => term.length >= this.MIN_SEARCH_LENGTH),
+      // Ignore if same as previous search term
+      distinctUntilChanged(),
+      // Switch to new search observable (cancel previous)
+      switchMap((term: string) => {
+        this.isSearching = true;
+        console.log('Autocomplete search for:', term);
+        return this.userService.searchUsers(term, 'PATIENT');
+      })
+    ).subscribe({
+      next: (results: any[]) => {
+        console.log('Autocomplete results:', results);
+        this.searchResults = results.map(user => ({
+          id: user.id || user.userId,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          dateOfBirth: user.dateOfBirth,
+          gender: user.gender,
+          address: user.address
+        }));
+        this.isSearching = false;
+        this.showAutocomplete = this.searchResults.length > 0;
+      },
+      error: (error) => {
+        console.error('Autocomplete error:', error);
+        this.isSearching = false;
+        this.searchResults = [];
+        this.showAutocomplete = false;
+      }
+    });
+  }
+
+  /**
+   * Handle input change for autocomplete
+   */
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.trim();
+    
+    if (value.length < this.MIN_SEARCH_LENGTH) {
+      this.searchResults = [];
+      this.showAutocomplete = false;
+      this.isSearching = false;
+    } else {
+      this.searchTerms.next(value);
+    }
   }
 
   /**
@@ -186,8 +258,18 @@ export class CreateConsultationComponent implements OnInit {
   selectPatient(patient: PatientInfo): void {
     this.selectedPatient = patient;
     this.searchResults = [];
-    this.searchPatientForm.reset();
+    this.showAutocomplete = false;
+    this.searchPatientForm.patchValue({ searchQuery: '' });
     this.loadPatientHistory(patient.id);
+  }
+
+  /**
+   * Close autocomplete dropdown
+   */
+  closeAutocomplete(): void {
+    setTimeout(() => {
+      this.showAutocomplete = false;
+    }, 200); // Delay to allow click event to fire
   }
 
   /**

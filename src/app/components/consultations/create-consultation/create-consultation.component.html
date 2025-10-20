@@ -42,26 +42,60 @@
           </div>
 
           <div class="form-group search-input-group">
-            <label>Recherche</label>
-            <div class="input-with-button">
-              <input
-                type="text"
-                formControlName="searchQuery"
-                placeholder="Entrez nom, email, téléphone..."
-                (keyup.enter)="searchPatients()"
-              >
-              <button type="submit" class="btn btn-primary" [disabled]="searchPatientForm.invalid || isSearching">
-                <i class="fas fa-search" *ngIf="!isSearching"></i>
-                <i class="fas fa-spinner fa-spin" *ngIf="isSearching"></i>
-                Rechercher
-              </button>
+            <label>Recherche (minimum 4 caractères)</label>
+            <div class="autocomplete-wrapper">
+              <div class="input-with-button">
+                <input
+                  type="text"
+                  formControlName="searchQuery"
+                  placeholder="Tapez au moins 4 caractères..."
+                  (input)="onSearchInput($event)"
+                  (blur)="closeAutocomplete()"
+                  (keyup.enter)="searchPatients()"
+                  autocomplete="off"
+                >
+                <button type="submit" class="btn btn-primary" [disabled]="searchPatientForm.invalid || isSearching">
+                  <i class="fas fa-search" *ngIf="!isSearching"></i>
+                  <i class="fas fa-spinner fa-spin" *ngIf="isSearching"></i>
+                  Rechercher
+                </button>
+              </div>
+              
+              <!-- Autocomplete Dropdown -->
+              <div class="autocomplete-dropdown" *ngIf="showAutocomplete && searchResults.length > 0">
+                <div class="autocomplete-header">
+                  <i class="fas fa-users"></i>
+                  <span>{{ searchResults.length }} patient(s) trouvé(s)</span>
+                </div>
+                <div class="autocomplete-item" 
+                     *ngFor="let patient of searchResults" 
+                     (mousedown)="selectPatient(patient)">
+                  <div class="patient-avatar-small">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="patient-info-small">
+                    <div class="patient-name">{{ patient.firstName }} {{ patient.lastName }}</div>
+                    <div class="patient-details">
+                      <span *ngIf="patient.email"><i class="fas fa-envelope"></i> {{ patient.email }}</span>
+                      <span *ngIf="patient.phone"><i class="fas fa-phone"></i> {{ patient.phone }}</span>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+              
+              <!-- Searching Indicator -->
+              <div class="autocomplete-loading" *ngIf="isSearching && showAutocomplete">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Recherche en cours...</span>
+              </div>
             </div>
           </div>
         </div>
       </form>
 
-      <!-- Search Results -->
-      <div class="search-results" *ngIf="searchResults.length > 0">
+      <!-- Search Results (Manual Search) -->
+      <div class="search-results" *ngIf="!showAutocomplete && searchResults.length > 0">
         <h3>Résultats de la recherche ({{ searchResults.length }})</h3>
         <div class="patient-list">
           <div class="patient-card" *ngFor="let patient of searchResults" (click)="selectPatient(patient)">
