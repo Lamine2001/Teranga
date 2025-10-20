@@ -64,6 +64,9 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   tableFilterText = '';
   tableSortColumn: 'name' | 'date' | 'status' = 'date';
   tableSortDirection: 'asc' | 'desc' = 'desc';
+  selectedStatusFilter = '';
+  selectedStartDate = '';
+  selectedEndDate = '';
   
   // Consultation
   currentConsultation: Consultation | null = null;
@@ -568,6 +571,17 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
     if (this.showPatientsTable && this.patientsWithAppointments.length === 0) {
       this.loadPatientsWithAppointments();
     }
+  }
+
+  /**
+   * Apply filters (status, date range)
+   */
+  applyFilters(): void {
+    this.loadPatientsWithAppointments(
+      this.selectedStatusFilter || undefined,
+      this.selectedStartDate || undefined,
+      this.selectedEndDate || undefined
+    );
   }
 
   /**

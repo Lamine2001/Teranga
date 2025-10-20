@@ -49,6 +49,29 @@
                 [(ngModel)]="tableFilterText"
               >
             </div>
+            <div class="status-filter">
+              <select [(ngModel)]="selectedStatusFilter" (change)="applyFilters()">
+                <option value="">Tous les statuts</option>
+                <option value="PENDING">En attente</option>
+                <option value="CONFIRMED">Confirmé</option>
+                <option value="COMPLETED">Terminé</option>
+                <option value="CANCELLED">Annulé</option>
+              </select>
+            </div>
+            <div class="date-filter">
+              <input 
+                type="date" 
+                [(ngModel)]="selectedStartDate" 
+                (change)="applyFilters()"
+                placeholder="Date début"
+              >
+              <input 
+                type="date" 
+                [(ngModel)]="selectedEndDate" 
+                (change)="applyFilters()"
+                placeholder="Date fin"
+              >
+            </div>
             <button class="btn-refresh" (click)="loadPatientsWithAppointments()">
               <i class="fas fa-sync-alt"></i>
             </button>
@@ -103,7 +126,12 @@
                   <div class="patient-avatar-mini">
                     <i class="fas fa-user"></i>
                   </div>
-                  <span class="patient-name-table">{{ patient.patientFirstName }} {{ patient.patientLastName }}</span>
+                  <div class="patient-name-container">
+                    <span class="patient-name-table">{{ patient.patientFirstName }} {{ patient.patientLastName }}</span>
+                    <span class="consultation-badge" *ngIf="patient.hasConsultation" title="Consultation déjà créée">
+                      <i class="fas fa-file-medical"></i> Consultation existante
+                    </span>
+                  </div>
                 </td>
                 <td class="contact-cell">
                   <div class="contact-info">
@@ -128,8 +156,8 @@
                 </td>
                 <td class="action-cell">
                   <button class="btn-select-patient" (click)="selectPatientFromTable(patient)">
-                    <i class="fas fa-user-check"></i>
-                    Sélectionner
+                    <i [class]="patient.hasConsultation ? 'fas fa-eye' : 'fas fa-user-check'"></i>
+                    {{ patient.hasConsultation ? 'Voir' : 'Créer consultation' }}
                   </button>
                 </td>
               </tr>
