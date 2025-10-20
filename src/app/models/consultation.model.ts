@@ -70,9 +70,12 @@ export interface LabTest {
 }
 
 export interface StartConsultationRequest {
-  appointmentId: number;
+  appointmentId?: number; // Optional for walk-in consultations
+  patientId?: number; // Required for walk-in consultations
   consultationType: 'virtual' | 'onsite';
   videoCallLink?: string;
+  chiefComplaint?: string; // Can be provided when starting
+  symptoms?: string; // Can be provided when starting
 }
 
 export interface EndConsultationRequest {

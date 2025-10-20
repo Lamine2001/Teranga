@@ -102,8 +102,8 @@ export class ConsultationManagementComponent implements OnInit {
   }
 
   navigateToNewConsultation(): void {
-    // For starting a consultation from scratch (walk-in patient)
-    this.router.navigate(['/appointments/search']);
+    // Navigate to consultation creation page
+    this.router.navigate(['/consultations/create']);
   }
 
   navigateToProfile(): void {

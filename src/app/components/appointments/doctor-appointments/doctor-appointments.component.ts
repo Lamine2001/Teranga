@@ -7,6 +7,7 @@ import { environment } from '../../../../environments/environment';
 
 interface Appointment {
   id: number;
+  patientId?: number; // Added for consultation creation
   patientFirstName: string;
   patientLastName: string;
   patientEmail: string;
@@ -95,14 +96,26 @@ interface Appointment {
           </div>
 
           <div class="appointment-actions">
-            <button class="btn-action btn-primary" 
-                    *ngIf="appointment.appointmentType === 'virtual' && type === 'today'"
-                    (click)="startVideoConsultation(appointment)">
-              <i class="fas fa-video"></i> Démarrer
+            <!-- Start Consultation Button (Primary action) -->
+            <button class="btn-action btn-success" 
+                    *ngIf="type === 'today' && appointment.status === 'CONFIRMED'"
+                    (click)="startConsultation(appointment)">
+              <i class="fas fa-play-circle"></i> Commencer Consultation
             </button>
+
+            <!-- Start Video Button (for teleconsultations) -->
+            <button class="btn-action btn-primary" 
+                    *ngIf="appointment.appointmentType === 'virtual' && type === 'today' && appointment.status === 'CONFIRMED'"
+                    (click)="startVideoConsultation(appointment)">
+              <i class="fas fa-video"></i> Vidéo
+            </button>
+
+            <!-- View Details -->
             <button class="btn-action btn-secondary" (click)="viewDetails(appointment)">
               <i class="fas fa-eye"></i> Détails
             </button>
+
+            <!-- Cancel -->
             <button class="btn-action btn-danger" *ngIf="appointment.status === 'CONFIRMED' && type !== 'history'"
                     (click)="cancelAppointment(appointment)">
               <i class="fas fa-times"></i> Annuler
@@ -292,6 +305,16 @@ interface Appointment {
       opacity: 0.9;
     }
 
+    .btn-success {
+      background: #28a745;
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
     .btn-primary {
       background: #007bff;
       color: white;
@@ -372,6 +395,21 @@ export class DoctorAppointmentsComponent implements OnInit {
       case 'history': return 'dans l\'historique';
       default: return '';
     }
+  }
+
+  /**
+   * Start a consultation from an appointment
+   * This navigates to the consultation creation page with appointment ID
+   * The patient will be automatically associated with the consultation
+   */
+  startConsultation(appointment: Appointment) {
+    // Navigate to consultation creation with appointmentId parameter
+    // The CreateConsultationComponent will automatically:
+    // 1. Load patient info from appointment
+    // 2. Load patient history
+    // 3. Start the consultation
+    // 4. Associate patient with consultation
+    this.router.navigate(['/consultations/create', appointment.id]);
   }
 
   viewDetails(appointment: Appointment) {

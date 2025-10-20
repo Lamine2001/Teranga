@@ -82,6 +82,16 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'consultations/create',
+    loadComponent: () => import('./components/consultations/create-consultation/create-consultation.component').then(m => m.CreateConsultationComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'consultations/create/:appointmentId',
+    loadComponent: () => import('./components/consultations/create-consultation/create-consultation.component').then(m => m.CreateConsultationComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'consultations/history',
     loadComponent: () => import('./components/consultations/consultation-history/consultation-history.component').then(m => m.ConsultationHistoryComponent),
     canActivate: [AuthGuard]
