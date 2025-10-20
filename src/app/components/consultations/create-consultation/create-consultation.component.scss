@@ -902,6 +902,329 @@
   }
 }
 
+// View Toggle
+.view-toggle {
+  margin-bottom: 20px;
+  text-align: center;
+
+  .btn-toggle-view {
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    i {
+      font-size: 18px;
+    }
+  }
+}
+
+// Patients Table
+.patients-table-container {
+  margin-bottom: 30px;
+
+  .table-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .table-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+
+      h2 {
+        margin: 0;
+        font-size: 20px;
+
+        i {
+          margin-right: 10px;
+        }
+      }
+
+      .table-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        .search-filter {
+          position: relative;
+          display: flex;
+          align-items: center;
+
+          i {
+            position: absolute;
+            left: 12px;
+            color: #6c757d;
+          }
+
+          input {
+            padding: 8px 12px 8px 35px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            width: 250px;
+            font-size: 14px;
+
+            &:focus {
+              outline: none;
+              border-color: #007bff;
+            }
+          }
+        }
+
+        .btn-refresh {
+          padding: 8px 12px;
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: background 0.2s;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.3);
+          }
+        }
+      }
+    }
+
+    .table-loading,
+    .table-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+
+      i {
+        margin-bottom: 15px;
+        color: #007bff;
+      }
+
+      h3 {
+        margin: 10px 0;
+        color: #495057;
+      }
+
+      p {
+        margin: 5px 0;
+      }
+    }
+
+    .patients-table-wrapper {
+      overflow-x: auto;
+
+      .patients-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        thead {
+          background: #f8f9fa;
+          border-bottom: 2px solid #dee2e6;
+
+          tr th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            white-space: nowrap;
+
+            &.sortable {
+              cursor: pointer;
+              user-select: none;
+              transition: background 0.2s;
+
+              &:hover {
+                background: #e9ecef;
+              }
+
+              i {
+                margin-left: 5px;
+                color: #6c757d;
+              }
+            }
+
+            &.action-column {
+              text-align: center;
+            }
+          }
+        }
+
+        tbody {
+          .patient-row {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+
+            &:hover {
+              background: #f8f9fa;
+            }
+
+            td {
+              padding: 15px;
+              vertical-align: middle;
+
+              &.patient-cell {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+
+                .patient-avatar-mini {
+                  width: 35px;
+                  height: 35px;
+                  background: #007bff;
+                  color: white;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  flex-shrink: 0;
+                }
+
+                .patient-name-table {
+                  font-weight: 600;
+                  color: #333;
+                }
+              }
+
+              &.contact-cell {
+                .contact-info {
+                  display: flex;
+                  flex-direction: column;
+                  gap: 5px;
+                  font-size: 13px;
+                  color: #6c757d;
+
+                  span {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    i {
+                      color: #007bff;
+                      font-size: 11px;
+                    }
+                  }
+                }
+              }
+
+              &.date-cell {
+                font-size: 14px;
+                color: #495057;
+              }
+
+              &.type-cell {
+                .type-badge {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 6px;
+                  padding: 5px 12px;
+                  border-radius: 12px;
+                  font-size: 13px;
+                  font-weight: 500;
+
+                  &.badge-video {
+                    background: #e7f3ff;
+                    color: #007bff;
+                  }
+
+                  &.badge-onsite {
+                    background: #d4edda;
+                    color: #155724;
+                  }
+                }
+              }
+
+              &.status-cell {
+                .status-badge {
+                  display: inline-block;
+                  padding: 5px 12px;
+                  border-radius: 12px;
+                  font-size: 12px;
+                  font-weight: 600;
+                  text-transform: uppercase;
+
+                  &.status-confirmed {
+                    background: #d4edda;
+                    color: #155724;
+                  }
+
+                  &.status-pending {
+                    background: #fff3cd;
+                    color: #856404;
+                  }
+
+                  &.status-cancelled {
+                    background: #f8d7da;
+                    color: #721c24;
+                  }
+
+                  &.status-unknown {
+                    background: #e9ecef;
+                    color: #495057;
+                  }
+                }
+              }
+
+              &.action-cell {
+                text-align: center;
+
+                .btn-select-patient {
+                  padding: 8px 16px;
+                  background: #28a745;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 13px;
+                  font-weight: 600;
+                  transition: all 0.2s;
+
+                  &:hover {
+                    background: #218838;
+                    transform: translateY(-2px);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .table-footer {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: #6c757d;
+      }
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .consultation-interface .interface-layout {
     grid-template-columns: 1fr;
@@ -914,6 +1237,28 @@
 
   .patient-search-section .search-card .search-form {
     grid-template-columns: 1fr;
+  }
+
+  .patients-table-container .table-card .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .table-actions {
+      width: 100%;
+
+      .search-filter input {
+        width: 100%;
+      }
+    }
+  }
+
+  .patients-table-wrapper .patients-table {
+    font-size: 12px;
+
+    thead tr th,
+    tbody tr td {
+      padding: 10px 8px;
+    }
   }
 }
 

@@ -26,7 +26,126 @@
 
   <!-- Patient Search (if no patient selected) -->
   <div class="patient-search-section" *ngIf="!selectedPatient">
-    <div class="search-card">
+    <!-- Toggle Button for Patients Table -->
+    <div class="view-toggle">
+      <button class="btn-toggle-view" (click)="togglePatientsTable()">
+        <i [class]="showPatientsTable ? 'fas fa-search' : 'fas fa-list'"></i>
+        {{ showPatientsTable ? 'Rechercher par nom' : 'Voir mes patients avec rendez-vous' }}
+      </button>
+    </div>
+
+    <!-- Patients Table View -->
+    <div class="patients-table-container" *ngIf="showPatientsTable">
+      <div class="table-card">
+        <div class="table-header">
+          <h2><i class="fas fa-users"></i> Mes Patients avec Rendez-vous</h2>
+          <div class="table-actions">
+            <div class="search-filter">
+              <i class="fas fa-filter"></i>
+              <input
+                type="text"
+                placeholder="Filtrer par nom, email, téléphone..."
+                (input)="filterPatientsTable($event)"
+                [(ngModel)]="tableFilterText"
+              >
+            </div>
+            <button class="btn-refresh" (click)="loadPatientsWithAppointments()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="table-loading" *ngIf="isLoadingPatients">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Chargement des patients...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div class="table-empty" *ngIf="!isLoadingPatients && filteredPatients.length === 0">
+          <i class="fas fa-calendar-times fa-3x"></i>
+          <h3>Aucun patient trouvé</h3>
+          <p *ngIf="tableFilterText">Essayez un autre filtre</p>
+          <p *ngIf="!tableFilterText">Aucun rendez-vous confirmé pour le moment</p>
+        </div>
+
+        <!-- Patients Table -->
+        <div class="patients-table-wrapper" *ngIf="!isLoadingPatients && filteredPatients.length > 0">
+          <table class="patients-table">
+            <thead>
+              <tr>
+                <th (click)="sortPatientsTable('name')" class="sortable">
+                  <span>Patient</span>
+                  <i class="fas" [class.fa-sort-up]="tableSortColumn === 'name' && tableSortDirection === 'asc'"
+                     [class.fa-sort-down]="tableSortColumn === 'name' && tableSortDirection === 'desc'"
+                     [class.fa-sort]="tableSortColumn !== 'name'"></i>
+                </th>
+                <th>Contact</th>
+                <th (click)="sortPatientsTable('date')" class="sortable">
+                  <span>Prochain RDV</span>
+                  <i class="fas" [class.fa-sort-up]="tableSortColumn === 'date' && tableSortDirection === 'asc'"
+                     [class.fa-sort-down]="tableSortColumn === 'date' && tableSortDirection === 'desc'"
+                     [class.fa-sort]="tableSortColumn !== 'date'"></i>
+                </th>
+                <th>Type</th>
+                <th (click)="sortPatientsTable('status')" class="sortable">
+                  <span>Statut</span>
+                  <i class="fas" [class.fa-sort-up]="tableSortColumn === 'status' && tableSortDirection === 'asc'"
+                     [class.fa-sort-down]="tableSortColumn === 'status' && tableSortDirection === 'desc'"
+                     [class.fa-sort]="tableSortColumn !== 'status'"></i>
+                </th>
+                <th class="action-column">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let patient of filteredPatients" class="patient-row">
+                <td class="patient-cell">
+                  <div class="patient-avatar-mini">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <span class="patient-name-table">{{ patient.patientFirstName }} {{ patient.patientLastName }}</span>
+                </td>
+                <td class="contact-cell">
+                  <div class="contact-info">
+                    <span *ngIf="patient.patientEmail"><i class="fas fa-envelope"></i> {{ patient.patientEmail }}</span>
+                    <span *ngIf="patient.patientPhone"><i class="fas fa-phone"></i> {{ patient.patientPhone }}</span>
+                  </div>
+                </td>
+                <td class="date-cell">
+                  {{ formatDateTime(patient.appointmentTime) }}
+                </td>
+                <td class="type-cell">
+                  <span class="type-badge" [class.badge-video]="patient.appointmentType === 'virtual'"
+                        [class.badge-onsite]="patient.appointmentType === 'onsite'">
+                    <i [class]="patient.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
+                    {{ patient.appointmentType === 'virtual' ? 'Vidéo' : 'Cabinet' }}
+                  </span>
+                </td>
+                <td class="status-cell">
+                  <span class="status-badge" [class]="getStatusClass(patient.status)">
+                    {{ patient.status }}
+                  </span>
+                </td>
+                <td class="action-cell">
+                  <button class="btn-select-patient" (click)="selectPatientFromTable(patient)">
+                    <i class="fas fa-user-check"></i>
+                    Sélectionner
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="table-footer">
+            <span>{{ filteredPatients.length }} patient(s) affiché(s)</span>
+            <span *ngIf="tableFilterText">sur {{ patientsWithAppointments.length }} total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Form View -->
+    <div class="search-card" *ngIf="!showPatientsTable">
       <h2><i class="fas fa-search"></i> Rechercher un Patient</h2>
       
       <form [formGroup]="searchPatientForm" (ngSubmit)="searchPatients()">

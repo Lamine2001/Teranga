@@ -5,7 +5,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
@@ -40,7 +40,7 @@ interface PreviousConsultation {
 @Component({
   selector: 'app-create-consultation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ConsultationNotesComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ConsultationNotesComponent],
   templateUrl: './create-consultation.component.html',
   styleUrls: ['./create-consultation.component.scss']
 })
@@ -55,6 +55,15 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   private searchTerms = new Subject<string>();
   private readonly MIN_SEARCH_LENGTH = 4;
   showAutocomplete = false;
+  
+  // Patient appointments table
+  showPatientsTable = false;
+  patientsWithAppointments: any[] = [];
+  filteredPatients: any[] = [];
+  isLoadingPatients = false;
+  tableFilterText = '';
+  tableSortColumn: 'name' | 'date' | 'status' = 'date';
+  tableSortDirection: 'asc' | 'desc' = 'desc';
   
   // Consultation
   currentConsultation: Consultation | null = null;
@@ -105,6 +114,9 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
         this.loadAppointmentAndStartConsultation(+appointmentId);
       } else if (params['patientId']) {
         this.loadPatientById(+params['patientId']);
+      } else {
+        // Load patients with appointments for this doctor
+        this.loadPatientsWithAppointments();
       }
     });
   }
@@ -493,6 +505,189 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
         });
       }
     }
+  }
+
+  /**
+   * Load patients with appointments for current doctor
+   */
+  loadPatientsWithAppointments(status?: string, startDate?: string, endDate?: string): void {
+    if (!this.currentDoctor?.id) {
+      console.warn('No current doctor ID');
+      return;
+    }
+
+    this.isLoadingPatients = true;
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+    const headers = { 'Authorization': token ? `Bearer ${token}` : '' };
+
+    // Build query parameters
+    let queryParams = '';
+    const params: string[] = [];
+    if (status) params.push(`status=${status}`);
+    if (startDate) params.push(`startDate=${startDate}`);
+    if (endDate) params.push(`endDate=${endDate}`);
+    if (params.length > 0) queryParams = '?' + params.join('&');
+
+    // Fetch patients with appointments using new endpoint
+    this.http.get<any[]>(`${environment.apiUrl}/appointments/doctor/patients${queryParams}`, { headers }).subscribe({
+      next: (patients) => {
+        this.patientsWithAppointments = patients.map(p => ({
+          patientId: p.patientId,
+          patientFirstName: p.patientFirstName,
+          patientLastName: p.patientLastName,
+          patientEmail: p.patientEmail,
+          patientPhone: p.patientPhone,
+          patientGender: p.patientGender,
+          appointmentId: p.appointmentId,
+          appointmentDate: p.appointmentDate,
+          appointmentTime: p.startTime || p.appointmentDate,
+          appointmentType: p.appointmentType,
+          status: p.appointmentStatus,
+          hasConsultation: p.hasExistingConsultation,
+          consultationNoteId: p.consultationNoteId,
+          appointmentNotes: p.appointmentNotes
+        }));
+        this.filteredPatients = [...this.patientsWithAppointments];
+        this.sortPatientsTable();
+        this.isLoadingPatients = false;
+        console.log('Loaded patients with appointments:', this.patientsWithAppointments);
+      },
+      error: (error) => {
+        console.error('Error loading patients with appointments:', error);
+        this.isLoadingPatients = false;
+        this.errorMessage = 'Erreur lors du chargement des patients';
+      }
+    });
+  }
+
+  /**
+   * Toggle patients table visibility
+   */
+  togglePatientsTable(): void {
+    this.showPatientsTable = !this.showPatientsTable;
+    if (this.showPatientsTable && this.patientsWithAppointments.length === 0) {
+      this.loadPatientsWithAppointments();
+    }
+  }
+
+  /**
+   * Filter patients table
+   */
+  filterPatientsTable(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.tableFilterText = input.value.toLowerCase();
+    
+    if (!this.tableFilterText) {
+      this.filteredPatients = [...this.patientsWithAppointments];
+    } else {
+      this.filteredPatients = this.patientsWithAppointments.filter(patient => {
+        const fullName = `${patient.patientFirstName} ${patient.patientLastName}`.toLowerCase();
+        const email = (patient.patientEmail || '').toLowerCase();
+        const phone = (patient.patientPhone || '').toLowerCase();
+        const status = (patient.status || '').toLowerCase();
+        
+        return fullName.includes(this.tableFilterText) ||
+               email.includes(this.tableFilterText) ||
+               phone.includes(this.tableFilterText) ||
+               status.includes(this.tableFilterText);
+      });
+    }
+    
+    this.sortPatientsTable();
+  }
+
+  /**
+   * Sort patients table
+   */
+  sortPatientsTable(column?: 'name' | 'date' | 'status'): void {
+    if (column) {
+      if (this.tableSortColumn === column) {
+        this.tableSortDirection = this.tableSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.tableSortColumn = column;
+        this.tableSortDirection = 'asc';
+      }
+    }
+
+    this.filteredPatients.sort((a, b) => {
+      let compareA, compareB;
+
+      switch (this.tableSortColumn) {
+        case 'name':
+          compareA = `${a.patientFirstName} ${a.patientLastName}`.toLowerCase();
+          compareB = `${b.patientFirstName} ${b.patientLastName}`.toLowerCase();
+          break;
+        case 'date':
+          compareA = new Date(a.appointmentTime).getTime();
+          compareB = new Date(b.appointmentTime).getTime();
+          break;
+        case 'status':
+          compareA = (a.status || '').toLowerCase();
+          compareB = (b.status || '').toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+
+      if (compareA < compareB) {
+        return this.tableSortDirection === 'asc' ? -1 : 1;
+      }
+      if (compareA > compareB) {
+        return this.tableSortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+
+  /**
+   * Select patient from table
+   */
+  selectPatientFromTable(patient: any): void {
+    this.selectedPatient = {
+      id: patient.patientId,
+      firstName: patient.patientFirstName,
+      lastName: patient.patientLastName,
+      email: patient.patientEmail,
+      phone: patient.patientPhone
+    };
+    
+    this.loadPatientHistory(patient.patientId);
+    this.showPatientsTable = false;
+    
+    // Auto-start consultation if appointment exists
+    if (patient.appointmentId) {
+      this.startConsultationFromAppointment(patient.appointmentId, patient.appointmentType);
+    }
+  }
+
+  /**
+   * Get status badge class
+   */
+  getStatusClass(status: string): string {
+    switch (status?.toUpperCase()) {
+      case 'CONFIRMED':
+        return 'status-confirmed';
+      case 'PENDING':
+        return 'status-pending';
+      case 'CANCELLED':
+        return 'status-cancelled';
+      default:
+        return 'status-unknown';
+    }
+  }
+
+  /**
+   * Format date for table display
+   */
+  formatDateTime(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 }
 
