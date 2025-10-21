@@ -42,7 +42,7 @@ export class ConsultationHistoryComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
+    public router: Router,
     private consultationService: ConsultationService,
     private authService: AuthService
   ) {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../interfaces/user';
@@ -112,9 +112,9 @@ export class DoctorDashboardComponent implements OnInit {
       icon: 'fas fa-stethoscope',
       expanded: false,
       subItems: [
+        { id: 'consultation-dashboard', label: 'Tableau de Bord', icon: 'fas fa-tachometer-alt' },
         { id: 'new-consultation', label: 'Nouvelle Consultation', icon: 'fas fa-plus' },
-        { id: 'consultation-history', label: 'Historique des Consultations', icon: 'fas fa-history' },
-        { id: 'consultation-notes', label: 'Notes de Consultation', icon: 'fas fa-notes-medical' }
+        { id: 'consultation-history', label: 'Historique Complet', icon: 'fas fa-history' }
       ]
     },
     {
@@ -175,7 +175,10 @@ export class DoctorDashboardComponent implements OnInit {
     }
   ];
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadDoctorProfile();
@@ -228,6 +231,31 @@ export class DoctorDashboardComponent implements OnInit {
   }
 
   selectMenuItem(sectionId: string, subSectionId?: string) {
+    // Handle consultation menu items with navigation
+    if (sectionId === 'consultations' && subSectionId) {
+      switch (subSectionId) {
+        case 'consultation-dashboard':
+          // Stay in dashboard to show consultation management component
+          this.activeSection = 'consultations';
+          this.activeSubSection = '';
+          // Close all expanded menus except the current one
+          this.menuItems.forEach(item => {
+            if (item.id !== sectionId) {
+              item.expanded = false;
+            }
+          });
+          return;
+        case 'new-consultation':
+          // Navigate to consultation creation page (full page)
+          this.router.navigate(['/consultations/create']);
+          return;
+        case 'consultation-history':
+          // Navigate to consultation history page (full page)
+          this.router.navigate(['/consultations/history']);
+          return;
+      }
+    }
+    
     this.activeSection = sectionId;
     this.activeSubSection = subSectionId || '';
     
