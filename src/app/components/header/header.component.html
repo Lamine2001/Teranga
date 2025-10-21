@@ -50,11 +50,36 @@
           </a>
         </div>
         <div class="nav-menu" [class.active]="isMenuOpen">
-          <a routerLink="/home" class="nav-link" (click)="closeMenu()">Accueil</a>
-          <a href="#about" class="nav-link" (click)="closeMenu()">À propos</a>
-          <a href="#services" class="nav-link" (click)="closeMenu()">Services</a>
-          <a href="#contact" class="nav-link" (click)="closeMenu()">Contact</a>
-          <a href="#rates" class="nav-link" (click)="closeMenu()">Tarifs</a>
+          <!-- Navigation for authenticated users -->
+          <ng-container *ngIf="isAuthenticated && currentUser?.userType === 'DOCTOR'">
+            <a routerLink="/doctor-dashboard" class="nav-link" (click)="closeMenu()">
+              <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </a>
+            <a routerLink="/consultations/create" class="nav-link" (click)="closeMenu()">
+              <i class="fas fa-plus-circle"></i> Nouvelle Consultation
+            </a>
+            <a routerLink="/consultations/history" class="nav-link" (click)="closeMenu()">
+              <i class="fas fa-history"></i> Historique
+            </a>
+          </ng-container>
+          
+          <ng-container *ngIf="isAuthenticated && currentUser?.userType === 'PATIENT'">
+            <a routerLink="/patient-dashboard" class="nav-link" (click)="closeMenu()">
+              <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </a>
+            <a routerLink="/book-appointment" class="nav-link" (click)="closeMenu()">
+              <i class="fas fa-calendar-plus"></i> Prendre RDV
+            </a>
+          </ng-container>
+          
+          <!-- Navigation for non-authenticated users -->
+          <ng-container *ngIf="!isAuthenticated">
+            <a routerLink="/home" class="nav-link" (click)="closeMenu()">Accueil</a>
+            <a href="#about" class="nav-link" (click)="closeMenu()">À propos</a>
+            <a href="#services" class="nav-link" (click)="closeMenu()">Services</a>
+            <a href="#contact" class="nav-link" (click)="closeMenu()">Contact</a>
+            <a href="#rates" class="nav-link" (click)="closeMenu()">Tarifs</a>
+          </ng-container>
         </div>
         
         <div class="nav-actions">
