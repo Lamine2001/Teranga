@@ -10,7 +10,6 @@ import { ChangePasswordComponent } from './components/user-profile/change-passwo
 import { AuthGuard } from './guards/auth.guard';
 import { PatientTypeSelectorComponent } from './components/appointments/patient-type-selector/patient-type-selector.component';
 import { DoctorsListComponent } from './components/appointments/doctors-list/doctors-list.component';
-import { AppointmentBookingComponent } from './components/appointments/appointment-booking/appointment-booking.component';
 import { AppointmentWizardComponent } from './components/appointments/appointment-wizard/appointment-wizard.component';
 
 export const routes: Routes = [
@@ -41,10 +40,6 @@ export const routes: Routes = [
   {
     path: 'appointments/doctors',
     component: DoctorsListComponent
-  },
-  {
-    path: 'appointments/booking',
-    component: AppointmentBookingComponent
   },
   {
     path: 'appointments/wizard',

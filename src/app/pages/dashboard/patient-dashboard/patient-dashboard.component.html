@@ -50,8 +50,11 @@
   <div class="appointments-section">
     <div class="section-header">
       <h2><i class="fas fa-clock"></i> Prochains Rendez-vous</h2>
-      <button class="btn-link" (click)="onViewAppointmentsClick()">
+      <button class="btn-link" *ngIf="!showAllAppointments && hasMoreThanThreeAppointments()" (click)="onViewAppointmentsClick()">
         Voir tous <i class="fas fa-arrow-right"></i>
+      </button>
+      <button class="btn-link" *ngIf="canShowLess()" (click)="onShowLimitedAppointments()">
+        Voir moins <i class="fas fa-arrow-up"></i>
       </button>
     </div>
     
@@ -73,7 +76,7 @@
     <!-- Appointments List -->
     <div class="appointments-list" *ngIf="!isLoading && !error && upcomingAppointments.length > 0">
       <div 
-        *ngFor="let appointment of upcomingAppointments.slice(0, 3)" 
+        *ngFor="let appointment of getDisplayedAppointments()" 
         class="appointment-card"
         [class.virtual]="appointment.appointmentType === 'virtual'"
       >
