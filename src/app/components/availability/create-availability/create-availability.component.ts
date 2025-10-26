@@ -28,15 +28,6 @@ export class CreateAvailabilityComponent implements OnInit {
   endDate: string = '';
   endTimeInput: string = '';
 
-  durations = [
-    { value: 15, label: '15 minutes' },
-    { value: 30, label: '30 minutes' },
-    { value: 45, label: '45 minutes' },
-    { value: 60, label: '1 heure' },
-    { value: 90, label: '1h30' },
-    { value: 120, label: '2 heures' }
-  ];
-
   loading = false;
   error = '';
   success = '';
@@ -64,11 +55,11 @@ export class CreateAvailabilityComponent implements OnInit {
   }
 
   setDefaultDates() {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
-    this.startDate = tomorrow.toISOString().split('T')[0];
-    this.endDate = tomorrow.toISOString().split('T')[0];
+    this.startDate = today.toISOString().split('T')[0];
+    this.endDate = today.toISOString().split('T')[0];
     this.startTimeInput = '09:00';
     this.endTimeInput = '17:00';
   }
@@ -143,34 +134,68 @@ export class CreateAvailabilityComponent implements OnInit {
     });
   }
 
+  /**
+   * Get minimum date for date inputs (today)
+   */
+  getMinDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  }
+
+  resetForm() {
+    this.setDefaultDates();
+    this.error = '';
+    this.success = '';
+  }
+
   validateForm(): boolean {
     if (!this.startDate || !this.startTimeInput || !this.endDate || !this.endTimeInput) {
       this.error = 'Veuillez remplir tous les champs';
       return false;
     }
 
-    const start = new Date(`${this.startDate}T${this.startTimeInput}`);
-    const end = new Date(`${this.endDate}T${this.endTimeInput}`);
-    const now = new Date();
+    // For comparison, create local dates
+    const start = new Date(this.startDate + 'T' + this.startTimeInput);
+    const end = new Date(this.endDate + 'T' + this.endTimeInput);
+    
+    // Debug logging
+    console.log('=== VALIDATION DEBUG ===');
+    console.log('Start date input:', this.startDate);
+    console.log('Start time input:', this.startTimeInput);
+    console.log('End date input:', this.endDate);
+    console.log('End time input:', this.endTimeInput);
+    console.log('Parsed start (local):', start);
+    console.log('Parsed end (local):', end);
+    console.log('Start valid?', !isNaN(start.getTime()));
+    console.log('End valid?', !isNaN(end.getTime()));
 
-    if (start < now) {
-      this.error = 'La date de début doit être dans le futur';
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      this.error = 'Format de date/heure invalide. Utilisez le format 24h (ex: 21:00 pour 9PM)';
       return false;
     }
 
+    // Simple date validation using string comparison to avoid timezone issues
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0]; // Get YYYY-MM-DD format
+    
+    console.log('Today string:', todayStr);
+    console.log('Start date string:', this.startDate);
+    console.log('Start date >= Today?', this.startDate >= todayStr);
+    
+    if (this.startDate < todayStr) {
+      this.error = 'La date de début ne peut pas être dans le passé';
+      return false;
+    }
+
+    // End must be after start
+    console.log('End <= Start?', end <= start);
     if (end <= start) {
-      this.error = 'La date de fin doit être après la date de début';
+      this.error = 'La date et heure de fin doivent être après la date et heure de début';
       return false;
     }
 
+    console.log('=== VALIDATION PASSED ===');
     return true;
-  }
-
-  resetForm() {
-    this.setDefaultDates();
-    this.availability.durationMinutes = 30;
-    this.error = '';
-    this.success = '';
   }
 
   onClose() {

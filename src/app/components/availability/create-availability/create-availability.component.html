@@ -65,24 +65,6 @@
       </div>
     </div>
 
-    <!-- Durée des créneaux -->
-    <div class="form-group">
-      <label for="duration">Durée des créneaux de consultation</label>
-      <select 
-        class="form-control" 
-        id="duration"
-        [(ngModel)]="availability.durationMinutes" 
-        name="duration"
-        required>
-        <option *ngFor="let duration of durations" [value]="duration.value">
-          {{ duration.label }}
-        </option>
-      </select>
-      <small class="form-text text-muted">
-        Cette durée sera utilisée pour diviser votre disponibilité en créneaux de consultation
-      </small>
-    </div>
-
     <!-- Boutons -->
     <div class="form-actions">
       <button 

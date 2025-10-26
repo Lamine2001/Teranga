@@ -70,9 +70,9 @@ export class ConsultationService {
    * Start a new consultation from an appointment
    */
   startConsultation(request: StartConsultationRequest): Observable<Consultation> {
-    this.logRequest('POST', `${this.apiUrl}/start`);
+    this.logRequest('POST', `${this.apiUrl}/${request.appointmentId}/start`);
     
-    return this.http.post<Consultation>(`${this.apiUrl}/start`, request, { 
+    return this.http.post<Consultation>(`${this.apiUrl}/${request.appointmentId}/start`, request, { 
       headers: this.getAuthHeaders() 
     }).pipe(
       tap(() => console.log('Consultation started successfully')),
