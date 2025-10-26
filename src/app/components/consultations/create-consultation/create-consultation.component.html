@@ -2,6 +2,9 @@
   <!-- Header -->
   <div class="consultation-header">
     <div class="header-left">
+      <button class="btn-back" (click)="router.navigate(['/doctor-dashboard'])" title="Retour au tableau de bord">
+        <i class="fas fa-arrow-left"></i>
+      </button>
       <h1><i class="fas fa-user-md"></i> Nouvelle Consultation</h1>
       <div class="consultation-timer" *ngIf="consultationStarted">
         <i class="fas fa-clock"></i>
@@ -9,6 +12,9 @@
       </div>
     </div>
     <div class="header-right">
+      <button class="btn btn-dashboard" (click)="router.navigate(['/doctor-dashboard'])">
+        <i class="fas fa-home"></i> Tableau de Bord
+      </button>
       <button class="btn btn-secondary" (click)="router.navigate(['/doctor-dashboard'])">
         <i class="fas fa-times"></i> Fermer
       </button>
