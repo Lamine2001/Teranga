@@ -48,11 +48,11 @@ interface Appointment {
       </div>
 
       <div class="appointments-grid" *ngIf="!isLoading && appointments.length > 0">
-        <div class="appointment-card" *ngFor="let appointment of appointments" 
+        <div class="appointment-card" *ngFor="let appointment of appointments"
              [class.virtual]="appointment.appointmentType === 'virtual'"
              [class.confirmed]="appointment.status === 'CONFIRMED'"
              [class.pending]="appointment.status === 'PENDING'">
-          
+
           <div class="appointment-header">
             <div class="patient-info">
               <i class="fas fa-user"></i>
@@ -68,7 +68,7 @@ interface Appointment {
               <i class="fas fa-clock"></i>
               <span>{{ appointment.appointmentTime | date:'HH:mm' }} - {{ appointment.endTime | date:'HH:mm' }}</span>
             </div>
-            
+
             <div class="appointment-detail">
               <i class="fas fa-calendar"></i>
               <span>{{ appointment.appointmentTime | date:'fullDate':'':'fr' }}</span>
@@ -97,17 +97,24 @@ interface Appointment {
 
           <div class="appointment-actions">
             <!-- Start Consultation Button (Primary action) -->
-            <button class="btn-action btn-success" 
+            <button class="btn-action btn-success"
                     *ngIf="type === 'today' && appointment.status === 'CONFIRMED'"
                     (click)="startConsultation(appointment)">
               <i class="fas fa-play-circle"></i> Commencer Consultation
             </button>
 
             <!-- Start Video Button (for teleconsultations) -->
-            <button class="btn-action btn-primary" 
+            <button class="btn-action btn-primary"
                     *ngIf="appointment.appointmentType === 'virtual' && type === 'today' && appointment.status === 'CONFIRMED'"
                     (click)="startVideoConsultation(appointment)">
               <i class="fas fa-video"></i> Vidéo
+            </button>
+
+            <!-- Create Consultation Button - New -->
+            <button class="btn-action btn-create"
+                    *ngIf="appointment.status === 'CONFIRMED' && type !== 'history'"
+                    (click)="createConsultation(appointment)">
+              <i class="fas fa-plus-circle"></i> Créer Consultation
             </button>
 
             <!-- View Details -->
@@ -330,6 +337,19 @@ interface Appointment {
       color: white;
     }
 
+    .btn-create {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-create:hover {
+      background: linear-gradient(135deg, #5568d3 0%, #654191 100%);
+      box-shadow: 0 6px 8px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+    }
+
     @media (max-width: 768px) {
       .appointments-grid {
         grid-template-columns: 1fr;
@@ -339,11 +359,11 @@ interface Appointment {
 })
 export class DoctorAppointmentsComponent implements OnInit {
   @Input() type: 'today' | 'upcoming' | 'history' = 'today';
-  
+
   appointments: Appointment[] = [];
   isLoading = false;
   error = '';
-  
+
   private readonly apiUrl = `${environment.apiUrl}/appointments/doctor`;
 
   constructor(
@@ -358,14 +378,14 @@ export class DoctorAppointmentsComponent implements OnInit {
   loadAppointments() {
     this.isLoading = true;
     this.error = '';
-    
+
     const token = localStorage.getItem('token') || localStorage.getItem('authToken');
     const headers = new HttpHeaders({
       'Authorization': token ? `Bearer ${token}` : ''
     });
 
     let endpoint = `${this.apiUrl}/${this.type}`;
-    
+
     this.http.get<Appointment[]>(endpoint, { headers }).subscribe({
       next: (data) => {
         this.appointments = data;
@@ -410,6 +430,31 @@ export class DoctorAppointmentsComponent implements OnInit {
     // 3. Start the consultation
     // 4. Associate patient with consultation
     this.router.navigate(['/consultations/create', appointment.id]);
+  }
+
+  /**
+   * Create a consultation from an appointment
+   * Navigates to the consultation creation page where the patient is automatically loaded
+   * and the consultation can be started with all patient information pre-populated
+   */
+  createConsultation(appointment: Appointment) {
+    console.log('Creating consultation for appointment:', appointment);
+
+    // Show confirmation dialog
+    const patientName = `${appointment.patientFirstName} ${appointment.patientLastName}`;
+    const appointmentType = appointment.appointmentType === 'virtual' ? 'téléconsultation' : 'consultation en cabinet';
+
+    if (confirm(`Créer une consultation pour ${patientName}?\nType: ${appointmentType}`)) {
+      // Navigate to the consultation creation page with appointment ID as query parameter
+      // The CreateConsultationComponent will:
+      // 1. Load appointment details from appointmentId query param
+      // 2. Extract patient information automatically
+      // 3. Load patient history
+      // 4. Start consultation with patient pre-selected
+      this.router.navigate(['/consultations/create'], {
+        queryParams: { appointmentId: appointment.id }
+      });
+    }
   }
 
   viewDetails(appointment: Appointment) {

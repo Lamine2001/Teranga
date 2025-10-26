@@ -50,12 +50,12 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   selectedPatient: PatientInfo | null = null;
   searchResults: PatientInfo[] = [];
   isSearching = false;
-  
+
   // Autocomplete
   private searchTerms = new Subject<string>();
   private readonly MIN_SEARCH_LENGTH = 4;
   showAutocomplete = false;
-  
+
   // Patient appointments table
   showPatientsTable = false;
   patientsWithAppointments: any[] = [];
@@ -67,20 +67,20 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   selectedStatusFilter = '';
   selectedStartDate = '';
   selectedEndDate = '';
-  
+
   // Consultation
   currentConsultation: Consultation | null = null;
   consultationStarted = false;
   consultationStartTime?: Date;
-  
+
   // Patient history
   patientPreviousConsultations: PreviousConsultation[] = [];
   isLoadingHistory = false;
   showPatientHistory = true;
-  
+
   // Current doctor
   currentDoctor: any = null;
-  
+
   // UI states
   activeTab: 'current' | 'history' | 'attachments' = 'current';
   isLoading = false;
@@ -104,20 +104,31 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.currentDoctor = this.authService.getCurrentUser();
-    
+
     // Setup autocomplete for patient search
     this.setupAutocomplete();
-    
-    // Check if patient ID or appointment ID is provided in route params
+
+    // Check if patient ID or appointment ID is provided in route params or query params
+    this.route.queryParams.subscribe(queryParams => {
+      const queryAppointmentId = queryParams['appointmentId'];
+
+      if (queryAppointmentId) {
+        // Load appointment details first, then start consultation
+        this.loadAppointmentAndStartConsultation(+queryAppointmentId);
+      }
+    });
+
+    // Also check route params for backward compatibility
     this.route.params.subscribe(params => {
       const appointmentId = params['appointmentId'];
-      
-      if (appointmentId) {
+      const patientId = params['patientId'];
+
+      if (appointmentId && !this.route.snapshot.queryParams['appointmentId']) {
         // Load appointment details first, then start consultation
         this.loadAppointmentAndStartConsultation(+appointmentId);
-      } else if (params['patientId']) {
-        this.loadPatientById(+params['patientId']);
-      } else {
+      } else if (patientId) {
+        this.loadPatientById(+patientId);
+      } else if (!appointmentId && !patientId && !this.route.snapshot.queryParams['appointmentId']) {
         // Load patients with appointments for this doctor
         this.loadPatientsWithAppointments();
       }
@@ -176,7 +187,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = input.value.trim();
-    
+
     if (value.length < this.MIN_SEARCH_LENGTH) {
       this.searchResults = [];
       this.showAutocomplete = false;
@@ -191,13 +202,13 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
    */
   private loadAppointmentAndStartConsultation(appointmentId: number): void {
     this.isLoading = true;
-    
+
     // Fetch appointment details from backend
     const token = localStorage.getItem('token') || localStorage.getItem('authToken');
     const headers = { 'Authorization': token ? `Bearer ${token}` : '' };
-    
-    this.http.get<any>(`${environment.apiUrl}/appointments/${appointmentId}`, { 
-      headers 
+
+    this.http.get<any>(`${environment.apiUrl}/appointments/${appointmentId}`, {
+      headers
     }).subscribe({
       next: (appointment) => {
         // Extract patient information from appointment
@@ -212,10 +223,10 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
             gender: appointment.patientGender,
             address: appointment.patientAddress
           };
-          
+
           // Load patient history
           this.loadPatientHistory(appointment.patientId);
-          
+
           // Automatically start consultation
           this.startConsultationFromAppointment(appointmentId, appointment.appointmentType || 'onsite');
         } else {
@@ -391,7 +402,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
         this.currentConsultation = consultation;
         this.consultationStarted = true;
         this.consultationStartTime = new Date();
-        
+
         // If patient info not already loaded, load from consultation
         if (!this.selectedPatient) {
           this.selectedPatient = {
@@ -402,7 +413,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
           };
           this.loadPatientHistory(consultation.patientId);
         }
-        
+
         this.isLoading = false;
         this.successMessage = `Consultation démarrée avec ${this.selectedPatient.firstName} ${this.selectedPatient.lastName}`;
         setTimeout(() => this.successMessage = '', 3000);
@@ -437,7 +448,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
    */
   onConsultationEnded(): void {
     this.successMessage = 'Consultation terminée avec succès';
-    
+
     setTimeout(() => {
       this.router.navigate(['/doctor-dashboard']);
     }, 2000);
@@ -448,12 +459,12 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
    */
   getConsultationDuration(): string {
     if (!this.consultationStartTime) return '00:00';
-    
+
     const now = new Date();
     const diff = now.getTime() - this.consultationStartTime.getTime();
     const minutes = Math.floor(diff / 60000);
     const seconds = Math.floor((diff % 60000) / 1000);
-    
+
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
@@ -473,16 +484,16 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
    */
   getPatientAge(dateOfBirth?: string): number {
     if (!dateOfBirth) return 0;
-    
+
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   }
 
@@ -513,52 +524,74 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Load patients with appointments for current doctor
    */
+  /**
+   * Load patients with appointments using the consultation service
+   * This calls the backend endpoint: POST /api/consultations/doctor/patient-requests
+   * Supports filtering by status, date range, and text search
+   */
   loadPatientsWithAppointments(status?: string, startDate?: string, endDate?: string): void {
     if (!this.currentDoctor?.id) {
-      console.warn('No current doctor ID');
+      console.warn('⚠️ No current doctor ID available');
       return;
     }
 
     this.isLoadingPatients = true;
-    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-    const headers = { 'Authorization': token ? `Bearer ${token}` : '' };
 
-    // Build query parameters
-    let queryParams = '';
-    const params: string[] = [];
-    if (status) params.push(`status=${status}`);
-    if (startDate) params.push(`startDate=${startDate}`);
-    if (endDate) params.push(`endDate=${endDate}`);
-    if (params.length > 0) queryParams = '?' + params.join('&');
+    // Build filter object for backend
+    const filter: any = {};
+    if (status) filter.appointmentStatus = status;
+    if (startDate) filter.startDate = startDate;
+    if (endDate) filter.endDate = endDate;
+    if (this.tableFilterText) filter.searchText = this.tableFilterText;
 
-    // Fetch patients with appointments using new endpoint
-    this.http.get<any[]>(`${environment.apiUrl}/appointments/doctor/patients${queryParams}`, { headers }).subscribe({
+    console.log('📋 Loading patient appointment requests with filter:', filter);
+
+    // Use consultation service to fetch patient appointment requests
+    this.consultationService.getPatientAppointmentRequests(filter).subscribe({
       next: (patients) => {
+        console.log('✅ Received patient appointment requests:', patients.length);
+
+        // Map backend DTO to component model
         this.patientsWithAppointments = patients.map(p => ({
           patientId: p.patientId,
-          patientFirstName: p.patientFirstName,
-          patientLastName: p.patientLastName,
+          patientFirstName: p.patientName?.split(' ')[0] || '',
+          patientLastName: p.patientName?.split(' ').slice(1).join(' ') || '',
           patientEmail: p.patientEmail,
           patientPhone: p.patientPhone,
           patientGender: p.patientGender,
+          patientAge: p.patientAge,
           appointmentId: p.appointmentId,
           appointmentDate: p.appointmentDate,
-          appointmentTime: p.startTime || p.appointmentDate,
-          appointmentType: p.appointmentType,
+          appointmentTime: p.appointmentDate,
+          appointmentType: p.appointmentType?.toLowerCase(),
           status: p.appointmentStatus,
-          hasConsultation: p.hasExistingConsultation,
-          consultationNoteId: p.consultationNoteId,
-          appointmentNotes: p.appointmentNotes
+          urgencyLevel: p.urgencyLevel,
+          hasConsultation: p.hasConsultationRecord,
+          consultationNoteId: p.consultationRecordId,
+          appointmentNotes: p.reasonForVisit,
+          symptoms: p.symptoms,
+          bloodType: p.bloodType,
+          allergies: p.allergies,
+          isPendingConsultation: p.isPendingConsultation
         }));
+
         this.filteredPatients = [...this.patientsWithAppointments];
         this.sortPatientsTable();
         this.isLoadingPatients = false;
-        console.log('Loaded patients with appointments:', this.patientsWithAppointments);
+
+        console.log(`✅ Successfully loaded ${this.patientsWithAppointments.length} patients with appointments`);
       },
       error: (error) => {
-        console.error('Error loading patients with appointments:', error);
+        console.error('❌ Error loading patient appointment requests:', error);
         this.isLoadingPatients = false;
-        this.errorMessage = 'Erreur lors du chargement des patients';
+        this.errorMessage = 'Erreur lors du chargement des demandes de rendez-vous';
+
+        // Show user-friendly error message
+        if (error.status === 403) {
+          this.errorMessage = 'Accès refusé. Veuillez vous connecter en tant que médecin.';
+        } else if (error.status === 404) {
+          this.errorMessage = 'Service non disponible. Veuillez réessayer plus tard.';
+        }
       }
     });
   }
@@ -574,9 +607,17 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Apply filters (status, date range)
+   * Apply filters (status, date range, and text search)
+   * This triggers a new backend request with all filter criteria
    */
   applyFilters(): void {
+    console.log('🔍 Applying filters:', {
+      status: this.selectedStatusFilter,
+      startDate: this.selectedStartDate,
+      endDate: this.selectedEndDate,
+      searchText: this.tableFilterText
+    });
+
     this.loadPatientsWithAppointments(
       this.selectedStatusFilter || undefined,
       this.selectedStartDate || undefined,
@@ -585,29 +626,19 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Filter patients table
+   * Filter patients table by text search
+   * Now triggers backend search instead of client-side filtering
    */
   filterPatientsTable(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.tableFilterText = input.value.toLowerCase();
-    
-    if (!this.tableFilterText) {
-      this.filteredPatients = [...this.patientsWithAppointments];
-    } else {
-      this.filteredPatients = this.patientsWithAppointments.filter(patient => {
-        const fullName = `${patient.patientFirstName} ${patient.patientLastName}`.toLowerCase();
-        const email = (patient.patientEmail || '').toLowerCase();
-        const phone = (patient.patientPhone || '').toLowerCase();
-        const status = (patient.status || '').toLowerCase();
-        
-        return fullName.includes(this.tableFilterText) ||
-               email.includes(this.tableFilterText) ||
-               phone.includes(this.tableFilterText) ||
-               status.includes(this.tableFilterText);
-      });
-    }
-    
-    this.sortPatientsTable();
+    this.tableFilterText = input.value;
+
+    // Reload data with text search filter (backend will handle the search)
+    this.loadPatientsWithAppointments(
+      this.selectedStatusFilter || undefined,
+      this.selectedStartDate || undefined,
+      this.selectedEndDate || undefined
+    );
   }
 
   /**
@@ -664,10 +695,10 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       email: patient.patientEmail,
       phone: patient.patientPhone
     };
-    
+
     this.loadPatientHistory(patient.patientId);
     this.showPatientsTable = false;
-    
+
     // Auto-start consultation if appointment exists
     if (patient.appointmentId) {
       this.startConsultationFromAppointment(patient.appointmentId, patient.appointmentType);

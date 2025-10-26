@@ -452,5 +452,51 @@ export class ConsultationService {
       })
     );
   }
+
+  /**
+   * Get filtered list of patients with appointment requests for the authenticated doctor
+   * This allows doctors to search and filter patients who have requested appointments
+   * 
+   * @param filter Optional filter criteria including:
+   *   - searchText: Search in patient name, email, symptoms, reason
+   *   - appointmentStatus: Filter by appointment status (PENDING, CONFIRMED, etc.)
+   *   - appointmentType: Filter by type (ONSITE, VIRTUAL)
+   *   - urgencyLevel: Filter by urgency (LOW, MEDIUM, HIGH, URGENT)
+   *   - startDate: Filter appointments from this date (YYYY-MM-DD)
+   *   - endDate: Filter appointments to this date (YYYY-MM-DD)
+   *   - hasConsultation: Filter by consultation record existence
+   * @returns Observable array of patient appointment requests with full patient and appointment details
+   */
+  getPatientAppointmentRequests(filter?: {
+    searchText?: string;
+    appointmentStatus?: string;
+    appointmentType?: string;
+    urgencyLevel?: string;
+    startDate?: string;
+    endDate?: string;
+    hasConsultation?: boolean;
+  }): Observable<any[]> {
+    const url = `${this.apiUrl}/doctor/patient-requests`;
+    const headers = this.getAuthHeaders();
+    
+    this.logRequest('POST', url);
+    console.log('Patient appointment requests filter:', filter);
+    
+    return this.http.post<any[]>(url, filter || {}, { headers }).pipe(
+      tap(response => {
+        console.log(`✅ Fetched ${response.length} patient appointment requests`);
+        console.log('Sample patient request:', response[0]);
+      }),
+      catchError(error => {
+        console.error('❌ Error fetching patient appointment requests:', error);
+        console.error('Status:', error.status);
+        console.error('Error message:', error.message);
+        if (error.error) {
+          console.error('Server error details:', error.error);
+        }
+        return of([]);
+      })
+    );
+  }
 }
 
