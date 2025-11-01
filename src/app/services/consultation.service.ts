@@ -88,10 +88,10 @@ export class ConsultationService {
    * End an ongoing consultation
    */
   endConsultation(request: EndConsultationRequest): Observable<Consultation> {
-    this.logRequest('POST', `${this.apiUrl}/${request.consultationId}/end`);
+    this.logRequest('POST', `${this.apiUrl}/${request.appointmentId}/end`);
     
     return this.http.post<Consultation>(
-      `${this.apiUrl}/${request.consultationId}/end`,
+      `${this.apiUrl}/${request.appointmentId}/end`,
       request.notes,
       { headers: this.getAuthHeaders() }
     ).pipe(

@@ -418,12 +418,22 @@
         </div>
 
         <!-- Current Consultation Notes -->
-        <div class="notes-panel" *ngIf="consultationStarted && currentConsultation && activeTab === 'current'">
+        <div class="notes-panel" *ngIf="consultationStarted && currentConsultation && currentConsultation.id && activeTab === 'current'">
           <app-consultation-notes
             [consultation]="currentConsultation"
+            [consultationId]="currentConsultation.id"
+            [appointmentId]="selectedAppointment?.id"
             [readOnly]="false"
             (consultationEnded)="onConsultationEnded()"
           ></app-consultation-notes>
+        </div>
+
+        <!-- Show loading or error if consultation ID is missing -->
+        <div class="notes-panel" *ngIf="consultationStarted && currentConsultation && !currentConsultation.id && activeTab === 'current'">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Erreur: ID de consultation manquant. Veuillez rafraîchir la page ou redémarrer la consultation.
+          </div>
         </div>
 
         <!-- History Tab Content -->

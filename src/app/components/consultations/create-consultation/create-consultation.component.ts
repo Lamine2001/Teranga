@@ -72,6 +72,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   currentConsultation: Consultation | null = null;
   consultationStarted = false;
   consultationStartTime?: Date;
+  selectedAppointment: any = null; // Add missing property
   
   // Patient history
   patientPreviousConsultations: PreviousConsultation[] = [];
@@ -80,6 +81,10 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   
   // Current doctor
   currentDoctor: any = null;
+  currentDoctorId: number | null = null; // Add missing property
+  
+  // Auto-save
+  private autoSaveTimer: any; // Add auto-save timer
   
   // UI states
   activeTab: 'current' | 'history' | 'attachments' = 'current';
@@ -104,6 +109,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.currentDoctor = this.authService.getCurrentUser();
+    this.currentDoctorId = this.currentDoctor?.id || this.currentDoctor?.userId; // Set doctor ID
     
     // Setup autocomplete for patient search
     this.setupAutocomplete();
@@ -126,6 +132,10 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchTerms.complete();
+    // Clear auto-save timer
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+    }
   }
 
   /**
@@ -200,6 +210,9 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       headers 
     }).subscribe({
       next: (appointment) => {
+        // Store the appointment
+        this.selectedAppointment = appointment;
+        
         // Extract patient information from appointment
         if (appointment.patientId) {
           this.selectedPatient = {
@@ -321,14 +334,20 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
 
     this.consultationService.getPatientConsultations({ patientId }).subscribe({
       next: (consultations) => {
-        this.patientPreviousConsultations = consultations.map(c => ({
-          id: c.id,
-          date: c.startTime,
-          doctorName: `Dr. ${c.doctorFirstName} ${c.doctorLastName}`,
-          diagnosis: c.diagnosis || 'Non spécifié',
-          treatment: c.treatment || 'Non spécifié',
-          prescriptions: c.prescriptions
-        }));
+        // Filter only completed consultations for history
+        this.patientPreviousConsultations = consultations
+          .filter(c => {
+            // Use lowercase for status comparison
+            return c.status === 'completed';
+          })
+          .map(c => ({
+            id: c.id,
+            date: c.startTime,
+            doctorName: `Dr. ${c.doctorFirstName} ${c.doctorLastName}`,
+            diagnosis: c.diagnosis || 'Non spécifié',
+            treatment: c.treatment || 'Non spécifié',
+            prescriptions: c.prescriptions
+          }));
         this.isLoadingHistory = false;
       },
       error: (error) => {
@@ -348,28 +367,52 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.selectedAppointment?.id) {
+      this.errorMessage = 'Aucun rendez-vous sélectionné';
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    const request: StartConsultationRequest = {
-      appointmentId: 0, // For walk-in consultations without appointment
-      consultationType: 'onsite',
-      patientId: this.selectedPatient.id
-    } as any;
+    const startRequest: StartConsultationRequest = {
+      appointmentId: this.selectedAppointment.id,
+      patientId: this.selectedPatient.id,
+      consultationType: this.selectedAppointment.type || this.selectedAppointment.appointmentType || 'onsite',
+      notes: ''
+    };
 
-    this.consultationService.startConsultation(request).subscribe({
+    console.log('Starting consultation with request:', startRequest); // Debug log
+
+    this.consultationService.startConsultation(startRequest).subscribe({
       next: (consultation) => {
+        console.log('Consultation started successfully:', consultation); // Debug log
+        console.log('Consultation ID:', consultation.id); // Check if ID is present
+        
+        if (!consultation.id) {
+          console.error('WARNING: Consultation created without ID!');
+          this.errorMessage = 'Erreur: La consultation a été créée sans identifiant';
+          this.isLoading = false;
+          return;
+        }
+        
         this.currentConsultation = consultation;
         this.consultationStarted = true;
         this.consultationStartTime = new Date();
         this.isLoading = false;
         this.successMessage = 'Consultation démarrée avec succès';
+        
+        // Start auto-save timer
+        this.startAutoSave();
+        
+        // Clear success message after 3 seconds
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Erreur lors du démarrage de la consultation';
         console.error('Error starting consultation:', error);
+        console.error('Full error response:', error.error); // Log full error
       }
     });
   }
@@ -514,7 +557,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
    * Load patients with appointments for current doctor
    */
   loadPatientsWithAppointments(status?: string, startDate?: string, endDate?: string): void {
-    if (!this.currentDoctor?.id) {
+    if (!this.currentDoctor?.id && !this.currentDoctorId) {
       console.warn('No current doctor ID');
       return;
     }
@@ -547,10 +590,17 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
           appointmentType: p.appointmentType,
           status: p.appointmentStatus,
           hasConsultation: p.hasExistingConsultation,
-          consultationNoteId: p.consultationNoteId,
+          consultationRecordId: p.consultationRecordId,
           appointmentNotes: p.appointmentNotes
         }));
-        this.filteredPatients = [...this.patientsWithAppointments];
+        
+        // Filter out completed and cancelled appointments if needed
+        this.filteredPatients = this.patientsWithAppointments.filter(patient => {
+          const normalizedStatus = patient.status?.toLowerCase();
+          // Show all appointments or filter based on requirement
+          return true; // Show all for now, remove filter
+        });
+        
         this.sortPatientsTable();
         this.isLoadingPatients = false;
         console.log('Loaded patients with appointments:', this.patientsWithAppointments);
@@ -665,26 +715,200 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       phone: patient.patientPhone
     };
     
+    // Store appointment data
+    this.selectedAppointment = {
+      id: patient.appointmentId,
+      type: patient.appointmentType,
+      appointmentType: patient.appointmentType,
+      status: patient.status,
+      date: patient.appointmentDate,
+      time: patient.appointmentTime
+    };
+    
     this.loadPatientHistory(patient.patientId);
     this.showPatientsTable = false;
     
-    // Auto-start consultation if appointment exists
-    if (patient.appointmentId) {
-      this.startConsultationFromAppointment(patient.appointmentId, patient.appointmentType);
+    // Check if consultation already exists
+    if (patient.hasConsultation && patient.appointmentId) {
+      // Load existing consultation by appointment ID
+      console.log('Loading existing consultation for appointment ID:', patient.appointmentId);
+      this.loadConsultationByAppointmentId();
+    } else {
+      // Create new consultation if appointment exists and is not completed/cancelled
+      if (patient.appointmentId) {
+        const normalizedStatus = patient.status?.toLowerCase();
+        // Use lowercase for comparison
+        if (normalizedStatus !== 'completed' && normalizedStatus !== 'cancelled') {
+          console.log('Starting new consultation for appointment ID:', patient.appointmentId);
+          this.startConsultationFromAppointment(patient.appointmentId, patient.appointmentType);
+        } else {
+          console.log('Cannot start consultation: appointment status is', patient.status);
+        }
+      } else {
+        console.log('Cannot start consultation: no appointment ID');
+      }
     }
+  }
+
+  /**
+   * Load an existing consultation by ID
+   */
+  private loadExistingConsultation(consultationId: number): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    
+    console.log('Loading existing consultation with ID:', consultationId);
+    
+    this.consultationService.getConsultation(consultationId).subscribe({
+      next: (consultation) => {
+        console.log('Existing consultation loaded:', consultation);
+        
+        if (!consultation.id) {
+          console.error('WARNING: Consultation loaded without ID!');
+          this.errorMessage = 'Erreur: La consultation chargée n\'a pas d\'identifiant';
+          this.isLoading = false;
+          return;
+        }
+        
+        this.currentConsultation = consultation;
+        this.consultationStarted = true;
+        this.consultationStartTime = new Date(consultation.startTime);
+        this.isLoading = false;
+        this.successMessage = 'Consultation existante chargée avec succès';
+        
+        // Don't start auto-save for existing consultations that might be completed
+        // Use lowercase status values
+        if (consultation.status !== 'completed' && consultation.status !== 'cancelled') {
+          this.startAutoSave();
+        }
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error loading existing consultation:', error);
+        
+        if (error.status === 404) {
+          // Consultation not found, try to get it by appointment ID
+          this.loadConsultationByAppointmentId();
+        } else {
+          this.errorMessage = 'Erreur lors du chargement de la consultation existante';
+        }
+      }
+    });
+  }
+
+  /**
+   * Try to load consultation by appointment ID as fallback
+   */
+  private loadConsultationByAppointmentId(): void {
+    if (!this.selectedAppointment?.id) {
+      this.errorMessage = 'Impossible de charger la consultation: ID de rendez-vous manquant';
+      return;
+    }
+    
+    console.log('Trying to load consultation by appointment ID:', this.selectedAppointment.id);
+    
+    this.consultationService.getConsultationByAppointmentId(this.selectedAppointment.id).subscribe({
+      next: (consultationDetails: any) => {
+        console.log('Consultation details loaded by appointment ID:', consultationDetails);
+        
+        // Map the ConsultationDetailsDTO to our consultation object
+        const consultation: any = {
+          id: consultationDetails.record?.id || consultationDetails.appointment?.id,
+          appointmentId: consultationDetails.appointment?.id,
+          patientId: consultationDetails.appointment?.patientId,
+          patientFirstName: consultationDetails.appointment?.patientFirstName,
+          patientLastName: consultationDetails.appointment?.patientLastName,
+          patientEmail: consultationDetails.appointment?.patientEmail,
+          doctorId: consultationDetails.appointment?.doctorId,
+          doctorFirstName: consultationDetails.appointment?.doctorFirstName,
+          doctorLastName: consultationDetails.appointment?.doctorLastName,
+          startTime: consultationDetails.record?.startedAt || consultationDetails.appointment?.appointmentTime,
+          endTime: consultationDetails.record?.endedAt,
+          status: consultationDetails.appointment?.status || 'in-progress',
+          consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
+          chiefComplaint: consultationDetails.record?.chiefComplaint,
+          diagnosis: consultationDetails.record?.diagnosis,
+          treatment: consultationDetails.record?.treatmentPlan,
+          notes: consultationDetails.appointment?.notes,
+          prescriptions: [],
+          labTests: []
+        };
+        
+        if (!consultation.id) {
+          console.error('WARNING: Consultation loaded without ID!');
+          this.errorMessage = 'Erreur: La consultation chargée n\'a pas d\'identifiant';
+          this.isLoading = false;
+          return;
+        }
+        
+        this.currentConsultation = consultation;
+        this.consultationStarted = true;
+        this.consultationStartTime = new Date(consultation.startTime);
+        this.isLoading = false;
+        this.successMessage = 'Consultation existante trouvée et chargée';
+        
+        // Don't start auto-save for existing consultations that might be completed
+        if (consultation.status !== 'completed' && consultation.status !== 'cancelled') {
+          this.startAutoSave();
+        }
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error loading consultation by appointment ID:', error);
+        
+        // If no consultation exists for this appointment, offer to create one
+        if (error.status === 404) {
+          if (confirm('Aucune consultation trouvée pour ce rendez-vous. Voulez-vous en créer une nouvelle?')) {
+            this.startConsultationFromAppointment(this.selectedAppointment.id, this.selectedAppointment.type);
+          }
+        } else {
+          this.errorMessage = 'Erreur lors du chargement de la consultation';
+        }
+      }
+    });
+  }
+
+  /**
+   * Start auto-save timer for consultation notes
+   */
+  private startAutoSave(): void {
+    // Clear existing timer if any
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+    }
+    
+    // Auto-save every 30 seconds
+    this.autoSaveTimer = setInterval(() => {
+      if (this.currentConsultation && this.consultationStarted) {
+        console.log('Auto-save triggered');
+        // The ConsultationNotesComponent will handle the actual saving
+      }
+    }, 30000); // 30 seconds
   }
 
   /**
    * Get status badge class
    */
   getStatusClass(status: string): string {
-    switch (status?.toUpperCase()) {
-      case 'CONFIRMED':
+    const normalizedStatus = status?.toLowerCase();
+    switch (normalizedStatus) {
+      case 'confirmed':
+      case 'scheduled':
         return 'status-confirmed';
-      case 'PENDING':
+      case 'pending':
+      case 'in-progress':
         return 'status-pending';
-      case 'CANCELLED':
+      case 'cancelled':
+      case 'canceled':
         return 'status-cancelled';
+      case 'completed':
+        return 'status-completed';
       default:
         return 'status-unknown';
     }

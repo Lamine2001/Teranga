@@ -17,7 +17,9 @@ import { Consultation, ConsultationNotes, Prescription, LabTest } from '../../..
 })
 export class ConsultationNotesComponent implements OnInit {
   @Input() consultation!: Consultation;
-  @Input() readOnly = false;
+  @Input() consultationId?: number; // Add explicit ID input
+  @Input() appointmentId?: number; // Add appointment ID input
+  @Input() readOnly: boolean = false;
   @Output() notesSaved = new EventEmitter<ConsultationNotes>();
   @Output() consultationEnded = new EventEmitter<void>();
 
@@ -62,9 +64,27 @@ export class ConsultationNotesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.consultation) {
-      this.loadExistingNotes();
+    // Log for debugging
+    console.log('ConsultationNotes component initialized');
+    console.log('Consultation:', this.consultation);
+    console.log('Consultation ID from input:', this.consultationId);
+    console.log('Consultation ID from object:', this.consultation?.id);
+    
+    // Use explicit consultationId if provided, otherwise use consultation.id
+    const effectiveId = this.consultationId || this.consultation?.id;
+    
+    if (!effectiveId) {
+      console.error('No consultation ID available!');
+      this.errorMessage = 'Erreur: ID de consultation non disponible';
+      return;
     }
+    
+    // Update the consultation object with the effective ID if needed
+    if (this.consultation && !this.consultation.id && this.consultationId) {
+      this.consultation = { ...this.consultation, id: this.consultationId };
+    }
+    
+    this.initializeForm();
 
     // Auto-save every 30 seconds
     if (this.autoSaveEnabled && !this.readOnly) {
@@ -80,6 +100,47 @@ export class ConsultationNotesComponent implements OnInit {
     }
   }
 
+  /**
+   * Initialize form with consultation data if available
+   */
+  private initializeForm(): void {
+    if (this.consultation) {
+      // Set basic consultation data that exists
+      this.notesForm.patchValue({
+        chiefComplaint: this.consultation.chiefComplaint || '',
+        symptoms: this.consultation.symptoms || '',
+        diagnosis: this.consultation.diagnosis || '',
+        treatment: this.consultation.treatment || '',
+        additionalNotes: this.consultation.notes || ''
+      });
+      
+      // If consultation has notes object with additional fields
+      const notes = (this.consultation as any).notes;
+      if (notes && typeof notes === 'object') {
+        this.notesForm.patchValue({
+          physicalExamination: notes.physicalExamination || '',
+          recommendations: notes.recommendations || '',
+          followUpDate: notes.followUpDate || '',
+          followUpInstructions: notes.followUpInstructions || ''
+        });
+      }
+      
+      // Load prescriptions if they exist
+      if (this.consultation.prescriptions && Array.isArray(this.consultation.prescriptions)) {
+        this.consultation.prescriptions.forEach(prescription => {
+          this.addPrescription(prescription);
+        });
+      }
+      
+      // Load lab tests if they exist
+      if (this.consultation.labTests && Array.isArray(this.consultation.labTests)) {
+        this.consultation.labTests.forEach(labTest => {
+          this.addLabTest(labTest);
+        });
+      }
+    }
+  }
+
   get prescriptions(): FormArray {
     return this.notesForm.get('prescriptions') as FormArray;
   }
@@ -89,27 +150,8 @@ export class ConsultationNotesComponent implements OnInit {
   }
 
   loadExistingNotes(): void {
-    if (this.consultation.chiefComplaint) this.notesForm.patchValue({
-      chiefComplaint: this.consultation.chiefComplaint,
-      symptoms: this.consultation.symptoms,
-      diagnosis: this.consultation.diagnosis,
-      treatment: this.consultation.treatment,
-      notes: this.consultation.notes
-    });
-
-    // Load existing prescriptions
-    if (this.consultation.prescriptions) {
-      this.consultation.prescriptions.forEach(prescription => {
-        this.addPrescription(prescription);
-      });
-    }
-
-    // Load existing lab tests
-    if (this.consultation.labTests) {
-      this.consultation.labTests.forEach(labTest => {
-        this.addLabTest(labTest);
-      });
-    }
+    // This method is now redundant with initializeForm, but keep for backward compatibility
+    // The initialization is handled in initializeForm()
   }
 
   addPrescription(prescription?: Prescription): void {
@@ -176,12 +218,30 @@ export class ConsultationNotesComponent implements OnInit {
       return;
     }
 
+    // Get the effective consultation ID
+    const consultationId = this.consultationId || this.consultation?.id;
+    
+    if (!consultationId) {
+      this.errorMessage = 'Erreur: ID de consultation non disponible pour la sauvegarde';
+      console.error('Cannot save notes: No consultation ID');
+      return;
+    }
+
     this.isSaving = true;
     this.errorMessage = '';
 
-    const notes: Partial<ConsultationNotes> = this.notesForm.value;
+    const formValue = this.notesForm.value;
+    const notes: Partial<ConsultationNotes> = {
+      ...formValue,
+      // Format followUpDate to yyyy-MM-dd'T'HH:mm:ss if it exists
+      followUpDate: formValue.followUpDate ? 
+        this.formatDateTimeForBackend(formValue.followUpDate) : 
+        formValue.followUpDate
+    };
 
-    this.consultationService.saveConsultationNotes(this.consultation.id, notes).subscribe({
+    console.log('Saving notes for consultation ID:', consultationId); // Debug log
+
+    this.consultationService.saveConsultationNotes(consultationId, notes).subscribe({
       next: () => {
         this.isSaving = false;
         this.lastSaved = new Date();
@@ -200,6 +260,39 @@ export class ConsultationNotesComponent implements OnInit {
     });
   }
 
+  /**
+   * Format date to yyyy-MM-dd'T'HH:mm:ss format for backend
+   */
+  private formatDateTimeForBackend(dateInput: string): string {
+    if (!dateInput) return dateInput;
+    
+    try {
+      // If it's just a date (YYYY-MM-DD), add default time
+      if (dateInput.length === 10) {
+        return `${dateInput}T09:00:00`;
+      }
+      
+      // If it's already a datetime, ensure proper format
+      const date = new Date(dateInput);
+      if (isNaN(date.getTime())) {
+        return dateInput; // Return original if invalid
+      }
+      
+      // Format to yyyy-MM-dd'T'HH:mm:ss
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateInput; // Return original if formatting fails
+    }
+  }
+
   endConsultation(): void {
     if (this.notesForm.invalid) {
       this.markFormGroupTouched();
@@ -210,8 +303,17 @@ export class ConsultationNotesComponent implements OnInit {
     if (confirm('Êtes-vous sûr de vouloir terminer cette consultation ?')) {
       this.isLoading = true;
 
+      // Use appointmentId instead of consultationId for ending consultation
+      const effectiveAppointmentId = this.appointmentId || this.consultation?.appointmentId;
+      
+      if (!effectiveAppointmentId) {
+        this.errorMessage = 'Erreur: ID de rendez-vous non disponible';
+        this.isLoading = false;
+        return;
+      }
+
       const endRequest = {
-        consultationId: this.consultation.id,
+        appointmentId: effectiveAppointmentId,
         notes: this.notesForm.value
       };
 
