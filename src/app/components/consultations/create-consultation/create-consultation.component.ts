@@ -57,7 +57,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   showAutocomplete = false;
   
   // Patient appointments table
-  showPatientsTable = false;
+  showPatientsTable = true; // Changed from false to true
   patientsWithAppointments: any[] = [];
   filteredPatients: any[] = [];
   isLoadingPatients = false;
@@ -124,7 +124,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       } else if (params['patientId']) {
         this.loadPatientById(+params['patientId']);
       } else {
-        // Load patients with appointments for this doctor
+        // Load patients with appointments for this doctor by default
         this.loadPatientsWithAppointments();
       }
     });
