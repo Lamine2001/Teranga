@@ -19,11 +19,12 @@ export interface UserProfile {
 }
 
 export interface UpdateProfileRequest {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  address?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string; // Ensure email is included
+  phone?: string;
   dateOfBirth?: string;
+  address?: string;
   specialty?: string;
   licenseNumber?: string;
   emergencyContactName?: string;
