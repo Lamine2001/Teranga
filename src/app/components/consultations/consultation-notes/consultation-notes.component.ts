@@ -20,6 +20,7 @@ export class ConsultationNotesComponent implements OnInit {
   @Input() consultationId?: number; // Add explicit ID input
   @Input() appointmentId?: number; // Add appointment ID input
   @Input() readOnly: boolean = false;
+  @Input() showLimitedFields: boolean = false; // New input to control field visibility
   @Output() notesSaved = new EventEmitter<ConsultationNotes>();
   @Output() consultationEnded = new EventEmitter<void>();
 
@@ -384,6 +385,27 @@ export class ConsultationNotesComponent implements OnInit {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
+  }
+
+  /**
+   * Check if a field should be visible based on doctor specialty
+   */
+  isFieldVisible(fieldName: string): boolean {
+    if (!this.showLimitedFields) {
+      return true; // Show all fields for regular specialties
+    }
+    
+    // For "Autre" specialty, only show these fields
+    const allowedFields = [
+      'chiefComplaint',        // Motif de Consultation
+      'symptoms',              // Symptômes
+      'recommendations',       // Recommandations
+      'followUp',              // Suivi
+      'followUpInstructions',  // Instructions pour le suivi
+      'additionalNotes'        // Notes supplémentaires
+    ];
+    
+    return allowedFields.includes(fieldName);
   }
 }
 

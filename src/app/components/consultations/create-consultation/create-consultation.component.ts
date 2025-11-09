@@ -374,6 +374,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.consultationStarted = true; // Set this earlier to show loading state
 
     const startRequest: StartConsultationRequest = {
       appointmentId: this.selectedAppointment.id,
@@ -385,20 +386,46 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
     console.log('Starting consultation with request:', startRequest); // Debug log
 
     this.consultationService.startConsultation(startRequest).subscribe({
-      next: (consultation) => {
-        console.log('Consultation started successfully:', consultation); // Debug log
+      next: (consultationDetails: any) => {
+        console.log('Consultation started successfully:', consultationDetails); // Debug log
+        
+        // Map the ConsultationDetailsDTO to our consultation object (same as getConsultationByAppointmentId)
+        const consultation: any = {
+          id: consultationDetails.record?.id,
+          appointmentId: consultationDetails.appointment?.id,
+          patientId: consultationDetails.appointment?.patientId,
+          patientFirstName: consultationDetails.appointment?.patientFirstName,
+          patientLastName: consultationDetails.appointment?.patientLastName,
+          patientEmail: consultationDetails.appointment?.patientEmail,
+          doctorId: consultationDetails.appointment?.doctorId,
+          doctorFirstName: consultationDetails.appointment?.doctorFirstName,
+          doctorLastName: consultationDetails.appointment?.doctorLastName,
+          doctorSpecialty: consultationDetails.appointment?.doctorSpecialty,
+          startTime: consultationDetails.record?.startedAt || consultationDetails.appointment?.appointmentTime,
+          endTime: consultationDetails.record?.endedAt,
+          status: consultationDetails.record?.status || 'in-progress',
+          consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
+          chiefComplaint: consultationDetails.record?.chiefComplaint,
+          diagnosis: consultationDetails.record?.diagnosis,
+          treatment: consultationDetails.record?.treatmentPlan,
+          notes: consultationDetails.record?.notes || consultationDetails.appointment?.notes,
+          prescriptions: consultationDetails.record?.prescriptions || [],
+          labTests: consultationDetails.record?.labTests || []
+        };
+        
+        console.log('Mapped consultation object:', consultation);
         console.log('Consultation ID:', consultation.id); // Check if ID is present
         
         if (!consultation.id) {
           console.error('WARNING: Consultation created without ID!');
           this.errorMessage = 'Erreur: La consultation a été créée sans identifiant';
+          this.consultationStarted = false; // Reset state on error
           this.isLoading = false;
           return;
         }
         
         this.currentConsultation = consultation;
-        this.consultationStarted = true;
-        this.consultationStartTime = new Date();
+        this.consultationStartTime = new Date(consultation.startTime);
         this.isLoading = false;
         this.successMessage = 'Consultation démarrée avec succès';
         
@@ -410,7 +437,8 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = 'Erreur lors du démarrage de la consultation';
+        this.consultationStarted = false; // Reset state on error
+        this.errorMessage = error.error?.message || 'Erreur lors du démarrage de la consultation';
         console.error('Error starting consultation:', error);
         console.error('Full error response:', error.error); // Log full error
       }
@@ -422,6 +450,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
    */
   startConsultationFromAppointment(appointmentId: number, consultationType: 'virtual' | 'onsite' = 'onsite'): void {
     this.isLoading = true;
+    this.consultationStarted = true; // Set this earlier to show loading state
 
     const request: StartConsultationRequest = {
       appointmentId: appointmentId,
@@ -429,11 +458,46 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       patientId: this.selectedPatient?.id // Include patientId
     };
 
+    console.log('Starting consultation from appointment with request:', request);
+
     this.consultationService.startConsultation(request).subscribe({
-      next: (consultation) => {
+      next: (consultationDetails: any) => {
+        console.log('Consultation from appointment started:', consultationDetails);
+        
+        // Map the ConsultationDetailsDTO to our consultation object
+        const consultation: any = {
+          id: consultationDetails.record?.id,
+          appointmentId: consultationDetails.appointment?.id,
+          patientId: consultationDetails.appointment?.patientId,
+          patientFirstName: consultationDetails.appointment?.patientFirstName,
+          patientLastName: consultationDetails.appointment?.patientLastName,
+          patientEmail: consultationDetails.appointment?.patientEmail,
+          doctorId: consultationDetails.appointment?.doctorId,
+          doctorFirstName: consultationDetails.appointment?.doctorFirstName,
+          doctorLastName: consultationDetails.appointment?.doctorLastName,
+          doctorSpecialty: consultationDetails.appointment?.doctorSpecialty,
+          startTime: consultationDetails.record?.startedAt || consultationDetails.appointment?.appointmentTime,
+          endTime: consultationDetails.record?.endedAt,
+          status: consultationDetails.record?.status || 'in-progress',
+          consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
+          chiefComplaint: consultationDetails.record?.chiefComplaint,
+          diagnosis: consultationDetails.record?.diagnosis,
+          treatment: consultationDetails.record?.treatmentPlan,
+          notes: consultationDetails.record?.notes || consultationDetails.appointment?.notes,
+          prescriptions: consultationDetails.record?.prescriptions || [],
+          labTests: consultationDetails.record?.labTests || []
+        };
+        
+        if (!consultation.id) {
+          console.error('WARNING: Consultation created without ID!');
+          this.errorMessage = 'Erreur: La consultation a été créée sans identifiant';
+          this.consultationStarted = false; // Reset state on error
+          this.isLoading = false;
+          return;
+        }
+        
         this.currentConsultation = consultation;
-        this.consultationStarted = true;
-        this.consultationStartTime = new Date();
+        this.consultationStartTime = new Date(consultation.startTime);
         
         // If patient info not already loaded, load from consultation
         if (!this.selectedPatient) {
@@ -448,12 +512,18 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
         
         this.isLoading = false;
         this.successMessage = `Consultation démarrée avec ${this.selectedPatient.firstName} ${this.selectedPatient.lastName}`;
+        
+        // Start auto-save timer
+        this.startAutoSave();
+        
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = 'Erreur lors du démarrage de la consultation';
-        console.error('Error starting consultation:', error);
+        this.consultationStarted = false; // Reset state on error
+        this.errorMessage = error.error?.message || 'Erreur lors du démarrage de la consultation';
+        console.error('Error starting consultation from appointment:', error);
+        console.error('Full error response:', error.error);
       }
     });
   }
@@ -741,6 +811,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
         if (normalizedStatus !== 'completed' && normalizedStatus !== 'cancelled') {
           console.log('Starting new consultation for appointment ID:', patient.appointmentId);
           this.startConsultationFromAppointment(patient.appointmentId, patient.appointmentType);
+        
         } else {
           console.log('Cannot start consultation: appointment status is', patient.status);
         }
@@ -809,6 +880,8 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
     }
     
     console.log('Trying to load consultation by appointment ID:', this.selectedAppointment.id);
+    this.isLoading = true;
+    this.consultationStarted = true; // Set loading state
     
     this.consultationService.getConsultationByAppointmentId(this.selectedAppointment.id).subscribe({
       next: (consultationDetails: any) => {
@@ -816,7 +889,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
         
         // Map the ConsultationDetailsDTO to our consultation object
         const consultation: any = {
-          id: consultationDetails.record?.id || consultationDetails.appointment?.id,
+          id: consultationDetails.record?.id,
           appointmentId: consultationDetails.appointment?.id,
           patientId: consultationDetails.appointment?.patientId,
           patientFirstName: consultationDetails.appointment?.patientFirstName,
@@ -825,27 +898,28 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
           doctorId: consultationDetails.appointment?.doctorId,
           doctorFirstName: consultationDetails.appointment?.doctorFirstName,
           doctorLastName: consultationDetails.appointment?.doctorLastName,
+          doctorSpecialty: consultationDetails.appointment?.doctorSpecialty,
           startTime: consultationDetails.record?.startedAt || consultationDetails.appointment?.appointmentTime,
           endTime: consultationDetails.record?.endedAt,
-          status: consultationDetails.appointment?.status || 'in-progress',
+          status: consultationDetails.record?.status || consultationDetails.appointment?.status || 'in-progress',
           consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
           chiefComplaint: consultationDetails.record?.chiefComplaint,
           diagnosis: consultationDetails.record?.diagnosis,
           treatment: consultationDetails.record?.treatmentPlan,
-          notes: consultationDetails.appointment?.notes,
-          prescriptions: [],
-          labTests: []
+          notes: consultationDetails.record?.notes || consultationDetails.appointment?.notes,
+          prescriptions: consultationDetails.record?.prescriptions || [],
+          labTests: consultationDetails.record?.labTests || []
         };
         
         if (!consultation.id) {
           console.error('WARNING: Consultation loaded without ID!');
           this.errorMessage = 'Erreur: La consultation chargée n\'a pas d\'identifiant';
+          this.consultationStarted = false; // Reset state
           this.isLoading = false;
           return;
         }
         
         this.currentConsultation = consultation;
-        this.consultationStarted = true;
         this.consultationStartTime = new Date(consultation.startTime);
         this.isLoading = false;
         this.successMessage = 'Consultation existante trouvée et chargée';
@@ -860,15 +934,23 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isLoading = false;
+        this.consultationStarted = false; // Reset state on error
         console.error('Error loading consultation by appointment ID:', error);
         
         // If no consultation exists for this appointment, offer to create one
         if (error.status === 404) {
-          if (confirm('Aucune consultation trouvée pour ce rendez-vous. Voulez-vous en créer une nouvelle?')) {
-            this.startConsultationFromAppointment(this.selectedAppointment.id, this.selectedAppointment.type);
-          }
+          this.errorMessage = 'Aucune consultation trouvée pour ce rendez-vous';
+          // Auto-create consultation after a short delay
+          setTimeout(() => {
+            if (confirm('Aucune consultation trouvée pour ce rendez-vous. Voulez-vous en créer une nouvelle?')) {
+              this.startConsultationFromAppointment(this.selectedAppointment.id, this.selectedAppointment.type);
+            } else {
+              this.consultationStarted = false;
+              this.errorMessage = '';
+            }
+          }, 1000);
         } else {
-          this.errorMessage = 'Erreur lors du chargement de la consultation';
+          this.errorMessage = error.error?.message || 'Erreur lors du chargement de la consultation';
         }
       }
     });

@@ -21,91 +21,180 @@
   <form [formGroup]="notesForm" class="notes-form">
     
     <!-- Chief Complaint -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('chiefComplaint')">
       <h3><i class="fas fa-comment-medical"></i> Motif de Consultation</h3>
       <div class="form-group">
-        <label for="chiefComplaint">Motif principal *</label>
+        <label for="chiefComplaint">
+          <i class="fas fa-stethoscope"></i>
+          Motif de Consultation *
+        </label>
         <textarea
           id="chiefComplaint"
           formControlName="chiefComplaint"
-          rows="2"
-          placeholder="Ex: Douleur thoracique, Fièvre persistante..."
-          [class.is-invalid]="isFieldInvalid('chiefComplaint')"
+          placeholder="Décrivez le motif principal de cette consultation..."
+          rows="3"
+          [readonly]="readOnly"
         ></textarea>
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('chiefComplaint')">
-          {{ getFieldError('chiefComplaint') }}
-        </div>
       </div>
     </div>
 
     <!-- Symptoms -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('symptoms')">
       <h3><i class="fas fa-heartbeat"></i> Symptômes</h3>
       <div class="form-group">
-        <label for="symptoms">Description des symptômes *</label>
+        <label for="symptoms">
+          <i class="fas fa-thermometer-half"></i>
+          Symptômes
+        </label>
         <textarea
           id="symptoms"
           formControlName="symptoms"
+          placeholder="Listez les symptômes observés ou rapportés par le patient..."
           rows="3"
-          placeholder="Décrivez les symptômes en détail..."
-          [class.is-invalid]="isFieldInvalid('symptoms')"
+          [readonly]="readOnly"
         ></textarea>
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('symptoms')">
-          {{ getFieldError('symptoms') }}
-        </div>
+      </div>
+    </div>
+
+    <!-- History of Present Illness -->
+    <div class="form-section" *ngIf="isFieldVisible('historyOfPresentIllness')">
+      <h3><i class="fas fa-book-medical"></i> Histoire de la Maladie Actuelle</h3>
+      <div class="form-group">
+        <label for="historyOfPresentIllness">
+          <i class="fas fa-history"></i>
+          Histoire de la Maladie Actuelle
+        </label>
+        <textarea
+          id="historyOfPresentIllness"
+          formControlName="historyOfPresentIllness"
+          placeholder="Décrivez l'évolution des symptômes..."
+          rows="4"
+          [readonly]="readOnly"
+        ></textarea>
       </div>
     </div>
 
     <!-- Physical Examination -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('physicalExamination')">
       <h3><i class="fas fa-stethoscope"></i> Examen Physique</h3>
       <div class="form-group">
-        <label for="physicalExamination">Résultats de l'examen physique</label>
+        <label for="physicalExamination">
+          <i class="fas fa-user-md"></i>
+          Examen Physique
+        </label>
         <textarea
           id="physicalExamination"
           formControlName="physicalExamination"
-          rows="3"
-          placeholder="Tension artérielle, température, auscultation..."
+          placeholder="Résultats de l'examen physique..."
+          rows="4"
+          [readonly]="readOnly"
         ></textarea>
+      </div>
+    </div>
+
+    <!-- Vital Signs -->
+    <div class="form-section" *ngIf="isFieldVisible('vitalSigns')">
+      <h3><i class="fas fa-heartbeat"></i> Signes Vitaux</h3>
+      <div class="vital-signs-grid">
+        <div class="vital-signs-row">
+          <div class="vital-sign-item">
+            <label>Tension Artérielle</label>
+            <input
+              type="text"
+              formControlName="bloodPressure"
+              placeholder="120/80"
+              [readonly]="readOnly"
+            >
+          </div>
+          <div class="vital-sign-item">
+            <label>Fréquence Cardiaque</label>
+            <input
+              type="number"
+              formControlName="heartRate"
+              placeholder="72"
+              [readonly]="readOnly"
+            >
+          </div>
+          <div class="vital-sign-item">
+            <label>Température (°C)</label>
+            <input
+              type="number"
+              step="0.1"
+              formControlName="temperature"
+              placeholder="36.5"
+              [readonly]="readOnly"
+            >
+          </div>
+          <div class="vital-sign-item">
+            <label>Fréquence Respiratoire</label>
+            <input
+              type="number"
+              formControlName="respiratoryRate"
+              placeholder="16"
+              [readonly]="readOnly"
+            >
+          </div>
+          <div class="vital-sign-item">
+            <label>Saturation O2 (%)</label>
+            <input
+              type="number"
+              formControlName="oxygenSaturation"
+              placeholder="98"
+              [readonly]="readOnly"
+            >
+          </div>
+          <div class="vital-sign-item">
+            <label>Poids (kg)</label>
+            <input
+              type="number"
+              step="0.1"
+              formControlName="weight"
+              placeholder="70"
+              [readonly]="readOnly"
+            >
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Diagnosis -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('diagnosis')">
       <h3><i class="fas fa-diagnoses"></i> Diagnostic</h3>
-      
-      <!-- Common Conditions Quick Select -->
-      <div class="quick-select" *ngIf="!readOnly">
-        <label>Conditions courantes:</label>
-        <div class="condition-chips">
-          <button
-            type="button"
-            class="chip"
-            *ngFor="let condition of commonConditions"
-            (click)="selectCommonCondition(condition)"
-          >
-            {{ condition }}
-          </button>
-        </div>
-      </div>
-
       <div class="form-group">
-        <label for="diagnosis">Diagnostic *</label>
+        <label for="diagnosis">
+          <i class="fas fa-diagnoses"></i>
+          Diagnostic *
+        </label>
         <textarea
           id="diagnosis"
           formControlName="diagnosis"
+          placeholder="Diagnostic principal et diagnostics différentiels..."
           rows="3"
-          placeholder="Diagnostic médical complet..."
-          [class.is-invalid]="isFieldInvalid('diagnosis')"
+          [readonly]="readOnly"
         ></textarea>
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('diagnosis')">
-          {{ getFieldError('diagnosis') }}
-        </div>
       </div>
     </div>
 
     <!-- Treatment Plan -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('treatmentPlan')">
+      <h3><i class="fas fa-procedures"></i> Plan de Traitement</h3>
+      <div class="form-group">
+        <label for="treatmentPlan">
+          <i class="fas fa-pills"></i>
+          Plan de Traitement *
+        </label>
+        <textarea
+          id="treatmentPlan"
+          formControlName="treatmentPlan"
+          placeholder="Plan de traitement détaillé..."
+          rows="4"
+          [readonly]="readOnly"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Treatment Plan (duplicate section - keep only one) -->
+    <div class="form-section" *ngIf="isFieldVisible('treatment')">
       <h3><i class="fas fa-procedures"></i> Plan de Traitement</h3>
       <div class="form-group">
         <label for="treatment">Traitement recommandé *</label>
@@ -123,7 +212,7 @@
     </div>
 
     <!-- Prescriptions -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('prescriptions')">
       <h3><i class="fas fa-prescription"></i> Ordonnances</h3>
       
       <!-- Common Medications Quick Select -->
@@ -205,7 +294,7 @@
     </div>
 
     <!-- Lab Tests -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('labTests')">
       <h3><i class="fas fa-flask"></i> Analyses de Laboratoire</h3>
       
       <div formArrayName="labTests">
@@ -259,21 +348,25 @@
     </div>
 
     <!-- Recommendations -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('recommendations')">
       <h3><i class="fas fa-lightbulb"></i> Recommandations</h3>
       <div class="form-group">
-        <label for="recommendations">Recommandations au patient</label>
+        <label for="recommendations">
+          <i class="fas fa-lightbulb"></i>
+          Recommandations
+        </label>
         <textarea
           id="recommendations"
           formControlName="recommendations"
+          placeholder="Recommandations pour le patient..."
           rows="3"
-          placeholder="Conseils, précautions, changements de mode de vie..."
+          [readonly]="readOnly"
         ></textarea>
       </div>
     </div>
 
     <!-- Follow-up -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('followUp')">
       <h3><i class="fas fa-calendar-plus"></i> Suivi</h3>
       <div class="form-group">
         <label for="followUpDate">Date de suivi</label>
@@ -285,7 +378,7 @@
         >
       </div>
 
-      <div class="form-group">
+      <div class="form-group" *ngIf="isFieldVisible('followUpInstructions')">
         <label for="followUpInstructions">Instructions pour le suivi</label>
         <textarea
           id="followUpInstructions"
@@ -297,7 +390,7 @@
     </div>
 
     <!-- Additional Notes -->
-    <div class="form-section">
+    <div class="form-section" *ngIf="isFieldVisible('additionalNotes')">
       <h3><i class="fas fa-sticky-note"></i> Notes Additionnelles</h3>
       <div class="form-group">
         <label for="additionalNotes">Notes supplémentaires</label>

@@ -424,6 +424,7 @@
             [consultationId]="currentConsultation.id"
             [appointmentId]="selectedAppointment?.id"
             [readOnly]="false"
+            [showLimitedFields]="currentConsultation.doctorSpecialty === 'Autre'"
             (consultationEnded)="onConsultationEnded()"
           ></app-consultation-notes>
         </div>
