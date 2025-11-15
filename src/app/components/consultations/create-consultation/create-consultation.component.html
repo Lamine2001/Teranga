@@ -423,8 +423,9 @@
             [consultation]="currentConsultation"
             [consultationId]="currentConsultation.id"
             [appointmentId]="selectedAppointment?.id"
+            [doctorSpecialty]="currentConsultation.doctorSpecialty"
             [readOnly]="false"
-            [showLimitedFields]="currentConsultation.doctorSpecialty === 'Autre'"
+            [showLimitedFields]="currentConsultation.doctorSpecialty === 'other' || currentConsultation.doctorSpecialty === 'Autre'"
             (consultationEnded)="onConsultationEnded()"
           ></app-consultation-notes>
         </div>

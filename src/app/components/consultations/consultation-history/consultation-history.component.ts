@@ -26,7 +26,7 @@ export class ConsultationHistoryComponent implements OnInit {
   filterForm: FormGroup;
   searchQuery = '';
   
-  userRole: string | null = null;
+  userType: string | null = null;
   
   // Filter options
   statusOptions = [
@@ -56,7 +56,7 @@ export class ConsultationHistoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userRole = this.authService.getUserRole();
+    this.userType = this.authService.getUserRole();
     this.loadConsultations();
     
     // Watch for filter changes
@@ -77,8 +77,8 @@ export class ConsultationHistoryComponent implements OnInit {
       searchQuery: this.filterForm.get('searchQuery')?.value
     };
 
-    // Load based on user role
-    const consultationsObservable = this.userRole === 'doctor'
+    // Load based on user type
+    const consultationsObservable = this.userType === 'doctor'
       ? this.consultationService.getDoctorConsultations(filter)
       : this.consultationService.getPatientConsultations(filter);
 

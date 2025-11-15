@@ -332,7 +332,15 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   loadPatientHistory(patientId: number): void {
     this.isLoadingHistory = true;
 
-    this.consultationService.getPatientConsultations({ patientId }).subscribe({
+    // Use userType instead of userRole for consistency
+    const filter = { patientId };
+    
+    // Load based on user type - doctors can see all, patients see only their own
+    const consultationsObservable = this.currentDoctor?.userType === 'DOCTOR'
+      ? this.consultationService.getPatientConsultations(filter)
+      : this.consultationService.getPatientConsultations(filter);
+
+    consultationsObservable.subscribe({
       next: (consultations) => {
         // Filter only completed consultations for history
         this.patientPreviousConsultations = consultations
@@ -406,8 +414,19 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
           status: consultationDetails.record?.status || 'in-progress',
           consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
           chiefComplaint: consultationDetails.record?.chiefComplaint,
+          symptoms: consultationDetails.record?.symptoms,
           diagnosis: consultationDetails.record?.diagnosis,
+          treatmentPlan: consultationDetails.record?.treatmentPlan,
           treatment: consultationDetails.record?.treatmentPlan,
+          examinationFindings: consultationDetails.record?.examinationFindings,
+          presentIllness: consultationDetails.record?.presentIllness,
+          recommendations: consultationDetails.record?.recommendations,
+          durationMinutes: consultationDetails.record?.durationMinutes,
+          followUpRequired: consultationDetails.record?.followUpRequired,
+          followUpDate: consultationDetails.record?.followUpDate,
+          followUpInstructions: consultationDetails.record?.followUpInstructions,
+          vitals: consultationDetails.record?.vitals,
+          additionalNotes: consultationDetails.record?.additionalNotes,
           notes: consultationDetails.record?.notes || consultationDetails.appointment?.notes,
           prescriptions: consultationDetails.record?.prescriptions || [],
           labTests: consultationDetails.record?.labTests || []
@@ -481,8 +500,19 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
           status: consultationDetails.record?.status || 'in-progress',
           consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
           chiefComplaint: consultationDetails.record?.chiefComplaint,
+          symptoms: consultationDetails.record?.symptoms,
           diagnosis: consultationDetails.record?.diagnosis,
+          treatmentPlan: consultationDetails.record?.treatmentPlan,
           treatment: consultationDetails.record?.treatmentPlan,
+          examinationFindings: consultationDetails.record?.examinationFindings,
+          presentIllness: consultationDetails.record?.presentIllness,
+          recommendations: consultationDetails.record?.recommendations,
+          durationMinutes: consultationDetails.record?.durationMinutes,
+          followUpRequired: consultationDetails.record?.followUpRequired,
+          followUpDate: consultationDetails.record?.followUpDate,
+          followUpInstructions: consultationDetails.record?.followUpInstructions,
+          vitals: consultationDetails.record?.vitals,
+          additionalNotes: consultationDetails.record?.additionalNotes,
           notes: consultationDetails.record?.notes || consultationDetails.appointment?.notes,
           prescriptions: consultationDetails.record?.prescriptions || [],
           labTests: consultationDetails.record?.labTests || []
@@ -904,8 +934,19 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
           status: consultationDetails.record?.status || consultationDetails.appointment?.status || 'in-progress',
           consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
           chiefComplaint: consultationDetails.record?.chiefComplaint,
+          symptoms: consultationDetails.record?.symptoms,
           diagnosis: consultationDetails.record?.diagnosis,
+          treatmentPlan: consultationDetails.record?.treatmentPlan,
           treatment: consultationDetails.record?.treatmentPlan,
+          examinationFindings: consultationDetails.record?.examinationFindings,
+          presentIllness: consultationDetails.record?.presentIllness,
+          recommendations: consultationDetails.record?.recommendations,
+          durationMinutes: consultationDetails.record?.durationMinutes,
+          followUpRequired: consultationDetails.record?.followUpRequired,
+          followUpDate: consultationDetails.record?.followUpDate,
+          followUpInstructions: consultationDetails.record?.followUpInstructions,
+          vitals: consultationDetails.record?.vitals,
+          additionalNotes: consultationDetails.record?.additionalNotes,
           notes: consultationDetails.record?.notes || consultationDetails.appointment?.notes,
           prescriptions: consultationDetails.record?.prescriptions || [],
           labTests: consultationDetails.record?.labTests || []

@@ -19,12 +19,30 @@ export interface Consultation {
   consultationType: 'virtual' | 'onsite';
   chiefComplaint?: string;
   symptoms?: string;
+  historyOfPresentIllness?: string;
+  physicalExamination?: string;
+  // Vital Signs
+  bloodPressure?: string;
+  heartRate?: number;
+  temperature?: number;
+  respiratoryRate?: number;
+  oxygenSaturation?: number;
+  weight?: number;
+  // Diagnosis and Treatment
   diagnosis?: string;
+  treatmentPlan?: string;
   treatment?: string;
+  duration?: string;
+  // Lab Tests
+  testName?: string;
+  // Follow-up and Notes
+  recommendations?: string;
+  followUpDate?: string;
+  followUpInstructions?: string;
+  additionalNotes?: string;
   notes?: string;
   prescriptions?: Prescription[];
   labTests?: LabTest[];
-  followUpDate?: string;
   followUpNotes?: string;
   createdAt: string;
   updatedAt?: string;

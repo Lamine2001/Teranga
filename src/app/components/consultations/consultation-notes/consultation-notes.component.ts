@@ -19,6 +19,7 @@ export class ConsultationNotesComponent implements OnInit {
   @Input() consultation!: Consultation;
   @Input() consultationId?: number; // Add explicit ID input
   @Input() appointmentId?: number; // Add appointment ID input
+  @Input() doctorSpecialty?: string; // Add doctor specialty input
   @Input() readOnly: boolean = false;
   @Input() showLimitedFields: boolean = false; // New input to control field visibility
   @Output() notesSaved = new EventEmitter<ConsultationNotes>();
@@ -50,11 +51,11 @@ export class ConsultationNotesComponent implements OnInit {
     private consultationService: ConsultationService
   ) {
     this.notesForm = this.fb.group({
-      chiefComplaint: ['', [Validators.required]],
-      symptoms: ['', [Validators.required]],
+      chiefComplaint: [''], // Remove initial validators
+      symptoms: [''],       // Remove initial validators
       physicalExamination: [''],
-      diagnosis: ['', [Validators.required]],
-      treatment: ['', [Validators.required]],
+      diagnosis: [''],      // Remove initial validators
+      treatment: [''],      // Remove initial validators
       recommendations: [''],
       prescriptions: this.fb.array([]),
       labTests: this.fb.array([]),
@@ -67,6 +68,8 @@ export class ConsultationNotesComponent implements OnInit {
   ngOnInit(): void {
     // Log for debugging
     console.log('ConsultationNotes component initialized');
+    console.log('Doctor Specialty:', this.doctorSpecialty);
+    console.log('Show Limited Fields:', this.showLimitedFields);
     console.log('Consultation:', this.consultation);
     console.log('Consultation ID from input:', this.consultationId);
     console.log('Consultation ID from object:', this.consultation?.id);
@@ -86,6 +89,9 @@ export class ConsultationNotesComponent implements OnInit {
     }
     
     this.initializeForm();
+
+    // Set field validators based on doctor specialty
+    this.updateFieldValidators();
 
     // Auto-save every 30 seconds
     if (this.autoSaveEnabled && !this.readOnly) {
@@ -111,8 +117,11 @@ export class ConsultationNotesComponent implements OnInit {
         chiefComplaint: this.consultation.chiefComplaint || '',
         symptoms: this.consultation.symptoms || '',
         diagnosis: this.consultation.diagnosis || '',
-        treatment: this.consultation.treatment || '',
-        additionalNotes: this.consultation.notes || ''
+        treatment: this.consultation.treatment || this.consultation.treatmentPlan || '',
+        recommendations: this.consultation.recommendations || '',
+        followUpDate: this.consultation.followUpDate || '',
+        followUpInstructions: this.consultation.followUpInstructions || '',
+        additionalNotes: this.consultation.additionalNotes || this.consultation.notes || ''
       });
       
       // If consultation has notes object with additional fields
@@ -120,9 +129,10 @@ export class ConsultationNotesComponent implements OnInit {
       if (notes && typeof notes === 'object') {
         this.notesForm.patchValue({
           physicalExamination: notes.physicalExamination || '',
-          recommendations: notes.recommendations || '',
-          followUpDate: notes.followUpDate || '',
-          followUpInstructions: notes.followUpInstructions || ''
+          recommendations: notes.recommendations || this.consultation.recommendations || '',
+          followUpDate: notes.followUpDate || this.consultation.followUpDate || '',
+          followUpInstructions: notes.followUpInstructions || this.consultation.followUpInstructions || '',
+          additionalNotes: notes.additionalNotes || this.consultation.additionalNotes || ''
         });
       }
       
@@ -139,11 +149,17 @@ export class ConsultationNotesComponent implements OnInit {
           this.addLabTest(labTest);
         });
       }
+      
+      // Log the form values for debugging
+      console.log('Form initialized with values:', this.notesForm.value);
+      console.log('Recommendations:', this.notesForm.get('recommendations')?.value);
+      console.log('Additional Notes:', this.notesForm.get('additionalNotes')?.value);
     }
   }
 
   get prescriptions(): FormArray {
     return this.notesForm.get('prescriptions') as FormArray;
+    
   }
 
   get labTests(): FormArray {
@@ -295,7 +311,8 @@ export class ConsultationNotesComponent implements OnInit {
   }
 
   endConsultation(): void {
-    if (this.notesForm.invalid) {
+    // Use the custom validation method instead of notesForm.invalid
+    if (!this.areRequiredFieldsValid()) {
       this.markFormGroupTouched();
       this.errorMessage = 'Veuillez remplir tous les champs obligatoires avant de terminer';
       return;
@@ -391,11 +408,22 @@ export class ConsultationNotesComponent implements OnInit {
    * Check if a field should be visible based on doctor specialty
    */
   isFieldVisible(fieldName: string): boolean {
-    if (!this.showLimitedFields) {
+    console.log(`Checking field visibility for: ${fieldName}`);
+    console.log(`Doctor Specialty: "${this.doctorSpecialty}"`);
+    console.log(`Show Limited Fields: ${this.showLimitedFields}`);
+    
+    // Use doctorSpecialty input if provided, otherwise fallback to showLimitedFields
+    // Check for both 'other' (English) and 'Autre' (French) values
+    const isOtherSpecialty = this.doctorSpecialty === 'other' || this.doctorSpecialty === 'Autre' || this.showLimitedFields;
+    
+    console.log(`Is Other Specialty: ${isOtherSpecialty}`);
+    
+    if (!isOtherSpecialty) {
+      console.log(`Showing all fields for specialty: ${this.doctorSpecialty}`);
       return true; // Show all fields for regular specialties
     }
     
-    // For "Autre" specialty, only show these fields
+    // For "other"/"Autre" specialty, only show these fields
     const allowedFields = [
       'chiefComplaint',        // Motif de Consultation
       'symptoms',              // Symptômes
@@ -405,7 +433,96 @@ export class ConsultationNotesComponent implements OnInit {
       'additionalNotes'        // Notes supplémentaires
     ];
     
-    return allowedFields.includes(fieldName);
+    const isAllowed = allowedFields.includes(fieldName);
+    console.log(`Field "${fieldName}" is ${isAllowed ? 'ALLOWED' : 'HIDDEN'} for "other" specialty`);
+    
+    // Return true only if field is in allowed list, false otherwise
+    return isAllowed;
+  }
+
+  /**
+   * Check if required fields for "other" specialty are valid
+   */
+  areRequiredFieldsValid(): boolean {
+    // Use doctorSpecialty input if provided, otherwise fallback to showLimitedFields
+    const isOtherSpecialty = this.doctorSpecialty === 'other' || this.doctorSpecialty === 'Autre' || this.showLimitedFields;
+    
+    if (!isOtherSpecialty) {
+      // For regular specialties, use the default form validation
+      return this.notesForm.valid;
+    }
+    
+    // For "other" specialty, only check these required fields
+    const requiredFields = [
+      'chiefComplaint',        // Motif de Consultation
+      'symptoms',              // Symptômes
+      'recommendations',       // Recommandations
+      'followUpInstructions',  // Instructions pour le suivi
+      'additionalNotes'        // Notes supplémentaires
+    ];
+    
+    // Check if all required fields are filled
+    return requiredFields.every(field => {
+      const control = this.notesForm.get(field);
+      return control && control.value && control.value.trim().length > 0;
+    });
+  }
+
+  /**
+   * Update field validators based on doctor specialty
+   */
+  private updateFieldValidators(): void {
+    const isOtherSpecialty = this.doctorSpecialty === 'other' || this.doctorSpecialty === 'Autre' || this.showLimitedFields;
+    
+    if (isOtherSpecialty) {
+      // For "other" specialty, only these fields are required
+      const requiredFields = [
+        'chiefComplaint',        // Motif de Consultation
+        'symptoms',              // Symptômes
+        'recommendations',       // Recommandations
+        'followUpInstructions',  // Instructions pour le suivi
+        'additionalNotes'        // Notes supplémentaires
+      ];
+      
+      // Remove required validators from all fields first
+      Object.keys(this.notesForm.controls).forEach(fieldName => {
+        const control = this.notesForm.get(fieldName);
+        if (control) {
+          control.clearValidators();
+          control.updateValueAndValidity();
+        }
+      });
+      
+      // Add required validators only to allowed fields
+      requiredFields.forEach(fieldName => {
+        const control = this.notesForm.get(fieldName);
+        if (control) {
+          control.setValidators([Validators.required]);
+          control.updateValueAndValidity();
+        }
+      });
+    } else {
+      // For regular specialties, keep original required fields
+      const regularRequiredFields = ['chiefComplaint', 'symptoms', 'diagnosis', 'treatment'];
+      
+      // Remove all validators first
+      Object.keys(this.notesForm.controls).forEach(fieldName => {
+        const control = this.notesForm.get(fieldName);
+        if (control) {
+          control.clearValidators();
+          control.updateValueAndValidity();
+        }
+      });
+      
+      // Add required validators to regular required fields
+      regularRequiredFields.forEach(fieldName => {
+        const control = this.notesForm.get(fieldName);
+        if (control) {
+          control.setValidators([Validators.required]);
+          control.updateValueAndValidity();
+        }
+      });
+    }
   }
 }
 

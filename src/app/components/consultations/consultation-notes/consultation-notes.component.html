@@ -409,7 +409,7 @@
         type="button"
         class="btn btn-secondary"
         (click)="saveNotes(false)"
-        [disabled]="isSaving || notesForm.invalid"
+        [disabled]="isSaving"
       >
         <i class="fas fa-save"></i>
         {{ isSaving ? 'Sauvegarde...' : 'Sauvegarder' }}
@@ -419,7 +419,7 @@
         type="button"
         class="btn btn-primary"
         (click)="endConsultation()"
-        [disabled]="isLoading || notesForm.invalid"
+        [disabled]="isLoading || !areRequiredFieldsValid()"
       >
         <i class="fas fa-check-circle"></i>
         {{ isLoading ? 'Traitement...' : 'Terminer la Consultation' }}
