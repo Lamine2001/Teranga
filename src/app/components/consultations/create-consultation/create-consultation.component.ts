@@ -29,7 +29,7 @@ interface PatientInfo {
 }
 
 interface PreviousConsultation {
-  id: number;
+  id: number | string; // Accept both number and string
   date: string;
   doctorName: string;
   diagnosis: string;
@@ -332,24 +332,20 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   loadPatientHistory(patientId: number): void {
     this.isLoadingHistory = true;
 
-    // Use userType instead of userRole for consistency
-    const filter = { patientId };
+    const filter = { patientId: patientId.toString() };
     
-    // Load based on user type - doctors can see all, patients see only their own
     const consultationsObservable = this.currentDoctor?.userType === 'DOCTOR'
       ? this.consultationService.getPatientConsultations(filter)
       : this.consultationService.getPatientConsultations(filter);
 
     consultationsObservable.subscribe({
       next: (consultations) => {
-        // Filter only completed consultations for history
         this.patientPreviousConsultations = consultations
           .filter(c => {
-            // Use lowercase for status comparison
             return c.status === 'completed';
           })
           .map(c => ({
-            id: c.id,
+            id: typeof c.id === 'string' ? parseInt(c.id, 10) : c.id, // Convert string to number
             date: c.startTime,
             doctorName: `Dr. ${c.doctorFirstName} ${c.doctorLastName}`,
             diagnosis: c.diagnosis || 'Non spécifié',
@@ -386,7 +382,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
 
     const startRequest: StartConsultationRequest = {
       appointmentId: this.selectedAppointment.id,
-      patientId: this.selectedPatient.id,
+      patientId: this.selectedPatient.id.toString(), // Convert to string
       consultationType: this.selectedAppointment.type || this.selectedAppointment.appointmentType || 'onsite',
       notes: ''
     };
@@ -474,7 +470,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
     const request: StartConsultationRequest = {
       appointmentId: appointmentId,
       consultationType: consultationType,
-      patientId: this.selectedPatient?.id // Include patientId
+      patientId: this.selectedPatient?.id.toString() // Convert to string
     };
 
     console.log('Starting consultation from appointment with request:', request);
@@ -561,7 +557,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * View a previous consultation
    */
-  viewPreviousConsultation(consultationId: number): void {
+  viewPreviousConsultation(consultationId: number | string): void {
     window.open(`/consultations/${consultationId}`, '_blank');
   }
 
@@ -637,8 +633,14 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
     if (files && files.length > 0 && this.currentConsultation) {
       // TODO: Implement file upload
       console.log('Files selected:', files);
+      
+      // Convert consultation ID to string
+      const consultationIdStr = typeof this.currentConsultation.id === 'number' 
+        ? this.currentConsultation.id.toString() 
+        : this.currentConsultation.id;
+      
       for (let i = 0; i < files.length; i++) {
-        this.consultationService.addConsultationAttachment(this.currentConsultation.id, files[i]).subscribe({
+        this.consultationService.addConsultationAttachment(consultationIdStr, files[i]).subscribe({
           next: () => {
             console.log('File uploaded successfully:', files[i].name);
             this.successMessage = `Fichier ${files[i].name} téléchargé avec succès`;
@@ -854,13 +856,16 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Load an existing consultation by ID
    */
-  private loadExistingConsultation(consultationId: number): void {
+  private loadExistingConsultation(consultationId: number | string): void {
     this.isLoading = true;
     this.errorMessage = '';
     
     console.log('Loading existing consultation with ID:', consultationId);
     
-    this.consultationService.getConsultation(consultationId).subscribe({
+    // Convert to string if needed for the service call
+    const consultationIdStr = typeof consultationId === 'number' ? consultationId.toString() : consultationId;
+    
+    this.consultationService.getConsultation(consultationIdStr).subscribe({
       next: (consultation) => {
         console.log('Existing consultation loaded:', consultation);
         
@@ -878,7 +883,6 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
         this.successMessage = 'Consultation existante chargée avec succès';
         
         // Don't start auto-save for existing consultations that might be completed
-        // Use lowercase status values
         if (consultation.status !== 'completed' && consultation.status !== 'cancelled') {
           this.startAutoSave();
         }
@@ -1049,6 +1053,40 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  /**
+   * Retry creating consultation
+   */
+  retryCreateConsultation(): void {
+    this.errorMessage = '';
+    this.consultationStarted = false;
+    this.currentConsultation = null;
+    
+    if (this.selectedPatient && this.selectedAppointment) {
+      setTimeout(() => {
+        this.startNewConsultation();
+      }, 100);
+    } else {
+      this.errorMessage = 'Informations patient ou rendez-vous manquantes';
+    }
+  }
+
+  /**
+   * Reset consultation state
+   */
+  resetConsultation(): void {
+    this.consultationStarted = false;
+    this.currentConsultation = null;
+    this.consultationStartTime = undefined;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.isLoading = false;
+    
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
   }
 }
 

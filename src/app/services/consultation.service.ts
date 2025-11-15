@@ -16,7 +16,8 @@ import {
   EndConsultationRequest,
   ConsultationHistoryFilter,
   ConsultationSummary,
-  VideoConsultationConfig
+  VideoConsultationConfig,
+  toEndConsultationRequest
 } from '../models/consultation.model';
 
 @Injectable({
@@ -86,13 +87,29 @@ export class ConsultationService {
 
   /**
    * End an ongoing consultation
+   * Converts frontend ConsultationNotes to backend-compatible flat structure
    */
   endConsultation(request: EndConsultationRequest): Observable<Consultation> {
     this.logRequest('POST', `${this.apiUrl}/${request.appointmentId}/end`);
     
+    // If old structure (with notes object), convert to new flat structure
+    let requestBody: any;
+    if (request.notes) {
+      // Convert nested ConsultationNotes to flat EndConsultationRequest
+      requestBody = toEndConsultationRequest(
+        request.appointmentId,
+        request.notes,
+        request.duration,
+        request.patientSatisfaction
+      );
+    } else {
+      // Already in new flat structure
+      requestBody = request;
+    }
+    
     return this.http.post<Consultation>(
       `${this.apiUrl}/${request.appointmentId}/end`,
-      request.notes,
+      requestBody,
       { headers: this.getAuthHeaders() }
     ).pipe(
       tap(() => console.log('Consultation ended successfully')),
@@ -107,7 +124,7 @@ export class ConsultationService {
   /**
    * Get consultation details by ID
    */
-  getConsultation(id: number): Observable<Consultation> {
+  getConsultation(id: string): Observable<Consultation> {
     this.logRequest('GET', `${this.apiUrl}/${id}`);
     
     return this.http.get<Consultation>(`${this.apiUrl}/${id}`, { 
@@ -161,7 +178,7 @@ export class ConsultationService {
   /**
    * Get consultation by appointment ID
    */
-  getConsultationByAppointmentId(appointmentId: number): Observable<Consultation> {
+  getConsultationByAppointmentId(appointmentId: string): Observable<Consultation> {
     this.logRequest('GET', `${this.apiUrl}/appointment/${appointmentId}`);
     
     return this.http.get<Consultation>(`${this.apiUrl}/appointment/${appointmentId}`, { 
@@ -197,7 +214,7 @@ export class ConsultationService {
   /**
    * Update consultation status
    */
-  updateConsultationStatus(consultationId: number, status: string): Observable<Consultation> {
+  updateConsultationStatus(consultationId: string, status: string): Observable<Consultation> {
     this.logRequest('PATCH', `${this.apiUrl}/${consultationId}/status`);
     
     return this.http.patch<Consultation>(`${this.apiUrl}/${consultationId}/status`, { status }, { 
@@ -215,7 +232,7 @@ export class ConsultationService {
   /**
    * Create prescription for a consultation
    */
-  createPrescription(consultationId: number, prescription: Prescription): Observable<Prescription> {
+  createPrescription(consultationId: string, prescription: Prescription): Observable<Prescription> {
     this.logRequest('POST', `${this.apiUrl}/${consultationId}/prescriptions`);
     
     return this.http.post<Prescription>(
@@ -235,7 +252,7 @@ export class ConsultationService {
   /**
    * Get all prescriptions for a consultation
    */
-  getPrescriptions(consultationId: number): Observable<Prescription[]> {
+  getPrescriptions(consultationId: string): Observable<Prescription[]> {
     this.logRequest('GET', `${this.apiUrl}/${consultationId}/prescriptions`);
     
     return this.http.get<Prescription[]>(`${this.apiUrl}/${consultationId}/prescriptions`, { 
@@ -253,7 +270,7 @@ export class ConsultationService {
   /**
    * Update prescription
    */
-  updatePrescription(prescriptionId: number, prescription: Partial<Prescription>): Observable<Prescription> {
+  updatePrescription(prescriptionId: string, prescription: Partial<Prescription>): Observable<Prescription> {
     return this.http.put<Prescription>(`${this.apiUrl}/prescriptions/${prescriptionId}`, prescription).pipe(
       catchError(error => {
         console.error('Error updating prescription:', error);
@@ -265,7 +282,7 @@ export class ConsultationService {
   /**
    * Delete prescription
    */
-  deletePrescription(prescriptionId: number): Observable<void> {
+  deletePrescription(prescriptionId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/prescriptions/${prescriptionId}`).pipe(
       catchError(error => {
         console.error('Error deleting prescription:', error);
@@ -277,7 +294,7 @@ export class ConsultationService {
   /**
    * Create lab test order
    */
-  createLabTest(consultationId: number, labTest: LabTest): Observable<LabTest> {
+  createLabTest(consultationId: string, labTest: LabTest): Observable<LabTest> {
     return this.http.post<LabTest>(`${this.apiUrl}/${consultationId}/lab-tests`, labTest).pipe(
       catchError(error => {
         console.error('Error creating lab test:', error);
@@ -289,7 +306,7 @@ export class ConsultationService {
   /**
    * Get lab tests for a consultation
    */
-  getLabTests(consultationId: number): Observable<LabTest[]> {
+  getLabTests(consultationId: string): Observable<LabTest[]> {
     return this.http.get<LabTest[]>(`${this.apiUrl}/${consultationId}/lab-tests`).pipe(
       catchError(error => {
         console.error('Error fetching lab tests:', error);
@@ -301,7 +318,7 @@ export class ConsultationService {
   /**
    * Get consultation summary/statistics for doctor
    */
-  getDoctorConsultationSummary(doctorId: number): Observable<ConsultationSummary> {
+  getDoctorConsultationSummary(doctorId: string): Observable<ConsultationSummary> {
     this.logRequest('GET', `${this.apiUrl}/doctor/${doctorId}/summary`);
     
     return this.http.get<ConsultationSummary>(`${this.apiUrl}/doctor/${doctorId}/summary`, { 
@@ -330,7 +347,7 @@ export class ConsultationService {
   /**
    * Get video consultation configuration
    */
-  getVideoConsultationConfig(consultationId: number): Observable<VideoConsultationConfig> {
+  getVideoConsultationConfig(consultationId: string): Observable<VideoConsultationConfig> {
     this.logRequest('GET', `${this.apiUrl}/${consultationId}/video-config`);
     
     return this.http.get<VideoConsultationConfig>(`${this.apiUrl}/${consultationId}/video-config`, { 
@@ -348,7 +365,7 @@ export class ConsultationService {
   /**
    * Generate consultation report/summary
    */
-  generateConsultationReport(consultationId: number): Observable<Blob> {
+  generateConsultationReport(consultationId: string): Observable<Blob> {
     this.logRequest('GET', `${this.apiUrl}/${consultationId}/report`);
     
     return this.http.get(`${this.apiUrl}/${consultationId}/report`, {
@@ -388,7 +405,7 @@ export class ConsultationService {
   /**
    * Get upcoming consultations for doctor
    */
-  getUpcomingConsultations(doctorId: number): Observable<Consultation[]> {
+  getUpcomingConsultations(doctorId: string): Observable<Consultation[]> {
     this.logRequest('GET', `${this.apiUrl}/doctor/${doctorId}/upcoming`);
     
     return this.http.get<Consultation[]>(`${this.apiUrl}/doctor/${doctorId}/upcoming`, { 
@@ -429,7 +446,7 @@ export class ConsultationService {
   /**
    * Add attachment to consultation
    */
-  addConsultationAttachment(consultationId: number, file: File): Observable<any> {
+  addConsultationAttachment(consultationId: string, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -444,7 +461,7 @@ export class ConsultationService {
   /**
    * Get consultation attachments
    */
-  getConsultationAttachments(consultationId: number): Observable<any[]> {
+  getConsultationAttachments(consultationId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${consultationId}/attachments`).pipe(
       catchError(error => {
         console.error('Error fetching attachments:', error);

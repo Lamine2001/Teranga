@@ -258,7 +258,12 @@ export class ConsultationNotesComponent implements OnInit {
 
     console.log('Saving notes for consultation ID:', consultationId); // Debug log
 
-    this.consultationService.saveConsultationNotes(consultationId, notes).subscribe({
+    // Convert consultationId to number if it's a string
+    const consultationIdNum = typeof consultationId === 'string' 
+      ? parseInt(consultationId, 10) 
+      : consultationId;
+
+    this.consultationService.saveConsultationNotes(consultationIdNum, notes).subscribe({
       next: () => {
         this.isSaving = false;
         this.lastSaved = new Date();
@@ -330,9 +335,16 @@ export class ConsultationNotesComponent implements OnInit {
         return;
       }
 
+      const formValue = this.notesForm.value;
       const endRequest = {
-        appointmentId: effectiveAppointmentId,
-        notes: this.notesForm.value
+        appointmentId: typeof effectiveAppointmentId === 'number' 
+          ? effectiveAppointmentId.toString() 
+          : effectiveAppointmentId, // Convert to string
+        diagnosis: formValue.diagnosis || 'Non spécifié',
+        treatmentPlan: formValue.treatment || 'Non spécifié',
+        notes: formValue,
+        duration: this.calculateDuration(),
+        patientSatisfaction: undefined
       };
 
       this.consultationService.endConsultation(endRequest).subscribe({
@@ -348,6 +360,18 @@ export class ConsultationNotesComponent implements OnInit {
         }
       });
     }
+  }
+
+  /**
+   * Calculate consultation duration in minutes
+   */
+  private calculateDuration(): number | undefined {
+    if (this.consultation?.startTime) {
+      const start = new Date(this.consultation.startTime);
+      const now = new Date();
+      return Math.floor((now.getTime() - start.getTime()) / 60000); // Duration in minutes
+    }
+    return undefined;
   }
 
   loadTemplate(templateName: string): void {
@@ -525,4 +549,3 @@ export class ConsultationNotesComponent implements OnInit {
     }
   }
 }
-

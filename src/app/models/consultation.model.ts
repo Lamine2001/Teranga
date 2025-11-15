@@ -1,15 +1,16 @@
 /**
  * Consultation Models and Interfaces
+ * Updated to align with backend DTOs and entities
  */
 
 export interface Consultation {
-  id: number;
-  appointmentId: number;
-  doctorId: number;
+  id: number | string; // Accept both number and string
+  appointmentId: string;  // Changed from number to match backend UUID
+  doctorId: string;  // Changed from number to match backend UUID
   doctorFirstName: string;
   doctorLastName: string;
   doctorSpecialty: string;
-  patientId: number;
+  patientId: string;  // Changed from number to match backend UUID
   patientFirstName: string;
   patientLastName: string;
   patientEmail: string;
@@ -37,9 +38,15 @@ export interface Consultation {
   testName?: string;
   // Follow-up and Notes
   recommendations?: string;
+  additionalNotes?: string;
+  treatmentPlan?: string;
+  examinationFindings?: string;
+  presentIllness?: string;
+  durationMinutes?: number;
+  followUpRequired?: boolean;
   followUpDate?: string;
   followUpInstructions?: string;
-  additionalNotes?: string;
+  vitals?: any;
   notes?: string;
   prescriptions?: Prescription[];
   labTests?: LabTest[];
@@ -50,11 +57,14 @@ export interface Consultation {
 
 export interface ConsultationNotes {
   chiefComplaint: string;
-  symptoms: string;
-  physicalExamination?: string;
+  presentIllness: string;  // Backend field name (was: symptoms)
+  symptoms?: string;  // Keep for backward compatibility
+  examinationFindings?: string;  // Backend field name (was: physicalExamination)
+  physicalExamination?: string;  // Keep for backward compatibility
   diagnosis: string;
-  treatment: string;
-  recommendations: string;
+  treatmentPlan: string;  // Backend field name (was: treatment)
+  treatment?: string;  // Keep for backward compatibility
+  recommendations?: string;
   prescriptions?: Prescription[];
   labTests?: LabTest[];
   followUpDate?: string;
@@ -63,47 +73,96 @@ export interface ConsultationNotes {
 }
 
 export interface Prescription {
-  id?: number;
-  consultationId?: number;
+  id?: string;  // Changed from number to match backend UUID
+  consultationId?: string;  // Changed from number to match backend UUID
   medicationName: string;
   dosage: string;
   frequency: string;
   duration: string;
   instructions: string;
-  refillable: boolean;
+  notes?: string;
+  quantity?: number;
+  unit?: string;
+  doctorNotes?: string;
+  warnings?: string;
+  status?: string;
+  prescribedDate?: string;
+  startDate?: string;
+  endDate?: string;
+  refillable?: boolean;  // Made optional for compatibility
   refillsAllowed?: number;
+  refillsRemaining?: number;
+  pharmacyInstructions?: string;
+  doctorName?: string;
+  patientName?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LabTest {
-  id?: number;
-  consultationId?: number;
+  id?: string;  // Changed from number to match backend UUID
+  consultationId?: string;  // Changed from number to match backend UUID
   testName: string;
-  testType: string;
-  urgency: 'routine' | 'urgent' | 'stat';
+  testCode?: string;  // Backend field name
+  testType?: string;  // Keep for backward compatibility
+  description?: string;
+  urgency: 'routine' | 'urgent' | 'stat' | string;  // Backend uses string
   instructions?: string;
-  labName?: string;
+  notes?: string;
+  labLocation?: string;  // Backend field name
+  labName?: string;  // Keep for backward compatibility
+  preferredDate?: string;
+  status?: string;
+  requiredPreparations?: string;
+  results?: string;
+  completedAt?: string;
+  resultUnit?: string;
+  referenceRange?: string;
+  resultInterpretation?: string;
+  labTechnician?: string;
+  sampleType?: string;
+  fastingRequired?: boolean;
+  priorityLevel?: number;
   estimatedCost?: number;
+  doctorName?: string;
+  patientName?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface StartConsultationRequest {
-  appointmentId: number;
-  patientId?: number;
+  appointmentId: number | string; // Accept both number and string
+  patientId?: number | string; // Accept both number and string
   consultationType?: 'virtual' | 'onsite';
   notes?: string;
 }
 
+/**
+ * End Consultation Request - Aligned with backend EndConsultationRequestDTO
+ * Uses flat structure to match backend expectations
+ */
 export interface EndConsultationRequest {
-  appointmentId: number;
-  notes: ConsultationNotes;
+  appointmentId: string;  // Changed from number to match backend UUID
+  diagnosis: string;
+  treatmentPlan: string;  // Backend field name (not 'treatment')
+  examinationFindings?: string;  // Backend field name (not 'physicalExamination')
+  chiefComplaint?: string;
+  presentIllness?: string;  // Backend field name (not 'symptoms')
+  prescriptionsJson?: string;  // Backend expects JSON string
+  labTestsJson?: string;  // Backend expects JSON string
+  followUpRequired?: boolean;
+  followUpDate?: string;
+  followUpInstructions?: string;
   duration?: number;
   patientSatisfaction?: number;
+  
+  // Keep old structure for backward compatibility
+  notes?: ConsultationNotes;
 }
 
 export interface ConsultationHistoryFilter {
-  patientId?: number;
-  doctorId?: number;
+  patientId?: number | string; // Accept both number and string
+  doctorId?: number | string;
   startDate?: string;
   endDate?: string;
   status?: string[];
@@ -123,10 +182,37 @@ export interface ConsultationSummary {
 }
 
 export interface VideoConsultationConfig {
-  consultationId: number;
+  consultationId: string;  // Changed from number to match backend UUID
   roomId: string;
   participantToken: string;
   platform: 'jitsi' | 'zoom' | 'meet' | 'custom';
   expiresAt: string;
+}
+
+/**
+ * Helper function to convert ConsultationNotes to flat EndConsultationRequest
+ * This ensures compatibility with backend EndConsultationRequestDTO
+ */
+export function toEndConsultationRequest(
+  appointmentId: string,
+  notes: ConsultationNotes,
+  duration?: number,
+  patientSatisfaction?: number
+): EndConsultationRequest {
+  return {
+    appointmentId,
+    diagnosis: notes.diagnosis,
+    treatmentPlan: notes.treatmentPlan || notes.treatment || '',
+    examinationFindings: notes.examinationFindings || notes.physicalExamination,
+    chiefComplaint: notes.chiefComplaint,
+    presentIllness: notes.presentIllness || notes.symptoms || '',
+    prescriptionsJson: notes.prescriptions ? JSON.stringify(notes.prescriptions) : undefined,
+    labTestsJson: notes.labTests ? JSON.stringify(notes.labTests) : undefined,
+    followUpRequired: !!notes.followUpDate,
+    followUpDate: notes.followUpDate,
+    followUpInstructions: notes.followUpInstructions,
+    duration,
+    patientSatisfaction
+  };
 }
 
