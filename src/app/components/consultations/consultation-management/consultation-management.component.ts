@@ -27,7 +27,7 @@ export class ConsultationManagementComponent implements OnInit {
   
   // User info
   currentUser: any = null;
-  doctorId: number = 0;
+  doctorId: string = '';
 
   constructor(
     public router: Router,

@@ -17,7 +17,7 @@ import { ConsultationNotesComponent } from '../consultation-notes/consultation-n
 import { environment } from '../../../../environments/environment';
 
 interface PatientInfo {
-  id: number;
+  id: string | number;
   firstName: string;
   lastName: string;
   email: string;
@@ -29,7 +29,7 @@ interface PatientInfo {
 }
 
 interface PreviousConsultation {
-  id: number;
+  id: string | number;
   date: string;
   doctorName: string;
   diagnosis: string;
@@ -303,8 +303,8 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Load patient by ID
    */
-  loadPatientById(patientId: number): void {
-    this.userService.getUserById(patientId).subscribe({
+  loadPatientById(patientId: string | number): void {
+    this.userService.getUserById(patientId as any).subscribe({
       next: (user: any) => {
         this.selectedPatient = {
           id: user.id || user.userId,
@@ -329,10 +329,10 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Load patient consultation history
    */
-  loadPatientHistory(patientId: number): void {
+  loadPatientHistory(patientId: string | number): void {
     this.isLoadingHistory = true;
 
-    this.consultationService.getPatientConsultations({ patientId }).subscribe({
+    this.consultationService.getPatientConsultations({ patientId: String(patientId) }).subscribe({
       next: (consultations) => {
         // Filter only completed consultations for history
         this.patientPreviousConsultations = consultations
@@ -377,8 +377,8 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
     this.consultationStarted = true; // Set this earlier to show loading state
 
     const startRequest: StartConsultationRequest = {
-      appointmentId: this.selectedAppointment.id,
-      patientId: this.selectedPatient.id,
+      appointmentId: String(this.selectedAppointment.id),
+      patientId: String(this.selectedPatient.id),
       consultationType: this.selectedAppointment.type || this.selectedAppointment.appointmentType || 'onsite',
       notes: ''
     };
@@ -448,14 +448,14 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Start consultation from an existing appointment
    */
-  startConsultationFromAppointment(appointmentId: number, consultationType: 'virtual' | 'onsite' = 'onsite'): void {
+  startConsultationFromAppointment(appointmentId: string | number, consultationType: 'virtual' | 'onsite' = 'onsite'): void {
     this.isLoading = true;
     this.consultationStarted = true; // Set this earlier to show loading state
 
     const request: StartConsultationRequest = {
-      appointmentId: appointmentId,
+      appointmentId: String(appointmentId),
       consultationType: consultationType,
-      patientId: this.selectedPatient?.id // Include patientId
+      patientId: this.selectedPatient?.id ? String(this.selectedPatient.id) : undefined // Include patientId
     };
 
     console.log('Starting consultation from appointment with request:', request);
@@ -531,7 +531,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * View a previous consultation
    */
-  viewPreviousConsultation(consultationId: number): void {
+  viewPreviousConsultation(consultationId: string | number): void {
     window.open(`/consultations/${consultationId}`, '_blank');
   }
 
@@ -824,13 +824,13 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Load an existing consultation by ID
    */
-  private loadExistingConsultation(consultationId: number): void {
+  private loadExistingConsultation(consultationId: string | number): void {
     this.isLoading = true;
     this.errorMessage = '';
     
     console.log('Loading existing consultation with ID:', consultationId);
     
-    this.consultationService.getConsultation(consultationId).subscribe({
+    this.consultationService.getConsultation(String(consultationId)).subscribe({
       next: (consultation) => {
         console.log('Existing consultation loaded:', consultation);
         

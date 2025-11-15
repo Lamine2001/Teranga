@@ -20,7 +20,7 @@ export class ConsultationDetailsComponent implements OnInit {
   consultation: Consultation | null = null;
   isLoading = true;
   errorMessage = '';
-  consultationId: number = 0;
+  consultationId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -32,7 +32,7 @@ export class ConsultationDetailsComponent implements OnInit {
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (id) {
-        this.consultationId = +id;
+        this.consultationId = id;
         this.loadConsultation();
       }
     });

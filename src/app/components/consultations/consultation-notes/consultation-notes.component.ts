@@ -17,8 +17,8 @@ import { Consultation, ConsultationNotes, Prescription, LabTest } from '../../..
 })
 export class ConsultationNotesComponent implements OnInit {
   @Input() consultation!: Consultation;
-  @Input() consultationId?: number; // Add explicit ID input
-  @Input() appointmentId?: number; // Add appointment ID input
+  @Input() consultationId?: string | number; // Add explicit ID input - support both for compatibility
+  @Input() appointmentId?: string | number; // Add appointment ID input - support both for compatibility
   @Input() readOnly: boolean = false;
   @Input() showLimitedFields: boolean = false; // New input to control field visibility
   @Output() notesSaved = new EventEmitter<ConsultationNotes>();
@@ -82,7 +82,7 @@ export class ConsultationNotesComponent implements OnInit {
     
     // Update the consultation object with the effective ID if needed
     if (this.consultation && !this.consultation.id && this.consultationId) {
-      this.consultation = { ...this.consultation, id: this.consultationId };
+      this.consultation = { ...this.consultation, id: String(this.consultationId) };
     }
     
     this.initializeForm();
@@ -228,6 +228,9 @@ export class ConsultationNotesComponent implements OnInit {
       return;
     }
 
+    // Convert to string to match backend UUID
+    const consultationIdStr = String(consultationId);
+
     this.isSaving = true;
     this.errorMessage = '';
 
@@ -240,9 +243,9 @@ export class ConsultationNotesComponent implements OnInit {
         formValue.followUpDate
     };
 
-    console.log('Saving notes for consultation ID:', consultationId); // Debug log
+    console.log('Saving notes for consultation ID:', consultationIdStr); // Debug log
 
-    this.consultationService.saveConsultationNotes(consultationId, notes).subscribe({
+    this.consultationService.saveConsultationNotes(consultationIdStr, notes).subscribe({
       next: () => {
         this.isSaving = false;
         this.lastSaved = new Date();
@@ -313,9 +316,12 @@ export class ConsultationNotesComponent implements OnInit {
         return;
       }
 
+      const formValue = this.notesForm.value;
       const endRequest = {
-        appointmentId: effectiveAppointmentId,
-        notes: this.notesForm.value
+        appointmentId: String(effectiveAppointmentId),
+        diagnosis: formValue.diagnosis || '',
+        treatmentPlan: formValue.treatmentPlan || '',
+        notes: formValue
       };
 
       this.consultationService.endConsultation(endRequest).subscribe({

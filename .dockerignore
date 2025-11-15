@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+# package-lock.json is needed for npm ci
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Production
+dist/
+tmp/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+
+# Playwright
+e2e/
+playwright.config.ts
+
+# Environment files
+.env*
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+# nginx.conf is needed for the build
+
