@@ -13,7 +13,8 @@ RUN npm ci --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build the application (default configuration uses environment.ts with VPS IP)
+# Build the application
+# Using default configuration which uses environment.ts (already updated with VPS IP)
 RUN npm run build
 
 # Production stage
