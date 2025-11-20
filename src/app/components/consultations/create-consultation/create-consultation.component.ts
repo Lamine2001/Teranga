@@ -29,7 +29,9 @@ interface PatientInfo {
 }
 
 interface PreviousConsultation {
-  id: number;
+  id: number | string; // Support both number and UUID string
+  consultationId: number | string; // Support both number and UUID string
+  appointmentId: string; // Add appointment ID
   date: string;
   doctorName: string;
   diagnosis: string;
@@ -120,7 +122,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
       
       if (appointmentId) {
         // Load appointment details first, then start consultation
-        this.loadAppointmentAndStartConsultation(+appointmentId);
+        this.loadAppointmentAndStartConsultation(appointmentId);
       } else if (params['patientId']) {
         this.loadPatientById(+params['patientId']);
       } else {
@@ -199,7 +201,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Load appointment details and start consultation
    */
-  private loadAppointmentAndStartConsultation(appointmentId: number): void {
+  private loadAppointmentAndStartConsultation(appointmentId: string): void {
     this.isLoading = true;
     
     // Fetch appointment details from backend
@@ -332,34 +334,48 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   loadPatientHistory(patientId: number): void {
     this.isLoadingHistory = true;
 
-    // Use userType instead of userRole for consistency
-    const filter = { patientId };
+    // Create filter with all required parameters
+    const filter: any = { 
+      patientId: patientId,
+      status: 'completed'
+    };
     
-    // Load based on user type - doctors can see all, patients see only their own
-    const consultationsObservable = this.currentDoctor?.userType === 'DOCTOR'
-      ? this.consultationService.getPatientConsultations(filter)
-      : this.consultationService.getPatientConsultations(filter);
-
-    consultationsObservable.subscribe({
+    // Add doctorId only if current user is a doctor
+    if (this.currentDoctor?.userType === 'DOCTOR' && this.currentDoctorId) {
+      filter.doctorId = this.currentDoctorId;
+    }
+    
+    console.log('Loading patient history with filter:', filter); // Debug log
+    
+    this.consultationService.getPatientConsultations(filter).subscribe({
       next: (consultations) => {
-        // Filter only completed consultations for history
+        console.log('Received consultations:', consultations); // Debug log
+        
+        // Map consultations to previous consultations format
         this.patientPreviousConsultations = consultations
           .filter(c => {
-            // Use lowercase for status comparison
-            return c.status === 'completed';
+            // Handle both uppercase and lowercase status
+            const status = c.status?.toUpperCase();
+            return status === 'COMPLETED';
           })
           .map(c => ({
-            id: c.id,
-            date: c.startTime,
-            doctorName: `Dr. ${c.doctorFirstName} ${c.doctorLastName}`,
+            id: c.id, // Consultation record ID
+            consultationId: c.id, // Also store as consultationId for clarity
+            appointmentId: c.appointmentId, // Appointment ID from backend
+            date: c.startedAt || c.startTime, // Use startedAt from backend
+            doctorName: c.doctorName || `Dr. ${c.doctorFirstName} ${c.doctorLastName}`, // Use doctorName directly if available
             diagnosis: c.diagnosis || 'Non spécifié',
-            treatment: c.treatment || 'Non spécifié',
-            prescriptions: c.prescriptions
-          }));
+            treatment: c.treatmentPlan || c.treatment || 'Non spécifié', // Use treatmentPlan from backend
+            prescriptions: c.prescriptions || []
+          }))
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort by date descending
+        
+        console.log('Mapped previous consultations:', this.patientPreviousConsultations); // Debug log
         this.isLoadingHistory = false;
       },
       error: (error) => {
         console.error('Error loading patient history:', error);
+        this.errorMessage = 'Erreur lors du chargement de l\'historique du patient';
         this.isLoadingHistory = false;
         this.patientPreviousConsultations = [];
       }
@@ -467,7 +483,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Start consultation from an existing appointment
    */
-  startConsultationFromAppointment(appointmentId: number, consultationType: 'virtual' | 'onsite' = 'onsite'): void {
+  startConsultationFromAppointment(appointmentId: string, consultationType: 'virtual' | 'onsite' = 'onsite'): void {
     this.isLoading = true;
     this.consultationStarted = true; // Set this earlier to show loading state
 
@@ -561,8 +577,20 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * View a previous consultation
    */
-  viewPreviousConsultation(consultationId: number): void {
-    window.open(`/consultations/${consultationId}`, '_blank');
+  viewPreviousConsultation(appointmentId: string): void {
+    console.log('Requested to view previous consultation with ID:', appointmentId);
+    
+    // Validate consultation ID - accept both number and UUID string
+    if (!appointmentId || (typeof appointmentId === 'number' && isNaN(appointmentId))) {
+      this.errorMessage = 'ID de consultation invalide';
+      console.error('Invalid consultation ID:', appointmentId);
+      return;
+    }
+
+    console.log('Viewing consultation with ID:', appointmentId);
+    
+    // Navigate to consultation detail route
+    this.router.navigate(['/consultations', appointmentId]);
   }
 
   /**
@@ -854,7 +882,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   /**
    * Load an existing consultation by ID
    */
-  private loadExistingConsultation(consultationId: number): void {
+  private loadExistingConsultation(consultationId: string): void {
     this.isLoading = true;
     this.errorMessage = '';
     

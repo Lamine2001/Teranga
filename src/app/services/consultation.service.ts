@@ -107,7 +107,7 @@ export class ConsultationService {
   /**
    * Get consultation details by ID
    */
-  getConsultation(id: number): Observable<Consultation> {
+  getConsultation(id: string): Observable<Consultation> {
     this.logRequest('GET', `${this.apiUrl}/${id}`);
     
     return this.http.get<Consultation>(`${this.apiUrl}/${id}`, { 
@@ -161,7 +161,7 @@ export class ConsultationService {
   /**
    * Get consultation by appointment ID
    */
-  getConsultationByAppointmentId(appointmentId: number): Observable<Consultation> {
+  getConsultationByAppointmentId(appointmentId: string): Observable<Consultation> {
     this.logRequest('GET', `${this.apiUrl}/appointment/${appointmentId}`);
     
     return this.http.get<Consultation>(`${this.apiUrl}/appointment/${appointmentId}`, { 

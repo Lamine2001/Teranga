@@ -20,7 +20,7 @@ export class ConsultationDetailsComponent implements OnInit {
   consultation: Consultation | null = null;
   isLoading = true;
   errorMessage = '';
-  consultationId: number = 0;
+  appointmentId: string = ''; // Use appointmentId instead
 
   constructor(
     private route: ActivatedRoute,
@@ -32,7 +32,9 @@ export class ConsultationDetailsComponent implements OnInit {
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (id) {
-        this.consultationId = +id;
+        // Check if it's a UUID (contains hyphens) or a number
+        this.appointmentId = id.includes('-') ? id : +id;
+        console.log('Loading consultation with appointment ID:', this.appointmentId, 'Type:', typeof this.appointmentId);
         this.loadConsultation();
       }
     });
@@ -42,15 +44,53 @@ export class ConsultationDetailsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.consultationService.getConsultation(this.consultationId).subscribe({
-      next: (consultation) => {
-        this.consultation = consultation;
+    console.log('Fetching consultation by appointment ID:', this.appointmentId);
+
+    // Use getConsultationByAppointmentId instead of getConsultation
+    this.consultationService.getConsultationByAppointmentId(this.appointmentId).subscribe({
+      next: (consultationDetails: any) => {
+        console.log('Consultation details loaded successfully:', consultationDetails);
+        
+        // Map ConsultationDetailsDTO to Consultation object
+        this.consultation = {
+          id: consultationDetails.record?.id,
+          appointmentId: consultationDetails.appointment?.id,
+          patientId: consultationDetails.appointment?.patientId,
+          patientFirstName: consultationDetails.appointment?.patientFirstName,
+          patientLastName: consultationDetails.appointment?.patientLastName,
+          patientEmail: consultationDetails.appointment?.patientEmail,
+          doctorId: consultationDetails.appointment?.doctorId,
+          doctorFirstName: consultationDetails.appointment?.doctorFirstName,
+          doctorLastName: consultationDetails.appointment?.doctorLastName,
+          doctorSpecialty: consultationDetails.appointment?.doctorSpecialty,
+          startTime: consultationDetails.record?.startedAt || consultationDetails.appointment?.appointmentTime,
+          endTime: consultationDetails.record?.endedAt,
+          status: consultationDetails.record?.status || 'in-progress',
+          consultationType: consultationDetails.record?.consultationType || consultationDetails.appointment?.appointmentType || 'onsite',
+          chiefComplaint: consultationDetails.record?.chiefComplaint,
+          symptoms: consultationDetails.record?.symptoms,
+          diagnosis: consultationDetails.record?.diagnosis,
+          treatmentPlan: consultationDetails.record?.treatmentPlan,
+          examinationFindings: consultationDetails.record?.examinationFindings,
+          presentIllness: consultationDetails.record?.presentIllness,
+          recommendations: consultationDetails.record?.recommendations,
+          durationMinutes: consultationDetails.record?.durationMinutes,
+          followUpRequired: consultationDetails.record?.followUpRequired,
+          followUpDate: consultationDetails.record?.followUpDate,
+          followUpInstructions: consultationDetails.record?.followUpInstructions,
+          vitals: consultationDetails.record?.vitals,
+          additionalNotes: consultationDetails.record?.additionalNotes,
+          notes: consultationDetails.record?.notes || consultationDetails.appointment?.notes,
+          prescriptions: consultationDetails.record?.prescriptions || [],
+          labTests: consultationDetails.record?.labTests || []
+        } as Consultation;
+        
         this.isLoading = false;
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Erreur lors du chargement de la consultation';
-        console.error('Error loading consultation:', error);
+        console.error('Error loading consultation by appointment ID:', error);
       }
     });
   }

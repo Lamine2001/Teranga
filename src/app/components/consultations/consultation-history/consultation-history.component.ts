@@ -18,8 +18,8 @@ import { Consultation, ConsultationHistoryFilter } from '../../../models/consult
   styleUrls: ['./consultation-history.component.scss']
 })
 export class ConsultationHistoryComponent implements OnInit {
-  consultations: Consultation[] = [];
-  filteredConsultations: Consultation[] = [];
+  consultations: any[] = []; // Change to any[] to handle backend format
+  filteredConsultations: any[] = []; // Change to any[]
   isLoading = false;
   errorMessage = '';
   
@@ -84,9 +84,50 @@ export class ConsultationHistoryComponent implements OnInit {
 
     consultationsObservable.subscribe({
       next: (consultations) => {
-        this.consultations = consultations;
-        this.filteredConsultations = consultations;
+        console.log('Raw consultations from backend:', consultations); // Debug log
+        
+        // Map backend format to frontend format
+        this.consultations = consultations.map((c: any) => ({
+          id: c.id,
+          appointmentId: c.appointmentId,
+          doctorId: c.doctorId,
+          doctorFirstName: c.doctorFirstName || this.extractFirstName(c.doctorName),
+          doctorLastName: c.doctorLastName || this.extractLastName(c.doctorName),
+          doctorName: c.doctorName,
+          doctorSpecialty: c.doctorSpecialty,
+          patientId: c.patientId,
+          patientFirstName: c.patientFirstName,
+          patientLastName: c.patientLastName,
+          patientEmail: c.patientEmail,
+          startTime: c.startedAt || c.startTime,
+          startedAt: c.startedAt,
+          endTime: c.endedAt || c.endTime,
+          endedAt: c.endedAt,
+          status: c.status?.toLowerCase() || 'scheduled',
+          consultationType: c.consultationType?.toLowerCase() || 'onsite',
+          chiefComplaint: c.chiefComplaint,
+          symptoms: c.symptoms,
+          diagnosis: c.diagnosis,
+          treatmentPlan: c.treatmentPlan,
+          treatment: c.treatmentPlan || c.treatment,
+          examinationFindings: c.examinationFindings,
+          presentIllness: c.presentIllness,
+          recommendations: c.recommendations,
+          durationMinutes: c.durationMinutes,
+          followUpRequired: c.followUpRequired,
+          followUpDate: c.followUpDate,
+          followUpInstructions: c.followUpInstructions,
+          vitals: c.vitals,
+          additionalNotes: c.additionalNotes,
+          notes: c.notes,
+          prescriptions: c.prescriptions || [],
+          labTests: c.labTests || [],
+          createdAt: c.createdAt || c.startedAt
+        }));
+        
+        this.filteredConsultations = this.consultations;
         this.isLoading = false;
+        console.log('Mapped consultations:', this.consultations); // Debug log
       },
       error: (error) => {
         this.isLoading = false;
@@ -94,6 +135,20 @@ export class ConsultationHistoryComponent implements OnInit {
         console.error('Error loading consultations:', error);
       }
     });
+  }
+
+  // Helper method to extract first name from "Dr. FirstName LastName"
+  private extractFirstName(doctorName?: string): string {
+    if (!doctorName) return '';
+    const parts = doctorName.replace('Dr. ', '').split(' ');
+    return parts[0] || '';
+  }
+
+  // Helper method to extract last name from "Dr. FirstName LastName"
+  private extractLastName(doctorName?: string): string {
+    if (!doctorName) return '';
+    const parts = doctorName.replace('Dr. ', '').split(' ');
+    return parts.slice(1).join(' ') || '';
   }
 
   applyFilters(): void {
@@ -107,6 +162,7 @@ export class ConsultationHistoryComponent implements OnInit {
         c.patientLastName?.toLowerCase().includes(query) ||
         c.doctorFirstName?.toLowerCase().includes(query) ||
         c.doctorLastName?.toLowerCase().includes(query) ||
+        c.doctorName?.toLowerCase().includes(query) || // Add doctorName search
         c.diagnosis?.toLowerCase().includes(query) ||
         c.chiefComplaint?.toLowerCase().includes(query)
       );
@@ -120,23 +176,25 @@ export class ConsultationHistoryComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
+    const normalizedStatus = status?.toLowerCase();
     const statusMap: { [key: string]: string } = {
       'scheduled': 'status-scheduled',
       'in-progress': 'status-in-progress',
       'completed': 'status-completed',
       'cancelled': 'status-cancelled'
     };
-    return statusMap[status] || '';
+    return statusMap[normalizedStatus] || '';
   }
 
   getStatusLabel(status: string): string {
+    const normalizedStatus = status?.toLowerCase();
     const labelMap: { [key: string]: string } = {
       'scheduled': 'Planifiée',
       'in-progress': 'En cours',
       'completed': 'Terminée',
       'cancelled': 'Annulée'
     };
-    return labelMap[status] || status;
+    return labelMap[normalizedStatus] || status;
   }
 
   getConsultationTypeIcon(type: string): string {
@@ -158,6 +216,7 @@ export class ConsultationHistoryComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
+    if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'short',
@@ -166,6 +225,7 @@ export class ConsultationHistoryComponent implements OnInit {
   }
 
   formatTime(dateString: string): string {
+    if (!dateString) return '';
     return new Date(dateString).toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit'

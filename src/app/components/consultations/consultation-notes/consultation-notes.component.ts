@@ -18,7 +18,7 @@ import { Consultation, ConsultationNotes, Prescription, LabTest } from '../../..
 export class ConsultationNotesComponent implements OnInit {
   @Input() consultation!: Consultation;
   @Input() consultationId?: number; // Add explicit ID input
-  @Input() appointmentId?: number; // Add appointment ID input
+  @Input() appointmentId?: string; // Add appointment ID input
   @Input() doctorSpecialty?: string; // Add doctor specialty input
   @Input() readOnly: boolean = false;
   @Input() showLimitedFields: boolean = false; // New input to control field visibility
@@ -332,7 +332,10 @@ export class ConsultationNotesComponent implements OnInit {
 
       const endRequest = {
         appointmentId: effectiveAppointmentId,
-        notes: this.notesForm.value
+        notes: {
+          ...this.notesForm.value,
+          status: 'completed'
+        }
       };
 
       this.consultationService.endConsultation(endRequest).subscribe({

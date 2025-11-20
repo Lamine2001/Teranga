@@ -20,7 +20,7 @@ declare var JitsiMeetExternalAPI: any;
 })
 export class VideoConsultationComponent implements OnInit, OnDestroy {
   consultation: Consultation | null = null;
-  appointmentId: number = 0;
+  appointmentId!: string;
   isLoading = true;
   errorMessage = '';
   
@@ -47,7 +47,7 @@ export class VideoConsultationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.appointmentId = +params['id'];
+      this.appointmentId = params['id'];
       this.initializeConsultation();
     });
   }
