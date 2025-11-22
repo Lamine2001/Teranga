@@ -174,16 +174,18 @@ export class CreateAvailabilityComponent implements OnInit {
       return false;
     }
 
-    // Simple date validation using string comparison to avoid timezone issues
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0]; // Get YYYY-MM-DD format
+    // Check if start date/time is in the past
+    // Ajouter une marge de 1 minute pour éviter les problèmes de timing
+    const now = new Date();
+    const nowMinusOneMinute = new Date(now.getTime() - 60000); // 1 minute de marge
     
-    console.log('Today string:', todayStr);
-    console.log('Start date string:', this.startDate);
-    console.log('Start date >= Today?', this.startDate >= todayStr);
+    console.log('Current time:', now);
+    console.log('Start time:', start);
+    console.log('Now minus 1 minute:', nowMinusOneMinute);
+    console.log('Is start in past?', start < nowMinusOneMinute);
     
-    if (this.startDate < todayStr) {
-      this.error = 'La date de début ne peut pas être dans le passé';
+    if (start < nowMinusOneMinute) {
+      this.error = 'La date et heure de début ne peuvent pas être dans le passé';
       return false;
     }
 

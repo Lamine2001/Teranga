@@ -8,24 +8,24 @@ export interface Consultation {
   doctorId: number;
   doctorFirstName: string;
   doctorLastName: string;
-  doctorName?: string; // Add doctorName property
+  doctorName?: string;
   doctorSpecialty: string;
   patientId: number;
   patientFirstName: string;
   patientLastName: string;
   patientEmail: string;
   startTime: string;
-  startedAt?: string; // Add startedAt property
+  startedAt?: string;
   endTime?: string;
-  endedAt?: string; // Add endedAt property
-  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled' | 'COMPLETED' | 'IN_PROGRESS' | 'SCHEDULED' | 'CANCELLED'; // Add uppercase status values
+  endedAt?: string;
+  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled' | 'COMPLETED' | 'IN_PROGRESS' | 'SCHEDULED' | 'CANCELLED';
   consultationType: 'virtual' | 'onsite';
   chiefComplaint?: string;
   symptoms?: string;
   historyOfPresentIllness?: string;
   physicalExamination?: string;
-  examinationFindings?: string; // Add examinationFindings
-  presentIllness?: string; // Add presentIllness
+  examinationFindings?: string;
+  presentIllness?: string;
   // Vital Signs
   bloodPressure?: string;
   heartRate?: number;
@@ -33,19 +33,19 @@ export interface Consultation {
   respiratoryRate?: number;
   oxygenSaturation?: number;
   weight?: number;
-  vitals?: any; // Add vitals object
+  vitals?: any;
   // Diagnosis and Treatment
   diagnosis?: string;
   treatmentPlan?: string;
   treatment?: string;
   duration?: string;
-  durationMinutes?: number; // Add durationMinutes
+  durationMinutes?: number;
   // Lab Tests
   testName?: string;
   // Follow-up and Notes
   recommendations?: string;
   followUpDate?: string;
-  followUpRequired?: boolean; // Add followUpRequired
+  followUpRequired?: boolean;
   followUpInstructions?: string;
   additionalNotes?: string;
   notes?: string;
@@ -54,6 +54,9 @@ export interface Consultation {
   followUpNotes?: string;
   createdAt: string;
   updatedAt?: string;
+  
+  // Video Consultation Configuration
+  videoConfig?: VideoConsultationConfig;
 }
 
 export interface ConsultationNotes {
@@ -116,7 +119,7 @@ export interface ConsultationHistoryFilter {
   doctorId?: number;
   startDate?: string;
   endDate?: string;
-  status?: string[] | string; // Updated to allow both array and single string
+  status?: string[] | string;
   consultationType?: 'virtual' | 'onsite';
   searchQuery?: string;
 }
@@ -133,9 +136,97 @@ export interface ConsultationSummary {
 }
 
 export interface VideoConsultationConfig {
-  consultationId: number;
-  roomId: string;
-  participantToken: string;
-  platform: 'jitsi' | 'zoom' | 'meet' | 'custom';
-  expiresAt: string;
+  // Platform and basic info
+  platform: 'jitsi' | 'zoom' | 'teams' | 'meet' | 'custom';
+  meetingId?: string;
+  meetingLink?: string;
+  meetingPasscode?: string;
+  hostKey?: string;
+  conferenceId?: string;
+  roomName?: string;
+  sessionId?: string;
+  
+  // Consultation reference
+  consultationId: string;
+  
+  // Doctor information
+  doctorId: number;
+  doctorName: string;
+  doctorEmail?: string;
+  doctorRole?: string; // 'host' or 'moderator'
+  
+  // Patient information
+  patientId: number;
+  patientName: string;
+  patientEmail?: string;
+  patientRole?: string; // 'participant' or 'guest'
+  
+  // URLs
+  participantUrl?: string;
+  hostUrl?: string;
+  
+  // Join status
+  isHostJoined?: boolean;
+  isGuestJoined?: boolean;
+  
+  // Meeting settings
+  maxParticipants?: number;
+  recordingEnabled?: boolean;
+  waitingRoomEnabled?: boolean;
+  screenShareEnabled?: boolean;
+  chatEnabled?: boolean;
+  muteOnEntry?: boolean;
+  videoOnEntry?: boolean;
+  meetingStatus?: string;
+  meetingDuration?: string;
+  timeZone?: string;
+  
+  // Security settings
+  securityCode?: string;
+  isPasswordProtected?: boolean;
+  
+  // Legacy/Platform-specific fields (kept for backward compatibility)
+  roomId?: string;
+  participantToken?: string;
+  expiresAt?: string;
+  jitsiDomain?: string;
+  jitsiRoomName?: string;
+  jitsiToken?: string;
+  jitsiPassword?: string;
+  zoomMeetingId?: string;
+  zoomMeetingNumber?: number;
+  zoomPasscode?: string;
+  zoomPassword?: string;
+  zoomSignature?: string;
+  zoomApiKey?: string;
+  zoomSdkKey?: string;
+  zoomSdkSecret?: string;
+  zoomRole?: number;
+  zoomJoinUrl?: string;
+  zoomStartUrl?: string;
+  teamsUrl?: string;
+  teamsJoinUrl?: string;
+  teamsMeetingId?: string;
+  teamsThreadId?: string;
+  teamsToken?: string;
+  meetUrl?: string;
+  meetCode?: string;
+  meetToken?: string;
+  customUrl?: string;
+  customPlatformName?: string;
+  customToken?: string;
+  customApiKey?: string;
+  customSettings?: Record<string, any>;
+  startTime?: string;
+  scheduledStartTime?: Date;
+  duration?: number;
+  isRecordingEnabled?: boolean;
+  isWaitingRoomEnabled?: boolean;
+  isChatEnabled?: boolean;
+  isScreenSharingEnabled?: boolean;
+  requirePassword?: boolean;
+  allowAnonymousJoin?: boolean;
+  muteParticipantsOnEntry?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }

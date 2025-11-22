@@ -6,7 +6,7 @@ import { BreadcrumbComponent, BreadcrumbItem } from '../../shared/breadcrumb/bre
 import { AppointmentContextService } from '../../../services/appointment-context.service';
 
 export interface ConsultationMode {
-  value: 'cabinet' | 'video';
+  value: 'onsite' | 'video';
   label: string;
   description: string;
   icon: string;
@@ -21,7 +21,7 @@ export interface ConsultationMode {
   styleUrls: ['./consultation-mode-selector.component.scss']
 })
 export class ConsultationModeSelectorComponent implements OnInit {
-  @Output() modeSelected = new EventEmitter<'cabinet' | 'video'>();
+  @Output() modeSelected = new EventEmitter<'onsite' | 'video'>();
 
   consultationForm: FormGroup;
   
@@ -32,7 +32,7 @@ export class ConsultationModeSelectorComponent implements OnInit {
 
   consultationModes: ConsultationMode[] = [
     {
-      value: 'cabinet',
+      value: 'onsite',
       label: 'Consultation en cabinet',
       description: 'Rencontrez votre professionnel de santé en personne dans un environnement médical professionnel',
       icon: 'fas fa-hospital',
@@ -78,16 +78,16 @@ export class ConsultationModeSelectorComponent implements OnInit {
     }
   }
 
-  selectMode(mode: 'cabinet' | 'video'): void {
+  selectMode(mode: 'onsite' | 'video'): void {
     this.consultationForm.patchValue({ mode });
     this.modeSelected.emit(mode);
   }
 
-  getSelectedMode(): 'cabinet' | 'video' | null {
+  getSelectedMode(): 'onsite' | 'video' | null {
     return this.consultationForm.get('mode')?.value;
   }
 
-  isSelected(mode: 'cabinet' | 'video'): boolean {
+  isSelected(mode: 'onsite' | 'video'): boolean {
     return this.getSelectedMode() === mode;
   }
 

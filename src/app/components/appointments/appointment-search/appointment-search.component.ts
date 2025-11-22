@@ -391,6 +391,7 @@ export class AppointmentSearchComponent implements OnInit, OnDestroy {
 
   // Handlers pour chaque étape
   onConsultationModeSelected(mode: string): void {
+    this.consultationType = mode as 'virtual' | 'onsite'; // Mettre à jour consultationType
     this.appointmentContextService.updateContext({ 
       consultationMode: mode,
       patientType: 'existing' // S'assurer que patientType est défini
@@ -562,11 +563,17 @@ export class AppointmentSearchComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
+    // Récupérer le mode de consultation du contexte si non défini
+    const context = this.appointmentContextService.getContext();
+    const appointmentType = this.consultationType || context.consultationMode || 'virtual';
+
     const appointmentData = {
       availabilityId: this.selectedSlot.id || '',
-      appointmentType: this.consultationType,
+      appointmentType: appointmentType,
       notes: this.appointmentNotes
     };
+
+    console.log('Sending appointment data:', appointmentData); // Pour déboguer
 
     this.appointmentService.bookAppointment(appointmentData).subscribe({
       next: (response) => {

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 
 export interface WorkflowState {
-  consultationMode?: 'cabinet' | 'video';
+  consultationMode?: 'onsite' | 'video';
   patientType?: 'nouveau' | 'existant';
   specialty?: string;
   professionalId?: number;
@@ -146,7 +146,7 @@ export class AppointmentWorkflowComponent implements OnInit {
     const parts = [];
     
     if (this.workflowState.consultationMode) {
-      parts.push(this.workflowState.consultationMode === 'cabinet' ? 'Cabinet' : 'Vidéo');
+      parts.push(this.workflowState.consultationMode === 'onsite' ? 'onsite' : 'Vidéo');
     }
     
     if (this.workflowState.patientType) {
