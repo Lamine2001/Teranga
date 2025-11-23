@@ -11,11 +11,16 @@ import { AuthGuard } from './guards/auth.guard';
 import { PatientTypeSelectorComponent } from './components/appointments/patient-type-selector/patient-type-selector.component';
 import { DoctorsListComponent } from './components/appointments/doctors-list/doctors-list.component';
 import { AppointmentWizardComponent } from './components/appointments/appointment-wizard/appointment-wizard.component';
+import { AboutPageComponent } from './pages/about-page/about-page.component';
+import { ServicePageComponent } from './pages/service-page/service-page.component';
+import { ContactComponent } from './components/contact/contact.component';
+import { RatesPageComponent } from './pages/rates-page/rates-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
-  { path: 'services', loadComponent: () => import('./pages/service-page/service-page.component').then(m => m.ServicePageComponent) },
+  { path: 'about', component: AboutPageComponent },
+  { path: 'services', component: ServicePageComponent },
   { path: 'auth', component: AuthPageComponent },
   { path: 'doctor-dashboard', component: DoctorDashboardComponent },
   { path: 'patient-dashboard', component: PatientDashboardComponent },
@@ -100,6 +105,14 @@ export const routes: Routes = [
     path: 'consultations/:id',
     loadComponent: () => import('./components/consultations/consultation-details/consultation-details.component').then(m => m.ConsultationDetailsComponent),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'contact',
+    component: ContactComponent
+  },
+  {
+    path: 'rates',
+    component: RatesPageComponent
   },
   
   { path: '**', redirectTo: '/home' }
