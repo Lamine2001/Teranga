@@ -4,19 +4,22 @@
  */
 
 export interface Consultation {
-  id: number | string; // Accept both number and string
-  appointmentId: string;  // Changed from number to match backend UUID
-  doctorId: string;  // Changed from number to match backend UUID
+  id: number;
+  appointmentId: string;
+  doctorId: number;
   doctorFirstName: string;
   doctorLastName: string;
+  doctorName?: string;
   doctorSpecialty: string;
   patientId: string;  // Changed from number to match backend UUID
   patientFirstName: string;
   patientLastName: string;
   patientEmail: string;
   startTime: string;
+  startedAt?: string;
   endTime?: string;
-  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
+  endedAt?: string;
+  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled' | 'COMPLETED' | 'IN_PROGRESS' | 'SCHEDULED' | 'CANCELLED';
   consultationType: 'virtual' | 'onsite';
   chiefComplaint?: string;
   symptoms?: string;
@@ -31,7 +34,6 @@ export interface Consultation {
   weight?: number;
   // Diagnosis and Treatment
   diagnosis?: string;
-  treatmentPlan?: string;
   treatment?: string;
   duration?: string;
   // Lab Tests
@@ -43,8 +45,8 @@ export interface Consultation {
   examinationFindings?: string;
   presentIllness?: string;
   durationMinutes?: number;
-  followUpRequired?: boolean;
   followUpDate?: string;
+  followUpRequired?: boolean;
   followUpInstructions?: string;
   vitals?: any;
   notes?: string;
@@ -53,6 +55,9 @@ export interface Consultation {
   followUpNotes?: string;
   createdAt: string;
   updatedAt?: string;
+  
+  // Video Consultation Configuration
+  videoConfig?: VideoConsultationConfig;
 }
 
 export interface ConsultationNotes {
@@ -62,14 +67,15 @@ export interface ConsultationNotes {
   examinationFindings?: string;  // Backend field name (was: physicalExamination)
   physicalExamination?: string;  // Keep for backward compatibility
   diagnosis: string;
-  treatmentPlan: string;  // Backend field name (was: treatment)
-  treatment?: string;  // Keep for backward compatibility
-  recommendations?: string;
+  treatment: string;
+  treatmentPlan?: string;
+  recommendations: string;
   prescriptions?: Prescription[];
   labTests?: LabTest[];
   followUpDate?: string;
   followUpInstructions?: string;
   additionalNotes?: string;
+  status?: string
 }
 
 export interface Prescription {
@@ -131,8 +137,8 @@ export interface LabTest {
 }
 
 export interface StartConsultationRequest {
-  appointmentId: number | string; // Accept both number and string
-  patientId?: number | string; // Accept both number and string
+  appointmentId: string;
+  patientId?: number;
   consultationType?: 'virtual' | 'onsite';
   notes?: string;
 }
@@ -142,22 +148,10 @@ export interface StartConsultationRequest {
  * Uses flat structure to match backend expectations
  */
 export interface EndConsultationRequest {
-  appointmentId: string;  // Changed from number to match backend UUID
-  diagnosis: string;
-  treatmentPlan: string;  // Backend field name (not 'treatment')
-  examinationFindings?: string;  // Backend field name (not 'physicalExamination')
-  chiefComplaint?: string;
-  presentIllness?: string;  // Backend field name (not 'symptoms')
-  prescriptionsJson?: string;  // Backend expects JSON string
-  labTestsJson?: string;  // Backend expects JSON string
-  followUpRequired?: boolean;
-  followUpDate?: string;
-  followUpInstructions?: string;
+  appointmentId: string;
+  notes: ConsultationNotes;
   duration?: number;
   patientSatisfaction?: number;
-  
-  // Keep old structure for backward compatibility
-  notes?: ConsultationNotes;
 }
 
 export interface ConsultationHistoryFilter {
@@ -165,7 +159,7 @@ export interface ConsultationHistoryFilter {
   doctorId?: number | string;
   startDate?: string;
   endDate?: string;
-  status?: string[];
+  status?: string[] | string;
   consultationType?: 'virtual' | 'onsite';
   searchQuery?: string;
 }
@@ -182,37 +176,97 @@ export interface ConsultationSummary {
 }
 
 export interface VideoConsultationConfig {
-  consultationId: string;  // Changed from number to match backend UUID
-  roomId: string;
-  participantToken: string;
-  platform: 'jitsi' | 'zoom' | 'meet' | 'custom';
-  expiresAt: string;
+  // Platform and basic info
+  platform: 'jitsi' | 'zoom' | 'teams' | 'meet' | 'custom';
+  meetingId?: string;
+  meetingLink?: string;
+  meetingPasscode?: string;
+  hostKey?: string;
+  conferenceId?: string;
+  roomName?: string;
+  sessionId?: string;
+  
+  // Consultation reference
+  consultationId: string;
+  
+  // Doctor information
+  doctorId: number;
+  doctorName: string;
+  doctorEmail?: string;
+  doctorRole?: string; // 'host' or 'moderator'
+  
+  // Patient information
+  patientId: number;
+  patientName: string;
+  patientEmail?: string;
+  patientRole?: string; // 'participant' or 'guest'
+  
+  // URLs
+  participantUrl?: string;
+  hostUrl?: string;
+  
+  // Join status
+  isHostJoined?: boolean;
+  isGuestJoined?: boolean;
+  
+  // Meeting settings
+  maxParticipants?: number;
+  recordingEnabled?: boolean;
+  waitingRoomEnabled?: boolean;
+  screenShareEnabled?: boolean;
+  chatEnabled?: boolean;
+  muteOnEntry?: boolean;
+  videoOnEntry?: boolean;
+  meetingStatus?: string;
+  meetingDuration?: string;
+  timeZone?: string;
+  
+  // Security settings
+  securityCode?: string;
+  isPasswordProtected?: boolean;
+  
+  // Legacy/Platform-specific fields (kept for backward compatibility)
+  roomId?: string;
+  participantToken?: string;
+  expiresAt?: string;
+  jitsiDomain?: string;
+  jitsiRoomName?: string;
+  jitsiToken?: string;
+  jitsiPassword?: string;
+  zoomMeetingId?: string;
+  zoomMeetingNumber?: number;
+  zoomPasscode?: string;
+  zoomPassword?: string;
+  zoomSignature?: string;
+  zoomApiKey?: string;
+  zoomSdkKey?: string;
+  zoomSdkSecret?: string;
+  zoomRole?: number;
+  zoomJoinUrl?: string;
+  zoomStartUrl?: string;
+  teamsUrl?: string;
+  teamsJoinUrl?: string;
+  teamsMeetingId?: string;
+  teamsThreadId?: string;
+  teamsToken?: string;
+  meetUrl?: string;
+  meetCode?: string;
+  meetToken?: string;
+  customUrl?: string;
+  customPlatformName?: string;
+  customToken?: string;
+  customApiKey?: string;
+  customSettings?: Record<string, any>;
+  startTime?: string;
+  scheduledStartTime?: Date;
+  duration?: number;
+  isRecordingEnabled?: boolean;
+  isWaitingRoomEnabled?: boolean;
+  isChatEnabled?: boolean;
+  isScreenSharingEnabled?: boolean;
+  requirePassword?: boolean;
+  allowAnonymousJoin?: boolean;
+  muteParticipantsOnEntry?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
-
-/**
- * Helper function to convert ConsultationNotes to flat EndConsultationRequest
- * This ensures compatibility with backend EndConsultationRequestDTO
- */
-export function toEndConsultationRequest(
-  appointmentId: string,
-  notes: ConsultationNotes,
-  duration?: number,
-  patientSatisfaction?: number
-): EndConsultationRequest {
-  return {
-    appointmentId,
-    diagnosis: notes.diagnosis,
-    treatmentPlan: notes.treatmentPlan || notes.treatment || '',
-    examinationFindings: notes.examinationFindings || notes.physicalExamination,
-    chiefComplaint: notes.chiefComplaint,
-    presentIllness: notes.presentIllness || notes.symptoms || '',
-    prescriptionsJson: notes.prescriptions ? JSON.stringify(notes.prescriptions) : undefined,
-    labTestsJson: notes.labTests ? JSON.stringify(notes.labTests) : undefined,
-    followUpRequired: !!notes.followUpDate,
-    followUpDate: notes.followUpDate,
-    followUpInstructions: notes.followUpInstructions,
-    duration,
-    patientSatisfaction
-  };
-}
-

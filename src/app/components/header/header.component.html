@@ -75,10 +75,10 @@
           <!-- Navigation for non-authenticated users -->
           <ng-container *ngIf="!isAuthenticated">
             <a routerLink="/home" class="nav-link" (click)="closeMenu()">Accueil</a>
-            <a href="#about" class="nav-link" (click)="closeMenu()">À propos</a>
-            <a href="#services" class="nav-link" (click)="closeMenu()">Services</a>
-            <a href="#contact" class="nav-link" (click)="closeMenu()">Contact</a>
-            <a href="#rates" class="nav-link" (click)="closeMenu()">Tarifs</a>
+            <a routerLink="/about" class="nav-link" (click)="closeMenu()">À propos</a>
+            <a routerLink="/services" class="nav-link" (click)="closeMenu()">Services</a>
+            <a routerLink="/contact" class="nav-link" (click)="closeMenu()">Contact</a>
+            <a routerLink="/rates" class="nav-link" (click)="closeMenu()">Tarifs</a>
           </ng-container>
         </div>
         

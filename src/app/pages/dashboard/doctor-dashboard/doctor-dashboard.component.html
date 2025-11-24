@@ -5,14 +5,14 @@
       <button class="menu-toggle" (click)="toggleSidebar()">
         <i class="fas fa-bars"></i>
       </button>
-      <h1 class="dashboard-title">Espace Médecin</h1>
+      <h1 class="dashboard-title">Espace Professionnel</h1>
       <div class="navbar-right">
         <div class="notifications">
           <i class="fas fa-bell"></i>
           <span class="badge" *ngIf="stats.unreadMessages > 0">{{ stats.unreadMessages }}</span>
         </div>
         <div class="user-info" *ngIf="doctor">
-          <span>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</span>
+          <span>{{ doctor.firstName }} {{ doctor.lastName }}</span>
           <i class="fas fa-user-circle"></i>
         </div>
       </div>

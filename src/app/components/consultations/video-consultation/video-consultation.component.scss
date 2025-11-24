@@ -19,6 +19,11 @@
   p {
     font-size: 18px;
     color: #f8f9fa;
+    
+    &.text-muted {
+      font-size: 14px;
+      color: #adb5bd;
+    }
   }
 
   .btn {
@@ -57,6 +62,10 @@
     h2 {
       margin: 0 0 5px 0;
       font-size: 20px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
 
       i {
         color: #007bff;
@@ -108,6 +117,19 @@
   }
 }
 
+// Platform Badge Styles
+.platform-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .video-content {
   display: flex;
   flex: 1;
@@ -136,6 +158,25 @@
     width: 100%;
   }
 
+  #zmmtg-root {
+    flex: 1;
+    width: 100%;
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  #custom-container {
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+
   .call-placeholder {
     display: flex;
     flex-direction: column;
@@ -143,10 +184,18 @@
     justify-content: center;
     flex: 1;
     gap: 20px;
+    padding: 40px 20px;
     color: #adb5bd;
 
     i {
       color: #007bff;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      color: #f8f9fa;
     }
 
     p {
@@ -156,6 +205,126 @@
     .btn-lg {
       padding: 15px 40px;
       font-size: 18px;
+    }
+  }
+}
+
+// External Platform Notice (Teams/Meet)
+.external-platform-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: 3rem;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 0;
+  margin: 0;
+
+  i {
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    max-width: 600px;
+
+    &.text-muted {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.95rem;
+    }
+  }
+
+  .btn {
+    margin-top: 2rem;
+    padding: 12px 30px;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// Platform Info
+.platform-info {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+
+  .platform-name {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #f8f9fa;
+    
+    i {
+      margin-right: 0.5rem;
+      color: #667eea;
+    }
+
+    strong {
+      color: #667eea;
+    }
+  }
+
+  .meeting-info {
+    margin-top: 1rem;
+    
+    p {
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      color: #adb5bd;
+      
+      strong {
+        color: #f8f9fa;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+// Alternative Join Options
+.alternative-join {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .text-muted {
+    margin-bottom: 1rem;
+    font-style: italic;
+    color: #adb5bd;
+  }
+
+  .btn {
+    margin-top: 0.5rem;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #667eea;
+      transform: translateY(-2px);
     }
   }
 }
@@ -191,6 +360,7 @@
 
     &:hover {
       background: #5a6268;
+      transform: translateY(-2px);
     }
 
     &.active {
@@ -275,6 +445,10 @@
       font-size: 20px;
       color: #007bff;
       min-width: 25px;
+
+      &.fab {
+        font-size: 24px;
+      }
     }
 
     div {
@@ -291,6 +465,15 @@
         color: white;
         font-size: 14px;
       }
+
+      small {
+        font-size: 12px;
+        color: #6c757d;
+
+        &.text-muted {
+          color: #adb5bd;
+        }
+      }
     }
   }
 }
@@ -301,33 +484,106 @@
   padding: 30px;
   margin: 30px;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
   .instruction-card {
     display: flex;
     gap: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    color: white;
 
     i {
       font-size: 40px;
-      color: #007bff;
+      color: rgba(255, 255, 255, 0.9);
     }
 
     h4 {
       margin: 0 0 15px 0;
-      color: #333;
+      color: white;
+      font-size: 1.25rem;
     }
 
     ul {
       margin: 0;
       padding-left: 20px;
-      color: #495057;
+      color: rgba(255, 255, 255, 0.95);
 
       li {
-        margin-bottom: 8px;
+        margin-bottom: 10px;
+        line-height: 1.5;
+
+        i {
+          font-size: 16px;
+          margin-right: 8px;
+        }
+      }
+    }
+
+    &.tech-requirements {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+      ul li i {
+        &.text-success {
+          color: #28a745;
+        }
+
+        &.text-info {
+          color: #17a2b8;
+        }
       }
     }
   }
 }
 
+// Button Styles
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: all 0.3s;
+
+  &-primary {
+    background: #007bff;
+    color: white;
+
+    &:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+  }
+
+  &-secondary {
+    background: #495057;
+    color: white;
+
+    &:hover {
+      background: #5a6268;
+    }
+  }
+
+  &-outline-primary {
+    background: transparent;
+    color: #007bff;
+    border: 2px solid #007bff;
+
+    &:hover {
+      background: #007bff;
+      color: white;
+    }
+  }
+}
+
+// Responsive Styles
 @media (max-width: 1024px) {
   .video-content.notes-visible {
     flex-direction: column;
@@ -342,6 +598,11 @@
       height: 40%;
     }
   }
+
+  .platform-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -349,24 +610,150 @@
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
+    padding: 15px 20px;
+
+    .header-info h2 {
+      font-size: 18px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .platform-badge {
+      margin-left: 0;
+      margin-top: 8px;
+    }
 
     .header-stats {
       width: 100%;
       justify-content: space-between;
+      flex-wrap: wrap;
+
+      .call-duration {
+        font-size: 16px;
+      }
     }
   }
 
   .call-controls {
     flex-wrap: wrap;
+    padding: 15px;
 
     .control-btn {
       flex: 1;
-      min-width: 120px;
+      min-width: 100px;
+      padding: 12px 15px;
+
+      i {
+        font-size: 20px;
+      }
+
+      span {
+        font-size: 11px;
+      }
     }
   }
 
   .quick-info {
     grid-template-columns: 1fr;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .call-instructions {
+    margin: 20px;
+    padding: 20px;
+
+    .instruction-card {
+      flex-direction: column;
+      padding: 15px;
+
+      i {
+        font-size: 30px;
+      }
+
+      h4 {
+        font-size: 1.1rem;
+      }
+
+      ul {
+        padding-left: 15px;
+
+        li {
+          font-size: 14px;
+          margin-bottom: 8px;
+        }
+      }
+    }
+  }
+
+  .external-platform-notice {
+    padding: 2rem 1rem;
+    min-height: 400px;
+
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .platform-info {
+    padding: 1rem;
+
+    .platform-name {
+      font-size: 1rem;
+    }
+
+    .meeting-info p {
+      font-size: 0.875rem;
+    }
+  }
+
+  .alternative-join {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }
 
+@media (max-width: 480px) {
+  .video-header .header-info h2 {
+    font-size: 16px;
+  }
+
+  .call-placeholder {
+    padding: 20px 15px;
+
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    p {
+      font-size: 14px;
+    }
+
+    .btn-lg {
+      padding: 12px 30px;
+      font-size: 16px;
+    }
+  }
+
+  .platform-info {
+    padding: 0.75rem;
+
+    .platform-name {
+      font-size: 0.9rem;
+    }
+  }
+
+  .call-instructions {
+    margin: 15px;
+    padding: 15px;
+  }
+}

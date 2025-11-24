@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AvailabilityService } from '../../../services/availability.service';
 import { CreateAvailabilityRequest } from '../../../interfaces/availability.interface';
 import { AuthService } from '../../../services/auth.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-create-availability',
@@ -13,7 +14,7 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./create-availability.component.css']
 })
 export class CreateAvailabilityComponent implements OnInit {
-  @Output() availabilityCreated = new EventEmitter<void>();
+  @Output() availabilityCreated = new EventEmitter<any>();
   @Output() close = new EventEmitter<void>();
 
   availability: CreateAvailabilityRequest = {
@@ -27,6 +28,24 @@ export class CreateAvailabilityComponent implements OnInit {
   startTimeInput: string = '';
   endDate: string = '';
   endTimeInput: string = '';
+
+  // Recurrent availability properties
+  creationMode: 'single' | 'recurrent' = 'single';
+  recurrentStartDate: string = '';
+  recurrentEndDate: string = '';
+  recurrentStartTime: string = '09:00';
+  recurrentEndTime: string = '17:00';
+  slotDuration: number = 60;
+
+  daysOfWeek = [
+    { value: 1, label: 'Lun', selected: false },
+    { value: 2, label: 'Mar', selected: false },
+    { value: 3, label: 'Mer', selected: false },
+    { value: 4, label: 'Jeu', selected: false },
+    { value: 5, label: 'Ven', selected: false },
+    { value: 6, label: 'Sam', selected: false },
+    { value: 0, label: 'Dim', selected: false }
+  ];
 
   loading = false;
   error = '';
@@ -64,7 +83,121 @@ export class CreateAvailabilityComponent implements OnInit {
     this.endTimeInput = '17:00';
   }
 
-  onSubmit() {
+  getTodayDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  getMaxDateForMonth(): string {
+    const today = new Date();
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    return lastDay.toISOString().split('T')[0];
+  }
+
+  onRecurrentDateChange(): void {
+    // S'assurer que la date de fin n'est pas avant la date de début
+    if (this.recurrentEndDate && this.recurrentStartDate) {
+      if (new Date(this.recurrentEndDate) < new Date(this.recurrentStartDate)) {
+        this.recurrentEndDate = this.recurrentStartDate;
+      }
+    }
+  }
+
+  getPreviewSlots(): any[] {
+    if (this.creationMode !== 'recurrent') return [];
+    
+    if (!this.recurrentStartDate || !this.recurrentEndDate || 
+        !this.recurrentStartTime || !this.recurrentEndTime) {
+      return [];
+    }
+
+    const selectedDays = this.daysOfWeek.filter(d => d.selected).map(d => d.value);
+    if (selectedDays.length === 0) return [];
+
+    const slots: any[] = [];
+    const start = new Date(this.recurrentStartDate);
+    const end = new Date(this.recurrentEndDate);
+    
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+      const dayOfWeek = date.getDay();
+      
+      if (selectedDays.includes(dayOfWeek)) {
+        const dateStr = date.toISOString().split('T')[0];
+        
+        // Générer les créneaux pour cette journée
+        const daySlots = this.generateSlotsForDay(
+          dateStr, 
+          this.recurrentStartTime, 
+          this.recurrentEndTime, 
+          this.slotDuration
+        );
+        
+        slots.push(...daySlots);
+      }
+    }
+
+    return slots;
+  }
+
+  generateSlotsForDay(date: string, startTime: string, endTime: string, duration: number): any[] {
+    const slots: any[] = [];
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    let currentTime = startHour * 60 + startMinute; // En minutes
+    const endTimeMinutes = endHour * 60 + endMinute;
+    
+    while (currentTime + duration <= endTimeMinutes) {
+      const slotStartHour = Math.floor(currentTime / 60);
+      const slotStartMinute = currentTime % 60;
+      const slotEndTime = currentTime + duration;
+      const slotEndHour = Math.floor(slotEndTime / 60);
+      const slotEndMinute = slotEndTime % 60;
+      
+      slots.push({
+        date: date,
+        startTime: `${String(slotStartHour).padStart(2, '0')}:${String(slotStartMinute).padStart(2, '0')}`,
+        endTime: `${String(slotEndHour).padStart(2, '0')}:${String(slotEndMinute).padStart(2, '0')}`
+      });
+      
+      currentTime += duration;
+    }
+    
+    return slots;
+  }
+
+  isFormValid(): boolean {
+    if (this.creationMode === 'single') {
+      return !!(this.startDate && this.startTimeInput && this.endDate && this.endTimeInput);
+    } else {
+      const hasSelectedDays = this.daysOfWeek.some(d => d.selected);
+      return !!(
+        this.recurrentStartDate && 
+        this.recurrentEndDate && 
+        this.recurrentStartTime && 
+        this.recurrentEndTime && 
+        hasSelectedDays
+      );
+    }
+  }
+
+  getSubmitButtonText(): string {
+    if (this.creationMode === 'single') {
+      return 'Créer la disponibilité';
+    } else {
+      const count = this.getPreviewSlots().length;
+      return count > 0 ? `Créer ${count} créneau(x)` : 'Créer les disponibilités';
+    }
+  }
+
+  onSubmit(): void {
+    if (this.creationMode === 'single') {
+      this.createSingleAvailability();
+    } else {
+      this.createRecurrentAvailabilities();
+    }
+  }
+
+  createSingleAvailability(): void {
     // Pour debug, vérifier le rôle et afficher des informations
     const user = this.authService.getCurrentUser();
     const token = this.authService.getToken();
@@ -134,6 +267,56 @@ export class CreateAvailabilityComponent implements OnInit {
     });
   }
 
+  createRecurrentAvailabilities(): void {
+    this.loading = true;
+    this.error = '';
+    this.success = '';
+
+    const slots = this.getPreviewSlots();
+    
+    if (slots.length === 0) {
+      this.error = 'Aucun créneau à créer. Vérifiez vos sélections.';
+      this.loading = false;
+      return;
+    }
+
+    // Créer toutes les disponibilités
+    const availabilityRequests = slots.map(slot => {
+      const startDateTime = new Date(`${slot.date}T${slot.startTime}`);
+      const endDateTime = new Date(`${slot.date}T${slot.endTime}`);
+      
+      return {
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        durationMinutes: this.slotDuration
+      };
+    });
+
+    // Envoyer toutes les requêtes
+    const requests = availabilityRequests.map(req => 
+      this.availabilityService.createAvailability(req)
+    );
+
+    // Utiliser forkJoin pour attendre toutes les requêtes
+    forkJoin(requests).subscribe({
+      next: (responses) => {
+        this.success = `${responses.length} créneau(x) créé(s) avec succès!`;
+        this.loading = false;
+        this.resetForm();
+        
+        setTimeout(() => {
+          this.availabilityCreated.emit(responses);
+          this.onClose();
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Error creating availabilities:', error);
+        this.error = 'Erreur lors de la création des disponibilités. Certains créneaux n\'ont peut-être pas été créés.';
+        this.loading = false;
+      }
+    });
+  }
+
   /**
    * Get minimum date for date inputs (today)
    */
@@ -143,9 +326,19 @@ export class CreateAvailabilityComponent implements OnInit {
   }
 
   resetForm() {
+    // Reset single mode
     this.setDefaultDates();
     this.error = '';
     this.success = '';
+
+    // Reset recurrent mode
+    this.creationMode = 'single';
+    this.recurrentStartDate = '';
+    this.recurrentEndDate = '';
+    this.recurrentStartTime = '09:00';
+    this.recurrentEndTime = '17:00';
+    this.slotDuration = 60;
+    this.daysOfWeek.forEach(day => day.selected = false);
   }
 
   validateForm(): boolean {
@@ -174,16 +367,18 @@ export class CreateAvailabilityComponent implements OnInit {
       return false;
     }
 
-    // Simple date validation using string comparison to avoid timezone issues
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0]; // Get YYYY-MM-DD format
+    // Check if start date/time is in the past
+    // Ajouter une marge de 1 minute pour éviter les problèmes de timing
+    const now = new Date();
+    const nowMinusOneMinute = new Date(now.getTime() - 60000); // 1 minute de marge
     
-    console.log('Today string:', todayStr);
-    console.log('Start date string:', this.startDate);
-    console.log('Start date >= Today?', this.startDate >= todayStr);
+    console.log('Current time:', now);
+    console.log('Start time:', start);
+    console.log('Now minus 1 minute:', nowMinusOneMinute);
+    console.log('Is start in past?', start < nowMinusOneMinute);
     
-    if (this.startDate < todayStr) {
-      this.error = 'La date de début ne peut pas être dans le passé';
+    if (start < nowMinusOneMinute) {
+      this.error = 'La date et heure de début ne peuvent pas être dans le passé';
       return false;
     }
 

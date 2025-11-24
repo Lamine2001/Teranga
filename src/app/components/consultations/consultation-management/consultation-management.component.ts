@@ -75,13 +75,45 @@ export class ConsultationManagementComponent implements OnInit {
   }
 
   loadActiveConsultations(): void {
+    console.log('Loading active consultations...');
     this.consultationService.getActiveConsultations().subscribe({
-      next: (consultations) => {
+      next: (response: any) => {
+        console.log('=== ACTIVE CONSULTATIONS DEBUG ===');
+        console.log('Raw response received:', response);
+        
+        // Le backend renvoie un objet avec appointment, meeting, et record
+        // On doit transformer ces données en format Consultation
+        let consultations: Consultation[] = [];
+        
+        if (Array.isArray(response)) {
+          // Si c'est un tableau de réponses
+          consultations = response.map((item: any) => this.mapResponseToConsultation(item));
+        } else if (response.appointment) {
+          // Si c'est un seul objet
+          consultations = [this.mapResponseToConsultation(response)];
+        }
+        
+        console.log('Mapped consultations:', consultations);
+        console.log('Number of consultations:', consultations.length);
+        
+        if (consultations.length > 0) {
+          consultations.forEach((c, index) => {
+            console.log(`Consultation ${index}:`, {
+              id: c.id,
+              patientFirstName: c.patientFirstName,
+              patientLastName: c.patientLastName,
+              consultationType: c.consultationType,
+              appointmentId: c.appointmentId,
+              fullObject: c
+            });
+          });
+        }
+        
         this.activeConsultations = consultations;
+        console.log('activeConsultations after assignment:', this.activeConsultations);
       },
       error: (error) => {
         console.error('Error loading active consultations:', error);
-        // Set empty array if API is not ready
         this.activeConsultations = [];
         
         if (error.status === 403) {
@@ -91,6 +123,27 @@ export class ConsultationManagementComponent implements OnInit {
         }
       }
     });
+  }
+
+  /**
+   * Map backend response to Consultation model
+   */
+  private mapResponseToConsultation(response: any): Consultation {
+    const appointment = response.appointment;
+    const record = response.record;
+    
+    return {
+      id: record?.id || '',
+      appointmentId: appointment?.id || '',
+      patientId: appointment?.patientId || '',
+      patientFirstName: appointment?.patientFirstName || '',
+      patientLastName: appointment?.patientLastName || '',
+      doctorId: appointment?.doctorId || '',
+      consultationType: record?.consultationType || appointment?.appointmentType || 'onsite',
+      status: record?.status || appointment?.status || 'active',
+      startedAt: record?.startedAt || appointment?.appointmentTime,
+      // Add other necessary fields
+    } as Consultation;
   }
 
   setActiveTab(tab: 'today' | 'upcoming' | 'history' | 'statistics'): void {

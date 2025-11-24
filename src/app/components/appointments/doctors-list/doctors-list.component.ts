@@ -26,7 +26,20 @@ export class DoctorsListComponent implements OnInit, OnDestroy {
   searchForm: FormGroup;
   doctors: any[] = [];
   filteredDoctors: any[] = [];
-  specialties: string[] = ['Toutes les spécialités', 'Médecine générale', 'Cardiologie', 'Dermatologie', 'Pédiatrie', 'Gynécologie'];
+  specialties: string[] = [
+    'Toutes les spécialités',
+    'Psychologie clinique',
+    'Psychothérapie',
+    'Coaching de vie',
+    'Thérapie de couple',
+    'Psychologie de l\'enfant et de l\'adolescent',
+    'Gestion du stress et de l\'anxiété',
+    'Développement personnel',
+    'Thérapie familiale',
+    'Psychiatrie',
+    'Neuropsychologie',
+    'Psychologie du travail'
+  ];
   isLoading = false;
   errorMessage = '';
   expandedDoctorId: string | null = null;

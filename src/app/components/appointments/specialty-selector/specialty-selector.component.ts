@@ -19,7 +19,7 @@ export interface Specialty {
   styleUrls: ['./specialty-selector.component.scss']
 })
 export class SpecialtySelectorComponent {
-  @Input() consultationMode: 'cabinet' | 'video' = 'cabinet';
+  @Input() consultationMode: 'onsite' | 'video' = 'onsite';
   @Input() patientType: 'nouveau' | 'existant' = 'nouveau';
   @Output() specialtySelected = new EventEmitter<string>();
 
@@ -128,11 +128,11 @@ export class SpecialtySelectorComponent {
   }
 
   getModeIcon(): string {
-    return this.consultationMode === 'cabinet' ? 'fas fa-hospital' : 'fas fa-video';
+    return this.consultationMode === 'onsite' ? 'fas fa-hospital' : 'fas fa-video';
   }
 
   getModeLabel(): string {
-    return this.consultationMode === 'cabinet' ? 'Consultation en cabinet' : 'Consultation en vidéo';
+    return this.consultationMode === 'onsite' ? 'Consultation en cabinet' : 'Consultation en vidéo';
   }
 
   getPatientTypeIcon(): string {

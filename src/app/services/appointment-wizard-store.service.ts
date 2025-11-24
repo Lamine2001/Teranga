@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface AppointmentWizardState {
   currentStep?: string;
-  consultationMode?: 'video' | 'in-person';
+  consultationMode?: 'video' | 'onsite';
   patientType?: 'new' | 'existing' | 'guest';
   doctorId?: string;
   doctorDetails?: any;
