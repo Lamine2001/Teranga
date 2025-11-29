@@ -16,7 +16,8 @@ import {
   EndConsultationRequest,
   ConsultationHistoryFilter,
   ConsultationSummary,
-  VideoConsultationConfig
+  VideoConsultationConfig,
+  ConsultationHistoryDTO
 } from '../models/consultation.model';
 
 @Injectable({
@@ -125,17 +126,17 @@ export class ConsultationService {
   /**
    * Get all consultations for current patient
    */
-  getPatientConsultations(filter?: ConsultationHistoryFilter): Observable<Consultation[]> {
+  getPatientConsultations(filter?: ConsultationHistoryFilter): Observable<ConsultationHistoryDTO[]> {
     this.logRequest('POST', `${this.apiUrl}/patient/history`);
     
-    return this.http.post<Consultation[]>(`${this.apiUrl}/patient/history`, filter || {}, { 
+    return this.http.post<ConsultationHistoryDTO[]>(`${this.apiUrl}/patient/history`, filter || {}, { 
       headers: this.getAuthHeaders() 
     }).pipe(
       tap(consultations => console.log(`Fetched ${consultations.length} patient consultations`)),
-      catchError(error => {
+      catchError((error: any) => {
         console.error('Error fetching patient consultations:', error);
         console.error('Status:', error.status, 'Message:', error.message);
-        return of([]);
+        return of([] as ConsultationHistoryDTO[]);
       })
     );
   }
@@ -143,17 +144,17 @@ export class ConsultationService {
   /**
    * Get all consultations for current doctor
    */
-  getDoctorConsultations(filter?: ConsultationHistoryFilter): Observable<Consultation[]> {
+  getDoctorConsultations(filter?: ConsultationHistoryFilter): Observable<ConsultationHistoryDTO[]> {
     this.logRequest('POST', `${this.apiUrl}/doctor/history`);
     
-    return this.http.post<Consultation[]>(`${this.apiUrl}/doctor/history`, filter || {}, { 
+    return this.http.post<ConsultationHistoryDTO[]>(`${this.apiUrl}/doctor/history`, filter || {}, { 
       headers: this.getAuthHeaders() 
     }).pipe(
       tap(consultations => console.log(`Fetched ${consultations.length} doctor consultations`)),
-      catchError(error => {
+      catchError((error: any) => {
         console.error('Error fetching doctor consultations:', error);
         console.error('Status:', error.status, 'Message:', error.message);
-        return of([]);
+        return of([] as ConsultationHistoryDTO[]);
       })
     );
   }

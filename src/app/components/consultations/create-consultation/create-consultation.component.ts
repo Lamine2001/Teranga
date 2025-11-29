@@ -12,7 +12,7 @@ import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/oper
 import { ConsultationService } from '../../../services/consultation.service';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
-import { Consultation, StartConsultationRequest } from '../../../models/consultation.model';
+import { Consultation, ConsultationHistoryDTO, StartConsultationRequest } from '../../../models/consultation.model';
 import { ConsultationNotesComponent } from '../consultation-notes/consultation-notes.component';
 import { environment } from '../../../../environments/environment';
 
@@ -77,7 +77,7 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   selectedAppointment: any = null; // Add missing property
   
   // Patient history
-  patientPreviousConsultations: PreviousConsultation[] = [];
+  patientPreviousConsultations: ConsultationHistoryDTO[] = [];
   isLoadingHistory = false;
   showPatientHistory = true;
   
@@ -334,46 +334,48 @@ export class CreateConsultationComponent implements OnInit, OnDestroy {
   loadPatientHistory(patientId: number): void {
     this.isLoadingHistory = true;
 
-    // Create filter with all required parameters
     const filter: any = { 
       patientId: patientId,
       status: 'completed'
     };
     
-    // Add doctorId only if current user is a doctor
     if (this.currentDoctor?.userType === 'DOCTOR' && this.currentDoctorId) {
       filter.doctorId = this.currentDoctorId;
     }
     
-    console.log('Loading patient history with filter:', filter); // Debug log
+    console.log('Loading patient history with filter:', filter);
     
     this.consultationService.getPatientConsultations(filter).subscribe({
       next: (consultations) => {
-        console.log('Received consultations:', consultations); // Debug log
+        console.log('Received consultations:', consultations);
         
-        // Map consultations to previous consultations format
         this.patientPreviousConsultations = consultations
           .filter(c => {
-            // Handle both uppercase and lowercase status
             const status = c.status?.toUpperCase();
             return status === 'COMPLETED';
           })
           .map(c => ({
-            id: c.id, // Consultation record ID
-            consultationId: c.id, // Also store as consultationId for clarity
-            appointmentId: c.appointmentId, // Appointment ID from backend
-            date: c.startedAt || c.startTime, // Use startedAt from backend
-            doctorName: c.doctorName || `Dr. ${c.doctorFirstName} ${c.doctorLastName}`, // Use doctorName directly if available
+            id: c.id || '',
+            consultationId: c.id || '',
+            appointmentId: c.appointmentId || '',
+            date: c.startedAt || '',
+            doctorName: c.doctorName || 'Médecin inconnu',
+            patientName: c.patientName || 'Patient inconnu',
+            status: c.status || 'inconnu',
             diagnosis: c.diagnosis || 'Non spécifié',
-            treatment: c.treatmentPlan || c.treatment || 'Non spécifié', // Use treatmentPlan from backend
-            prescriptions: c.prescriptions || []
+            treatment: c.treatmentPlan || 'Non spécifié',
+            prescriptions: []
           }))
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort by date descending
+          .sort((a, b) => {
+            const dateA = a.date ? new Date(a.date).getTime() : 0;
+            const dateB = b.date ? new Date(b.date).getTime() : 0;
+            return dateB - dateA;
+          });
         
-        console.log('Mapped previous consultations:', this.patientPreviousConsultations); // Debug log
+        console.log('Mapped previous consultations:', this.patientPreviousConsultations);
         this.isLoadingHistory = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading patient history:', error);
         this.errorMessage = 'Erreur lors du chargement de l\'historique du patient';
         this.isLoadingHistory = false;

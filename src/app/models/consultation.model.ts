@@ -60,6 +60,39 @@ export interface Consultation {
   videoConfig?: VideoConsultationConfig;
 }
 
+
+// models/consultation-history.dto.ts
+export interface ConsultationHistoryDTO {
+  id?: string;
+  appointmentId: string;
+  consultationType?: string;
+  status?: string;
+  doctorName?: string;
+  patientName?: string;
+
+  // Text fields (limits kept as comment to reflect Java @Size)
+  notes?: string;                 // max 5000
+  chiefComplaint?: string;        // max 2000
+  diagnosis?: string;             // max 3000
+  treatmentPlan?: string;         // max 4000
+  examinationFindings?: string;   // max 2000
+  presentIllness?: string;        // max 1000
+  symptoms?: string;              // max 2000
+  recommendations?: string;       // max 3000
+
+  // Dates/times: ISO strings from backend (or null)
+  startedAt?: string | null;      // ISO 8601 e.g. "2025-11-28T15:30:00"
+  endedAt?: string | null;
+  durationMinutes?: number | null;
+  followUpRequired?: boolean | null;
+  followUpDate?: string | null;
+
+  followUpInstructions?: string;  // max 1500
+  vitals?: string;                // max 500
+  additionalNotes?: string;       // max 1000
+}
+
+
 export interface ConsultationNotes {
   chiefComplaint: string;
   presentIllness: string;  // Backend field name (was: symptoms)

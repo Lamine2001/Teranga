@@ -368,16 +368,16 @@
                  (click)="viewPreviousConsultation(consultation.appointmentId)">
               <div class="consultation-date">
                 <i class="fas fa-calendar"></i>
-                {{ formatDate(consultation.date) }}
+                {{ consultation.startedAt ? formatDate(consultation.startedAt) : 'Date non disponible' }}
               </div>
               <div class="consultation-info">
                 <p class="doctor-name">{{ consultation.doctorName }}</p>
-                <p class="diagnosis"><strong>Diagnostic:</strong> {{ consultation.diagnosis }}</p>
-                <p class="treatment"><strong>Traitement:</strong> {{ consultation.treatment }}</p>
-                <span class="prescription-badge" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
+                <p class="diagnosis"><strong>Patient:</strong> {{ consultation.patientName }}</p>
+                <p class="treatment"><strong>Traitement:</strong> {{ consultation.status }}</p>
+              <!--   <span class="prescription-badge" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
                   <i class="fas fa-prescription"></i>
                   {{ consultation.prescriptions.length }} ordonnance(s)
-                </span>
+                </span> -->
               </div>
               <div class="view-btn">
                 <i class="fas fa-eye"></i>
@@ -459,15 +459,15 @@
             <div class="timeline-item" *ngFor="let consultation of patientPreviousConsultations">
               <div class="timeline-marker"></div>
               <div class="timeline-content">
-                <div class="timeline-date">{{ formatDate(consultation.date) }}</div>
+              <!--   <div class="timeline-date">{{ formatDate(consultation.date) }}</div> -->
                 <div class="timeline-doctor">{{ consultation.doctorName }}</div>
-                <div class="timeline-diagnosis"><strong>Diagnostic:</strong> {{ consultation.diagnosis }}</div>
-                <div class="timeline-treatment" *ngIf="consultation.treatment">
-                  <strong>Traitement:</strong> {{ consultation.treatment }}
+                <div class="timeline-diagnosis"><strong>Patient:</strong> {{ consultation.patientName }}</div>
+                <div class="timeline-treatment" >
+                  <strong>Statut:</strong> {{ consultation.status }}
                 </div>
-                <div class="timeline-prescriptions" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
+               <!--  <div class="timeline-prescriptions" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
                   <i class="fas fa-prescription"></i> {{ consultation.prescriptions.length }} ordonnance(s)
-                </div>
+                </div> -->
                 <button class="btn-view-details" (click)="viewPreviousConsultation(consultation.appointmentId)">
                   <i class="fas fa-eye"></i> Voir détails
                 </button>

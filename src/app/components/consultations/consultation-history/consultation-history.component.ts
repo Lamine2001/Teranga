@@ -8,7 +8,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConsultationService } from '../../../services/consultation.service';
 import { AuthService } from '../../../services/auth.service';
-import { Consultation, ConsultationHistoryFilter } from '../../../models/consultation.model';
+import { Consultation, ConsultationHistoryDTO, ConsultationHistoryFilter } from '../../../models/consultation.model';
 
 @Component({
   selector: 'app-consultation-history',
@@ -19,7 +19,7 @@ import { Consultation, ConsultationHistoryFilter } from '../../../models/consult
 })
 export class ConsultationHistoryComponent implements OnInit {
   consultations: any[] = []; // Change to any[] to handle backend format
-  filteredConsultations: any[] = []; // Change to any[]
+  filteredConsultations: ConsultationHistoryDTO[] = []; // Change to any[]
   isLoading = false;
   errorMessage = '';
   
@@ -87,21 +87,21 @@ export class ConsultationHistoryComponent implements OnInit {
         console.log('Raw consultations from backend:', consultations); // Debug log
         
         // Map backend format to frontend format
-        this.consultations = consultations.map((c: any) => ({
+        this.consultations = consultations.map((c: ConsultationHistoryDTO) => ({
           id: c.id,
           appointmentId: c.appointmentId,
-          doctorId: c.doctorId,
-          doctorFirstName: c.doctorFirstName || this.extractFirstName(c.doctorName),
-          doctorLastName: c.doctorLastName || this.extractLastName(c.doctorName),
+          //doctorId: c.doctorId,
+        //  doctorFirstName: c.doctorName || this.extractFirstName(c.doctorName),
+         // doctorLastName: c.doctorLastName || this.extractLastName(c.doctorName),
           doctorName: c.doctorName,
-          doctorSpecialty: c.doctorSpecialty,
-          patientId: c.patientId,
-          patientFirstName: c.patientFirstName,
-          patientLastName: c.patientLastName,
-          patientEmail: c.patientEmail,
-          startTime: c.startedAt || c.startTime,
+        //  doctorSpecialty: c.doctorSpecialty,
+        //  patientId: c.patientId,
+          patientName: c.patientName,
+         // patientLastName: c.patientLastName,
+        //  patientEmail: c.patientEmail,
+        //  startTime: c.startedAt || c.startTime,
           startedAt: c.startedAt,
-          endTime: c.endedAt || c.endTime,
+          //endTime: c.endedAt || c.endTime,
           endedAt: c.endedAt,
           status: c.status?.toLowerCase() || 'scheduled',
           consultationType: c.consultationType?.toLowerCase() || 'onsite',
@@ -109,7 +109,7 @@ export class ConsultationHistoryComponent implements OnInit {
           symptoms: c.symptoms,
           diagnosis: c.diagnosis,
           treatmentPlan: c.treatmentPlan,
-          treatment: c.treatmentPlan || c.treatment,
+        //  treatment: c.treatmentPlan || c.treatment,
           examinationFindings: c.examinationFindings,
           presentIllness: c.presentIllness,
           recommendations: c.recommendations,
@@ -120,9 +120,9 @@ export class ConsultationHistoryComponent implements OnInit {
           vitals: c.vitals,
           additionalNotes: c.additionalNotes,
           notes: c.notes,
-          prescriptions: c.prescriptions || [],
-          labTests: c.labTests || [],
-          createdAt: c.createdAt || c.startedAt
+        //  prescriptions: c.prescriptions || [],
+          //labTests: c.labTests || [],
+        //  createdAt: c.createdAt || c.startedAt
         }));
         
         this.filteredConsultations = this.consultations;
@@ -171,8 +171,8 @@ export class ConsultationHistoryComponent implements OnInit {
     this.filteredConsultations = filtered;
   }
 
-  viewConsultation(consultation: Consultation): void {
-    this.router.navigate(['/consultations', consultation.id]);
+  viewConsultation(consultation: ConsultationHistoryDTO): void {
+    this.router.navigate(['/consultations', consultation.appointmentId]);
   }
 
   getStatusClass(status: string): string {
@@ -215,7 +215,7 @@ export class ConsultationHistoryComponent implements OnInit {
     alert('Export functionality coming soon');
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString?: string | null): string {
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
@@ -224,7 +224,7 @@ export class ConsultationHistoryComponent implements OnInit {
     });
   }
 
-  formatTime(dateString: string): string {
+  formatTime(dateString?: string | null): string {
     if (!dateString) return '';
     return new Date(dateString).toLocaleTimeString('fr-FR', {
       hour: '2-digit',
@@ -232,4 +232,3 @@ export class ConsultationHistoryComponent implements OnInit {
     });
   }
 }
-
