@@ -267,55 +267,60 @@ export class CreateAvailabilityComponent implements OnInit {
     });
   }
 
-  createRecurrentAvailabilities(): void {
-    this.loading = true;
-    this.error = '';
-    this.success = '';
+  // ...existing code...
 
-    const slots = this.getPreviewSlots();
-    
-    if (slots.length === 0) {
-      this.error = 'Aucun créneau à créer. Vérifiez vos sélections.';
-      this.loading = false;
-      return;
-    }
+createRecurrentAvailabilities(): void {
+  this.loading = true;
+  this.error = '';
+  this.success = '';
 
-    // Créer toutes les disponibilités
-    const availabilityRequests = slots.map(slot => {
-      const startDateTime = new Date(`${slot.date}T${slot.startTime}`);
-      const endDateTime = new Date(`${slot.date}T${slot.endTime}`);
-      
-      return {
-        startTime: startDateTime.toISOString(),
-        endTime: endDateTime.toISOString(),
-        durationMinutes: this.slotDuration
-      };
-    });
-
-    // Envoyer toutes les requêtes
-    const requests = availabilityRequests.map(req => 
-      this.availabilityService.createAvailability(req)
-    );
-
-    // Utiliser forkJoin pour attendre toutes les requêtes
-    forkJoin(requests).subscribe({
-      next: (responses) => {
-        this.success = `${responses.length} créneau(x) créé(s) avec succès!`;
-        this.loading = false;
-        this.resetForm();
-        
-        setTimeout(() => {
-          this.availabilityCreated.emit(responses);
-          this.onClose();
-        }, 1500);
-      },
-      error: (error) => {
-        console.error('Error creating availabilities:', error);
-        this.error = 'Erreur lors de la création des disponibilités. Certains créneaux n\'ont peut-être pas été créés.';
-        this.loading = false;
-      }
-    });
+  const slots = this.getPreviewSlots();
+  
+  if (slots.length === 0) {
+    this.error = 'Aucun créneau à créer. Vérifiez vos sélections.';
+    this.loading = false;
+    return;
   }
+
+  // Créer toutes les disponibilités
+  const availabilityRequests = slots.map(slot => {
+    // Utiliser le format local sans conversion de fuseau horaire
+    const startDateTime = `${slot.date}T${slot.startTime}:00`;
+    const endDateTime = `${slot.date}T${slot.endTime}:00`;
+    
+    return {
+      startTime: startDateTime,
+      endTime: endDateTime,
+      durationMinutes: this.slotDuration
+    };
+  });
+
+  // Envoyer toutes les requêtes
+  const requests = availabilityRequests.map(req => 
+    this.availabilityService.createAvailability(req)
+  );
+
+  // Utiliser forkJoin pour attendre toutes les requêtes
+  forkJoin(requests).subscribe({
+    next: (responses) => {
+      this.success = `${responses.length} créneau(x) créé(s) avec succès!`;
+      this.loading = false;
+      this.resetForm();
+      
+      setTimeout(() => {
+        this.availabilityCreated.emit(responses);
+        this.onClose();
+      }, 1500);
+    },
+    error: (error) => {
+      console.error('Error creating availabilities:', error);
+      this.error = 'Erreur lors de la création des disponibilités. Certains créneaux n\'ont peut-être pas été créés.';
+      this.loading = false;
+    }
+  });
+}
+
+// ...existing code...
 
   /**
    * Get minimum date for date inputs (today)

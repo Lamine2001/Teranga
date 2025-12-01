@@ -67,10 +67,6 @@ export class LoginFormComponent implements OnInit {
         password: this.loginForm.get('password')?.value
       };
 
-      console.log('=== LOGIN SUBMIT ===');
-      console.log('Redirect URL:', this.redirectUrl);
-      console.log('Appointment Mode:', this.appointmentMode);
-
       this.authService.login(credentials).subscribe({
         next: (response) => {
           console.log('=== LOGIN RESPONSE ===');
@@ -79,14 +75,50 @@ export class LoginFormComponent implements OnInit {
           if (response.success && response.user) {
             this.handleRedirection(response.user);
           } else {
-            this.errorMessage = response.error || 'Login failed';
+            this.errorMessage = 'Email ou mot de passe incorrect. Veuillez réessayer.';
+            this.isLoading = false;
           }
         },
         error: (error) => {
-          this.errorMessage = 'An error occurred during login. Please try again.';
-          console.error('Login error:', error);
-        },
-        complete: () => {
+          console.error('=== LOGIN ERROR ===');
+          console.error('Full error object:', error);
+          console.error('Error.error:', error.error);
+          
+          // Le backend retourne la structure d'erreur dans error.error
+          const backendError = error.error;
+          const httpStatus = error.status;
+          const backendStatus = backendError?.status;
+          
+          console.log('HTTP Status:', httpStatus);
+          console.log('Backend Status:', backendStatus);
+          console.log('Backend Error:', backendError?.error);
+          console.log('Backend Message:', backendError?.message);
+          
+          // Utiliser le statut backend si disponible, sinon le statut HTTP
+          const finalStatus = backendStatus || httpStatus;
+          
+          // Gérer les erreurs selon le code de statut
+          switch (finalStatus) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+              // Pour toutes les erreurs d'authentification, afficher le même message
+              this.errorMessage = 'Email ou mot de passe incorrect. Veuillez réessayer.';
+              break;
+            case 403:
+              this.errorMessage = 'Accès refusé. Votre compte pourrait être désactivé.';
+              break;
+            case 503:
+              this.errorMessage = 'Service temporairement indisponible. Veuillez réessayer dans quelques instants.';
+              break;
+            case 0:
+              this.errorMessage = 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.';
+              break;
+            default:
+              this.errorMessage = 'Email ou mot de passe incorrect. Veuillez réessayer.';
+          }
+          
           this.isLoading = false;
         }
       });

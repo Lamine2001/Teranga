@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { AppointmentService } from '../../../services/appointment.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../../../interfaces/user';
 
@@ -25,7 +26,8 @@ export class PatientDashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private appointmentService: AppointmentService
   ) {}
 
   ngOnInit(): void {
@@ -199,20 +201,17 @@ export class PatientDashboardComponent implements OnInit {
 
   cancelAppointment(appointment: any): void {
     if (confirm(`Êtes-vous sûr de vouloir annuler votre rendez-vous avec Dr. ${appointment.doctorFirstName} ${appointment.doctorLastName} ?`)) {
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-      const headers = new HttpHeaders({
-        'Authorization': token ? `Bearer ${token}` : ''
-      });
-
-      this.http.delete(`http://localhost:8080/api/appointments/${appointment.id}`, { headers }).subscribe({
-        next: () => {
+      this.appointmentService.cancelAppointment(appointment.id).subscribe({
+        next: (response) => {
+          console.log('Appointment canceled:', response);
           // Recharger les rendez-vous après annulation
           this.loadUpcomingAppointments();
+          this.loadAppointmentHistory();
           alert('Rendez-vous annulé avec succès');
         },
         error: (error) => {
           console.error('Error canceling appointment:', error);
-          alert('Erreur lors de l\'annulation du rendez-vous');
+          alert('Erreur lors de l\'annulation du rendez-vous. Veuillez réessayer.');
         }
       });
     }
