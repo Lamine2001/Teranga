@@ -2,31 +2,41 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { AppointmentService } from '../../../services/appointment.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AppointmentService, AppointmentResponseDTO } from '../../../services/appointment.service';
 import { User } from '../../../interfaces/user';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { NotificationComponent } from '../../../shared/components/notification/notification.component';
 
 @Component({
   selector: 'app-patient-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmDialogComponent, NotificationComponent],
   templateUrl: './patient-dashboard.component.html',
   styleUrls: ['./patient-dashboard.component.css']
 })
 export class PatientDashboardComponent implements OnInit {
   currentUser: User | null = null;
-  upcomingAppointments: any[] = [];
-  appointmentHistory: any[] = [];
+  upcomingAppointments: AppointmentResponseDTO[] = [];
+  appointmentHistory: AppointmentResponseDTO[] = [];
   isLoading = false;
   error = '';
-  showAllAppointments = false; // Nouvelle propriété pour gérer l'affichage
+  showAllAppointments = false;
 
-  private apiUrl = 'http://localhost:8080/api/appointments/patient';
+  // Propriétés pour le modal de confirmation
+  showConfirmDialog = false;
+  confirmDialogTitle = '';
+  confirmDialogMessage = '';
+  appointmentToCancel: AppointmentResponseDTO | null = null;
+
+  // Propriétés pour les notifications
+  showNotification = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' | 'info' | 'warning' = 'info';
+  private notificationTimeout: any;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient,
     private appointmentService: AppointmentService
   ) {}
 
@@ -43,13 +53,8 @@ export class PatientDashboardComponent implements OnInit {
   loadUpcomingAppointments(): void {
     this.isLoading = true;
     this.error = '';
-    
-    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-    const headers = new HttpHeaders({
-      'Authorization': token ? `Bearer ${token}` : ''
-    });
 
-    this.http.get<any[]>(`${this.apiUrl}/upcoming`, { headers }).subscribe({
+    this.appointmentService.getPatientUpcoming().subscribe({
       next: (appointments) => {
         this.upcomingAppointments = appointments;
         this.isLoading = false;
@@ -66,12 +71,7 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   loadAppointmentHistory(): void {
-    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-    const headers = new HttpHeaders({
-      'Authorization': token ? `Bearer ${token}` : ''
-    });
-
-    this.http.get<any[]>(`${this.apiUrl}/history`, { headers }).subscribe({
+    this.appointmentService.getPatientHistory().subscribe({
       next: (history) => {
         this.appointmentHistory = history;
         console.log('Appointment history loaded:', history);
@@ -116,7 +116,7 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   // Modifier cette méthode pour avoir une logique plus claire
-  getDisplayedAppointments(): any[] {
+  getDisplayedAppointments(): AppointmentResponseDTO[] {
     if (this.showAllAppointments) {
       // Afficher tous les rendez-vous
       return this.upcomingAppointments;
@@ -194,26 +194,61 @@ export class PatientDashboardComponent implements OnInit {
     return (appointment.status === 'CONFIRMED' || appointment.status === 'PENDING') && appointmentDate > now;
   }
 
-  viewAppointmentDetails(appointment: any): void {
+  viewAppointmentDetails(appointment: AppointmentResponseDTO): void {
     console.log('View appointment details:', appointment);
     // TODO: Implémenter la vue détaillée du rendez-vous
   }
 
-  cancelAppointment(appointment: any): void {
-    if (confirm(`Êtes-vous sûr de vouloir annuler votre rendez-vous avec Dr. ${appointment.doctorFirstName} ${appointment.doctorLastName} ?`)) {
-      this.appointmentService.cancelAppointment(appointment.id).subscribe({
+  cancelAppointment(appointment: AppointmentResponseDTO): void {
+    this.appointmentToCancel = appointment;
+    this.confirmDialogTitle = 'Annuler le rendez-vous';
+    this.confirmDialogMessage = `Êtes-vous sûr de vouloir annuler votre rendez-vous avec Dr. ${appointment.doctorFirstName} ${appointment.doctorLastName} prévu le ${this.getDateDisplay(appointment.appointmentTime)} à ${this.getTimeDisplay(appointment.appointmentTime)} ?`;
+    this.showConfirmDialog = true;
+  }
+
+  onConfirmCancel(): void {
+    if (this.appointmentToCancel) {
+      this.appointmentService.cancelAppointment(this.appointmentToCancel.id).subscribe({
         next: (response) => {
           console.log('Appointment canceled:', response);
-          // Recharger les rendez-vous après annulation
           this.loadUpcomingAppointments();
           this.loadAppointmentHistory();
-          alert('Rendez-vous annulé avec succès');
+          this.showNotificationMessage('Rendez-vous annulé avec succès', 'success');
+          this.showConfirmDialog = false;
+          this.appointmentToCancel = null;
         },
         error: (error) => {
           console.error('Error canceling appointment:', error);
-          alert('Erreur lors de l\'annulation du rendez-vous. Veuillez réessayer.');
+          this.showNotificationMessage('Erreur lors de l\'annulation du rendez-vous. Veuillez réessayer.', 'error');
+          this.showConfirmDialog = false;
         }
       });
+    }
+  }
+
+  onCancelDialog(): void {
+    this.showConfirmDialog = false;
+    this.appointmentToCancel = null;
+  }
+
+  private showNotificationMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
+
+    // Auto-hide après 5 secondes
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+    this.notificationTimeout = setTimeout(() => {
+      this.showNotification = false;
+    }, 5000);
+  }
+
+  onNotificationClosed(): void {
+    this.showNotification = false;
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
     }
   }
 }

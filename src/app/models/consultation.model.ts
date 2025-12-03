@@ -60,6 +60,25 @@ export interface Consultation {
   videoConfig?: VideoConsultationConfig;
 }
 
+// src/app/models/patient-with-appointment.dto.ts
+
+export interface PatientWithAppointmentDTO {
+  patientId: string;
+  patientFirstName: string;
+  patientLastName: string;
+  patientEmail: string;
+  patientPhone: string;
+  patientGender: string;
+  appointmentId: string;
+  // si le backend renvoie un ISO string, laisse en string; tu peux le transformer en Date avec fromServer
+  startTime: string;
+  appointmentType: string;
+  appointmentStatus: string;
+  appointmentNotes: string | null;
+  hasExistingConsultation: boolean;
+  consultationRecordId: string | null;
+}
+
 
 // models/consultation-history.dto.ts
 export interface ConsultationHistoryDTO {
@@ -90,6 +109,45 @@ export interface ConsultationHistoryDTO {
   followUpInstructions?: string;  // max 1500
   vitals?: string;                // max 500
   additionalNotes?: string;       // max 1000
+}
+
+export interface AppointmentResponseDto {
+  id: string;
+  patientId: string;
+  patientFirstName: string;
+  patientLastName: string;
+  patientEmail: string;
+  patientPhone: string;
+
+  patientName: string; // full name
+
+  doctorId: string;
+  doctorFirstName: string;
+  doctorLastName: string;
+  doctorEmail: string;
+  doctorSpecialty: string;
+  doctorDepartment: string;
+  doctorName: string; // full name
+
+  specialty: string;
+
+  appointmentTime: string; // LocalDateTime
+  endTime: string;         // LocalDateTime
+
+  status: string;
+  notes: string;
+
+  createdAt: string;       // LocalDateTime
+  updatedAt: string;       // LocalDateTime
+
+  // Consultation-specific fields
+  appointmentType: string; // "virtual" | "onsite"
+  meetingLink: string;
+  meetingId: string;
+  meetingPasscode: string;
+  platform: string;
+  clinicLocation: string;
+  clinicAddress: string;
 }
 
 

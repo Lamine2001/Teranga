@@ -12,12 +12,15 @@ export interface AppointmentResponseDTO {
   patientLastName: string;
   patientEmail: string;
   patientPhone: string;
+  patientName?: string;
   doctorId: number;
   doctorFirstName: string;
   doctorLastName: string;
   doctorEmail: string;
   doctorSpecialty: string;
   doctorDepartment: string;
+  doctorName?: string;
+  specialty?: string;
   appointmentTime: string;
   endTime: string;
   appointmentType?: 'virtual' | 'onsite';
@@ -26,6 +29,12 @@ export interface AppointmentResponseDTO {
   notes: string;
   createdAt: string;
   updatedAt: string;
+  meetingLink?: string;
+  meetingId?: string;
+  meetingPasscode?: string;
+  platform?: string;
+  clinicLocation?: string;
+  clinicAddress?: string;
 }
 
 export interface SearchAvailabilityRequestDTO {
@@ -130,8 +139,36 @@ export class AppointmentService {
     return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/patient`);
   }
 
+  /**
+   * Get patient appointment history
+   */
+  getPatientHistory(): Observable<AppointmentResponseDTO[]> {
+    return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/patient/history`);
+  }
+
+  /**
+   * Get patient upcoming appointments
+   */
+  getPatientUpcoming(): Observable<AppointmentResponseDTO[]> {
+    return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/patient/upcoming`);
+  }
+
   getDoctorAppointments(): Observable<AppointmentResponseDTO[]> {
     return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/doctor`);
+  }
+
+  /**
+   * Get doctor appointment history
+   */
+  getDoctorHistory(): Observable<AppointmentResponseDTO[]> {
+    return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/doctor/history`);
+  }
+
+  /**
+   * Get doctor upcoming appointments
+   */
+  getDoctorUpcoming(): Observable<AppointmentResponseDTO[]> {
+    return this.http.get<AppointmentResponseDTO[]>(`${this.apiUrl}/appointments/doctor/upcoming`);
   }
 
   cancelAppointment(appointmentId: number): Observable<string> {
