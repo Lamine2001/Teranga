@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
+import { AppointmentDetailsModalComponent } from '../../../shared/components/appointment-details-modal/appointment-details-modal.component';
 
 interface Appointment {
   id: number;
@@ -23,7 +24,7 @@ interface Appointment {
 @Component({
   selector: 'app-doctor-appointments',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppointmentDetailsModalComponent],
   template: `
     <div class="appointments-container">
       <div class="appointments-header">
@@ -66,12 +67,12 @@ interface Appointment {
           <div class="appointment-body">
             <div class="appointment-detail">
               <i class="fas fa-clock"></i>
-              <span>{{ appointment.appointmentTime | date:'HH:mm' }} - {{ appointment.endTime | date:'HH:mm' }}</span>
+              <span>{{ getTimeDisplay(appointment.appointmentTime) }} - {{ getTimeDisplay(appointment.endTime) }}</span>
             </div>
             
             <div class="appointment-detail">
               <i class="fas fa-calendar"></i>
-              <span>{{ appointment.appointmentTime | date:'fullDate':'':'fr' }}</span>
+              <span>{{ getDateDisplay(appointment.appointmentTime) }}</span>
             </div>
 
             <div class="appointment-detail">
@@ -124,6 +125,13 @@ interface Appointment {
         </div>
       </div>
     </div>
+
+    <!-- Modal de détails -->
+    <app-appointment-details-modal
+      [isOpen]="showDetailsModal"
+      [appointment]="selectedAppointment"
+      (closed)="closeDetailsModal()">
+    </app-appointment-details-modal>
   `,
   styles: [`
     .appointments-container {
@@ -344,6 +352,10 @@ export class DoctorAppointmentsComponent implements OnInit {
   isLoading = false;
   error = '';
   
+  // Propriétés pour le modal de détails
+  showDetailsModal = false;
+  selectedAppointment: Appointment | null = null;
+  
   private readonly apiUrl = `${environment.apiUrl}/appointments/doctor`;
 
   constructor(
@@ -397,6 +409,26 @@ export class DoctorAppointmentsComponent implements OnInit {
     }
   }
 
+  getDateDisplay(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
+  getTimeDisplay(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  }
+
   /**
    * Start a consultation from an appointment
    * This navigates to the consultation creation page with appointment ID
@@ -413,8 +445,13 @@ export class DoctorAppointmentsComponent implements OnInit {
   }
 
   viewDetails(appointment: Appointment) {
-    // Navigate to consultation details
-    this.router.navigate(['/consultations', appointment.id]);
+    this.selectedAppointment = appointment;
+    this.showDetailsModal = true;
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedAppointment = null;
   }
 
   startVideoConsultation(appointment: Appointment) {

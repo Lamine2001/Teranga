@@ -1,0 +1,87 @@
+<div class="modal-overlay" *ngIf="isOpen && appointment" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 class="modal-title">Détails du Rendez-vous</h2>
+      <button class="close-button" (click)="close()" aria-label="Fermer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Status Badge -->
+      <div class="status-section">
+        <span class="status-badge" [ngClass]="getStatusClass(appointment.status)">
+          {{ getStatusLabel(appointment.status) }}
+        </span>
+      </div>
+
+      <!-- Patient Information -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <i class="fas fa-user"></i> Informations Patient
+        </h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Nom complet</span>
+            <span class="detail-value">{{ appointment.patientFirstName }} {{ appointment.patientLastName }}</span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.patientEmail">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">{{ appointment.patientEmail }}</span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.patientPhone">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ appointment.patientPhone }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointment Information -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <i class="fas fa-calendar-check"></i> Informations du Rendez-vous
+        </h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">{{ getDateDisplay(appointment.appointmentTime) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Heure</span>
+            <span class="detail-value">{{ getTimeDisplay(appointment.appointmentTime) }} - {{ getTimeDisplay(appointment.endTime) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Type de consultation</span>
+            <span class="detail-value">
+              <i [class]="appointment.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
+              {{ getTypeLabel(appointment.appointmentType) }}
+            </span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.consultationFee">
+            <span class="detail-label">Frais de consultation</span>
+            <span class="detail-value">{{ appointment.consultationFee }} FCFA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="detail-section" *ngIf="appointment.notes">
+        <h3 class="section-title">
+          <i class="fas fa-notes-medical"></i> Notes
+        </h3>
+        <div class="notes-content">
+          {{ appointment.notes }}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="close()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
