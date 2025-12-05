@@ -8,6 +8,7 @@ import { CreateAvailabilityComponent } from '../../../components/availability/cr
 import { ViewAvailabilityComponent } from '../../../components/availability/view-availability/view-availability.component';
 import { DoctorAppointmentsComponent } from '../../../components/appointments/doctor-appointments/doctor-appointments.component';
 import { ConsultationManagementComponent } from '../../../components/consultations/consultation-management/consultation-management.component';
+import { UserManagementComponent } from '../../../components/admin/user-management/user-management.component';
 
 interface DoctorProfile extends User {
   speciality?: string;
@@ -53,7 +54,8 @@ interface DashboardStats {
     CreateAvailabilityComponent,
     ViewAvailabilityComponent,
     DoctorAppointmentsComponent,
-    ConsultationManagementComponent
+    ConsultationManagementComponent,
+    UserManagementComponent
   ],
   templateUrl: './doctor-dashboard.component.html',
   styleUrls: ['./doctor-dashboard.component.css']
@@ -171,7 +173,13 @@ export class DoctorDashboardComponent implements OnInit {
     {
       id: 'settings',
       label: 'Paramètres',
-      icon: 'fas fa-cog'
+      icon: 'fas fa-cog',
+      expanded: false,
+      subItems: [
+        { id: 'user-management', label: 'Gestion des Utilisateurs', icon: 'fas fa-users-cog' },
+        { id: 'general-settings', label: 'Paramètres Généraux', icon: 'fas fa-sliders-h' },
+        { id: 'security', label: 'Sécurité', icon: 'fas fa-shield-alt' }
+      ]
     }
   ];
 
@@ -281,6 +289,13 @@ export class DoctorDashboardComponent implements OnInit {
     if (this.activeSubSection && mainItem.subItems) {
       const subItem = mainItem.subItems.find(sub => sub.id === this.activeSubSection);
       return subItem ? subItem.label : mainItem.label;
+    }
+
+    if (this.activeSection === 'settings') {
+      if (this.activeSubSection === 'user-management') return 'Gestion des Utilisateurs';
+      if (this.activeSubSection === 'general-settings') return 'Paramètres Généraux';
+      if (this.activeSubSection === 'security') return 'Sécurité';
+      return 'Paramètres';
     }
 
     return mainItem.label;

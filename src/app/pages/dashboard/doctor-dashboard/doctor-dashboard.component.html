@@ -314,10 +314,36 @@
         </div>
 
         <div *ngIf="activeSection === 'settings'" class="section-content">
-          <div class="feature-placeholder">
-            <i class="fas fa-cog feature-icon"></i>
-            <h3>Paramètres</h3>
-            <p>Configurez vos préférences et paramètres</p>
+          <div [ngSwitch]="activeSubSection">
+            <!-- User Management -->
+            <div *ngSwitchCase="'user-management'">
+              <app-user-management></app-user-management>
+            </div>
+
+            <!-- General Settings -->
+            <div *ngSwitchCase="'general-settings'">
+              <div class="feature-placeholder">
+                <i class="fas fa-sliders-h feature-icon"></i>
+                <h3>Paramètres Généraux</h3>
+                <p>Configurez vos préférences générales</p>
+              </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div *ngSwitchCase="'security'">
+              <div class="feature-placeholder">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <h3>Paramètres de Sécurité</h3>
+                <p>Gérez la sécurité de votre compte</p>
+              </div>
+            </div>
+
+            <!-- Default -->
+            <div *ngSwitchDefault class="feature-placeholder">
+              <i class="fas fa-cog feature-icon"></i>
+              <h3>Paramètres</h3>
+              <p>Configurez vos préférences et paramètres</p>
+            </div>
           </div>
         </div>
       </div>
