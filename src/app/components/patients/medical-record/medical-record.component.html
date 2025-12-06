@@ -1,0 +1,120 @@
+<div class="medical-record-container">
+  <div class="record-header">
+    <button class="btn-back" (click)="onBack()">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    <h3>Dossier Médical</h3>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement du dossier médical...</p>
+  </div>
+
+  <div *ngIf="error" class="error-state">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadMedicalRecord()">Réessayer</button>
+  </div>
+
+  <div *ngIf="!isLoading && !error && medicalRecord" class="record-content">
+    <!-- Patient Information Card -->
+    <div class="info-card">
+      <div class="card-header">
+        <i class="fas fa-user-circle"></i>
+        <h4>Informations du Patient</h4>
+      </div>
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Nom complet</label>
+            <span>{{ medicalRecord.firstName }} {{ medicalRecord.lastName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Âge</label>
+            <span>{{ getAge(medicalRecord.dateOfBirth) }} ans</span>
+          </div>
+          <div class="info-item">
+            <label>Genre</label>
+            <span>{{ getGenderLabel(medicalRecord.gender) }}</span>
+          </div>
+          <div class="info-item">
+            <label>Date de naissance</label>
+            <span>{{ medicalRecord.dateOfBirth | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <span>{{ medicalRecord.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>Téléphone</label>
+            <span>{{ medicalRecord.phone }}</span>
+          </div>
+          <div class="info-item full-width">
+            <label>Adresse</label>
+            <span>{{ medicalRecord.address }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Card -->
+    <div class="stats-card">
+      <div class="stat-item">
+        <i class="fas fa-calendar-check"></i>
+        <div class="stat-content">
+          <span class="stat-label">Total Rendez-vous</span>
+          <span class="stat-value">{{ medicalRecord.totalAppointments }}</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-clock"></i>
+        <div class="stat-content">
+          <span class="stat-label">Dernière visite</span>
+          <span class="stat-value">{{ medicalRecord.lastVisitDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment History Card -->
+    <div class="history-card">
+      <div class="card-header">
+        <i class="fas fa-history"></i>
+        <h4>Historique des Rendez-vous</h4>
+      </div>
+      <div class="card-body">
+        <div *ngIf="medicalRecord.appointmentHistory.length === 0" class="empty-history">
+          <i class="fas fa-calendar-times fa-2x"></i>
+          <p>Aucun rendez-vous enregistré</p>
+        </div>
+
+        <div class="appointments-timeline" *ngIf="medicalRecord.appointmentHistory.length > 0">
+          <div class="timeline-item" *ngFor="let appointment of medicalRecord.appointmentHistory">
+            <div class="timeline-marker" [ngClass]="getStatusClass(appointment.status)"></div>
+            <div class="timeline-content">
+              <div class="appointment-header">
+                <div class="appointment-info">
+                  <h5>{{ appointment.doctorName }}</h5>
+                  <span class="specialty">{{ appointment.specialty }}</span>
+                </div>
+                <span class="status-badge" [ngClass]="getStatusClass(appointment.status)">
+                  {{ getStatusLabel(appointment.status) }}
+                </span>
+              </div>
+              <div class="appointment-details">
+                <div class="detail-row">
+                  <i class="fas fa-calendar"></i>
+                  <span>{{ appointment.appointmentDate }}</span>
+                </div>
+                <div class="detail-row" *ngIf="appointment.notes">
+                  <i class="fas fa-notes-medical"></i>
+                  <span>{{ appointment.notes }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

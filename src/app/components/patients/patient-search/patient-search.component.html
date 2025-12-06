@@ -1,0 +1,82 @@
+<div class="patient-search-container">
+  <div class="search-header">
+    <h3>Rechercher un Patient</h3>
+    <p class="search-description">Recherchez par nom, prénom, email ou téléphone</p>
+  </div>
+
+  <div class="search-box">
+    <div class="search-input-group">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        class="search-input"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Nom, prénom, email ou téléphone..."
+      >
+      <button *ngIf="searchQuery" class="btn-clear" (click)="onClearSearch()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <button class="btn-search" (click)="onSearch()" [disabled]="isSearching">
+      <i class="fas fa-search"></i> Rechercher
+    </button>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="isSearching" class="loading-state">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Recherche en cours...</p>
+  </div>
+
+  <div *ngIf="!isSearching && hasSearched && patients.length === 0" class="empty-state">
+    <i class="fas fa-search fa-3x"></i>
+    <p>Aucun patient trouvé pour "{{ searchQuery }}"</p>
+  </div>
+
+  <div class="search-results" *ngIf="!isSearching && patients.length > 0">
+    <div class="results-header">
+      <h4>Résultats de recherche ({{ patients.length }})</h4>
+    </div>
+
+    <div class="patients-grid">
+      <div class="patient-card" *ngFor="let patient of patients">
+        <div class="patient-header">
+          <div class="patient-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="patient-info">
+            <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+            <span class="patient-age">{{ getAge(patient.dateOfBirth) }} ans</span>
+            <span class="patient-gender">{{ getGenderLabel(patient.gender) }}</span>
+          </div>
+        </div>
+
+        <div class="patient-details">
+          <div class="detail-row">
+            <i class="fas fa-envelope"></i>
+            <span>{{ patient.email }}</span>
+          </div>
+          <div class="detail-row">
+            <i class="fas fa-phone"></i>
+            <span>{{ patient.phone }}</span>
+          </div>
+          <div class="detail-row">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ patient.address }}</span>
+          </div>
+        </div>
+
+        <div class="patient-actions">
+          <button class="btn-action btn-primary" (click)="onViewMedicalRecord(patient)">
+            <i class="fas fa-file-medical"></i> Dossier Médical
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

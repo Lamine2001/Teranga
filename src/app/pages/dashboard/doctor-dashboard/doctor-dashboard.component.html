@@ -269,11 +269,7 @@
         </div>
 
         <div *ngIf="activeSection === 'patients'" class="section-content">
-          <div class="feature-placeholder">
-            <i class="fas fa-users feature-icon"></i>
-            <h3>Gestion des Patients</h3>
-            <p>Gérez les dossiers de vos {{ stats.totalPatients }} patients</p>
-          </div>
+          <app-patient-management></app-patient-management>
         </div>
 
         <div *ngIf="activeSection === 'profile'" class="section-content">

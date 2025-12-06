@@ -9,6 +9,7 @@ import { ViewAvailabilityComponent } from '../../../components/availability/view
 import { DoctorAppointmentsComponent } from '../../../components/appointments/doctor-appointments/doctor-appointments.component';
 import { ConsultationManagementComponent } from '../../../components/consultations/consultation-management/consultation-management.component';
 import { UserManagementComponent } from '../../../components/admin/user-management/user-management.component';
+import { PatientManagementComponent } from '../../../components/patients/patient-management/patient-management.component';
 
 interface DoctorProfile extends User {
   speciality?: string;
@@ -55,7 +56,8 @@ interface DashboardStats {
     ViewAvailabilityComponent,
     DoctorAppointmentsComponent,
     ConsultationManagementComponent,
-    UserManagementComponent
+    UserManagementComponent,
+    PatientManagementComponent
   ],
   templateUrl: './doctor-dashboard.component.html',
   styleUrls: ['./doctor-dashboard.component.css']
