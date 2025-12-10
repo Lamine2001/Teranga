@@ -142,7 +142,7 @@
                 type="tel" 
                 id="phone" 
                 formControlName="phone" 
-                placeholder="+221 XX XXX XX XX"
+                placeholder="Ex: +221771234567 ou 771234567"
                 [class.invalid]="isFieldInvalid('phone')"
                 class="form-control">
             </div>
@@ -252,30 +252,16 @@
             </div>
 
             <div class="form-group full-width">
-              <label for="department">Département/Région d'exercice *</label>
+              <label for="department">Ville/Région d'exercice *</label>
               <div class="input-group">
-                <i class="fas fa-map input-icon"></i>
-                <select 
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                <input 
+                  type="text" 
                   id="department" 
                   formControlName="department" 
+                  placeholder="Ex: Dakar, Paris, New York..."
                   [class.invalid]="isFieldInvalid('department')"
-                  class="form-control select-control">
-                  <option value="">Sélectionnez votre département</option>
-                  <option value="dakar">Dakar</option>
-                  <option value="thies">Thiès</option>
-                  <option value="saint-louis">Saint-Louis</option>
-                  <option value="diourbel">Diourbel</option>
-                  <option value="louga">Louga</option>
-                  <option value="fatick">Fatick</option>
-                  <option value="kaolack">Kaolack</option>
-                  <option value="tambacounda">Tambacounda</option>
-                  <option value="kolda">Kolda</option>
-                  <option value="ziguinchor">Ziguinchor</option>
-                  <option value="matam">Matam</option>
-                  <option value="kaffrine">Kaffrine</option>
-                  <option value="kedougou">Kédougou</option>
-                  <option value="sedhiou">Sédhiou</option>
-                </select>
+                  class="form-control">
               </div>
               <div class="error-message" *ngIf="isFieldInvalid('department')">
                 {{ getFieldError('department') }}
@@ -397,5 +383,40 @@
         </p>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Modal de succès d'inscription -->
+<div class="success-modal-overlay" *ngIf="showSuccessModal" (click)="onCloseSuccessModal()">
+  <div class="success-modal" (click)="$event.stopPropagation()">
+    <div class="success-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h2>Inscription réussie !</h2>
+    <p class="success-message">
+      Votre compte a été créé avec succès. Un email de confirmation a été envoyé à 
+      <strong>{{ registrationEmail }}</strong>
+    </p>
+    <div class="info-box">
+      <i class="fas fa-info-circle"></i>
+      <div class="info-content">
+        <h4>Activation du compte</h4>
+        <p>
+          Votre compte sera activé dans les <strong>48 heures</strong> suivant votre inscription. 
+          Vous recevrez une notification par email dès que votre compte sera activé.
+        </p>
+      </div>
+    </div>
+    <div class="instructions">
+      <h4>Prochaines étapes :</h4>
+      <ul>
+        <li><i class="fas fa-envelope"></i> Vérifiez votre boîte email (et vos spams)</li>
+        <li><i class="fas fa-clock"></i> Attendez la confirmation d'activation (sous 48h)</li>
+        <li><i class="fas fa-sign-in-alt"></i> Connectez-vous une fois votre compte activé</li>
+      </ul>
+    </div>
+    <button class="btn-close-modal" (click)="onCloseSuccessModal()">
+      Compris, retour à la connexion
+    </button>
   </div>
 </div>

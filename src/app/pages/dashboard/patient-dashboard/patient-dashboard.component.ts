@@ -41,9 +41,22 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.checkAccountStatus();
     this.loadUserProfile();
     this.loadUpcomingAppointments();
     this.loadAppointmentHistory();
+  }
+
+  private checkAccountStatus(): void {
+    const user = this.authService.getCurrentUser();
+    if (user && !user.isActive) {
+      this.showNotificationMessage(
+        'Votre compte est en attente d\'activation. Vous recevrez une notification par email une fois votre compte activé.',
+        'warning'
+      );
+      // Optionnel: rediriger vers une page d'attente
+      // this.router.navigate(['/account-pending']);
+    }
   }
 
   loadUserProfile(): void {

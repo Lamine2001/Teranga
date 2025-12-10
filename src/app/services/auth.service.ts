@@ -125,34 +125,34 @@ export class AuthService {
       );
   }
 
-  register(data: RegisterData): Observable<{ success: boolean; user?: User; error?: string }> {
+  register(data: RegisterData): Observable<{ success: boolean; user?: User; error?: string; message?: string; info?: string }> {
     return this.http.post<any>(`${this.apiUrl}/register`, data, this.httpOptions)
       .pipe(
         map(response => {
           console.log('=== REGISTER RESPONSE DEBUG ===');
           console.log('Full response:', response);
           
-          // Response should have the structure: { user: UserResponseDTO, token: string }
-          let token = response.token;
-          let userData = response.user;
-          
-          if (!token || !userData) {
-            return { success: false, error: 'Réponse invalide du serveur' };
+          // Response has the structure: { success, message, userId, email, firstName, lastName, role, accountStatus, info }
+          if (!response.success) {
+            return { 
+              success: false, 
+              error: response.message || 'Erreur lors de l\'inscription' 
+            };
           }
           
-          // Map UserResponseDTO to User interface
+          // Map response to User interface
           const user: User = {
-            id: userData.userId,
-            email: userData.email,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            phone: userData.phone,
-            userType: userData.userType,
-            isActive: userData.isActive,
-            createdAt: userData.createdAt
+            id: response.userId,
+            email: response.email,
+            firstName: response.firstName,
+            lastName: response.lastName,
+            phone: data.phone, // From registration data
+            userType: response.role,
+            isActive: response.accountStatus !== 'pending_activation',
+            createdAt: new Date().toISOString()
           } as User;
           
-          // Keep userType in uppercase format
+          // Normalize userType
           if (user.userType) {
             const normalizedType = user.userType.toUpperCase();
             if (normalizedType === 'DOCTOR' || normalizedType === 'DOCTEUR') {
@@ -164,17 +164,20 @@ export class AuthService {
           
           console.log('Registered user:', user);
           console.log('User userType:', user.userType);
+          console.log('Account status:', response.accountStatus);
           
-          // Store token
-          if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('token', token);
-          }
+          // Note: No token is provided during registration
+          // User needs to login after account activation
           
-          this.setCurrentUser(user);
-          return { success: true, user: user };
+          return { 
+            success: true, 
+            user: user,
+            message: response.message,
+            info: response.info
+          };
         }),
         catchError(error => {
+          console.error('Registration error:', error);
           const errorMessage = this.errorHandler.handleHttpError(error);
           return of({ success: false, error: errorMessage });
         })
@@ -548,7 +551,7 @@ export class AuthService {
     return user.userType || null;
   }
 }
-  
+
 
 
 

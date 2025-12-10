@@ -20,7 +20,11 @@ export class RegisterFormComponent implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
   passwordStrength = 0;
-  currentStep = 1; // Add current step tracking
+  currentStep = 1;
+  
+  // Propriétés pour le modal de succès
+  showSuccessModal = false;
+  registrationEmail = '';
 
   constructor(
     private fb: FormBuilder,
@@ -31,7 +35,7 @@ export class RegisterFormComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^\+221\s?[0-9]{2}\s?[0-9]{3}\s?[0-9]{2}\s?[0-9]{2}$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^[\+]?[0-9\s]{8,15}$/)]],
       userType: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
@@ -52,9 +56,9 @@ export class RegisterFormComponent implements OnInit {
 
   ngOnInit(): void {
     // Check if user is already authenticated
-    if (this.authService.isAuthenticated()) {
-      this.redirectBasedOnRole();
-    }
+   // if (this.authService.isAuthenticated()) {
+    //  this.redirectBasedOnRole();
+   // }
 
     // Listen to user type changes to show/hide relevant fields
     this.registerForm.get('userType')?.valueChanges.subscribe(userType => {
@@ -155,17 +159,31 @@ export class RegisterFormComponent implements OnInit {
 
       this.authService.register(registrationData).subscribe({
         next: (response) => {
+          console.log('Registration response:', response);
+          
           if (response.success) {
-            this.redirectBasedOnRole();
+            // Store registration email for the success modal
+            this.registrationEmail = formData.email;
+            
+            // Show success modal with the message and info from backend
+            this.showSuccessModal = true;
+            
+            // Optionally log the messages
+            if (response.message) {
+              console.log('Success message:', response.message);
+            }
+            if (response.info) {
+              console.log('Info message:', response.info);
+            }
           } else {
-            this.errorMessage = response.error || 'Registration failed';
+            this.errorMessage = response.error || 'Erreur lors de l\'inscription';
           }
+          
+          this.isLoading = false;
         },
         error: (error) => {
-          this.errorMessage = 'An error occurred during registration. Please try again.';
           console.error('Registration error:', error);
-        },
-        complete: () => {
+          this.errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
           this.isLoading = false;
         }
       });
@@ -181,6 +199,12 @@ export class RegisterFormComponent implements OnInit {
     } else {
       this.router.navigate(['/patient-dashboard']);
     }
+  }
+
+  onCloseSuccessModal(): void {
+    this.showSuccessModal = false;
+    // Rediriger vers la page de connexion
+    this.router.navigate(['/auth']);
   }
 
   private markFormGroupTouched(): void {
@@ -215,7 +239,7 @@ export class RegisterFormComponent implements OnInit {
       }
       if (field.errors?.['pattern']) {
         if (fieldName === 'phone') {
-          return 'Format de téléphone invalide. Utilisez le format: +221 XX XXX XX XX';
+          return 'Téléphone invalide (8 à 15 chiffres, avec ou sans +)';
         }
         return `${this.getFieldLabel(fieldName)} a un format invalide`;
       }
@@ -236,7 +260,7 @@ export class RegisterFormComponent implements OnInit {
       address: 'Adresse',
       specialty: 'Spécialité',
       licenseNumber: 'Numéro de licence',
-      department: 'Département'
+      department: 'Ville/Région d\'exercice'
     };
     return labels[fieldName] || fieldName;
   }
