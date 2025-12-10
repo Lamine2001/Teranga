@@ -1,0 +1,128 @@
+<div class="appointments-table-container">
+  <div class="table-header">
+    <h3><i class="fas fa-calendar-alt"></i> {{ getTitle() }}</h3>
+    <button class="btn-refresh" (click)="loadAppointments()">
+      <i class="fas fa-sync-alt"></i> Actualiser
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement des rendez-vous...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !isLoading" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && appointments.length === 0" class="empty-state">
+    <i class="fas fa-calendar-times fa-3x"></i>
+    <h4>Aucun rendez-vous</h4>
+    <p>Aucun rendez-vous {{ type === 'today' ? 'aujourd\'hui' : type === 'upcoming' ? 'à venir' : 'dans l\'historique' }}</p>
+  </div>
+
+  <!-- Appointments Table -->
+  <div *ngIf="!isLoading && appointments.length > 0" class="table-wrapper">
+    <table class="appointments-table">
+      <thead>
+        <tr>
+          <th><i class="fas fa-user"></i> Patient</th>
+          <th><i class="fas fa-calendar"></i> Date</th>
+          <th><i class="fas fa-clock"></i> Heure</th>
+          <th><i class="fas fa-video"></i> Type</th>
+          <th><i class="fas fa-phone"></i> Contact</th>
+          <th><i class="fas fa-info-circle"></i> Statut</th>
+          <th><i class="fas fa-cog"></i> Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let appointment of appointments" 
+            [class.today]="isToday(appointment.appointmentTime)"
+            [class.virtual]="appointment.appointmentType === 'virtual'">
+          
+          <!-- Patient Info -->
+          <td class="patient-cell">
+            <div class="patient-info">
+              <div class="patient-avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <div class="patient-details">
+                <strong>{{ appointment.patientFirstName }} {{ appointment.patientLastName }}</strong>
+                <small *ngIf="appointment.patientEmail">{{ appointment.patientEmail }}</small>
+              </div>
+            </div>
+          </td>
+
+          <!-- Date -->
+          <td class="date-cell">
+            <div class="date-display">
+              <i class="fas fa-calendar-day"></i>
+              <span>{{ formatDate(appointment.appointmentTime) }}</span>
+            </div>
+          </td>
+
+          <!-- Time -->
+          <td class="time-cell">
+            <div class="time-display">
+              <i class="fas fa-clock"></i>
+              <span>{{ formatTime(appointment.appointmentTime) }}</span>
+            </div>
+          </td>
+
+          <!-- Type -->
+          <td class="type-cell">
+            <span class="type-badge" [class.virtual]="appointment.appointmentType === 'virtual'">
+              <i [class]="appointment.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
+              {{ appointment.appointmentType === 'virtual' ? 'Téléconsultation' : 'En cabinet' }}
+            </span>
+          </td>
+
+          <!-- Contact -->
+          <td class="contact-cell">
+            <div class="contact-info">
+              <a [href]="'tel:' + appointment.patientPhone" *ngIf="appointment.patientPhone">
+                <i class="fas fa-phone"></i> {{ appointment.patientPhone }}
+              </a>
+              <span *ngIf="!appointment.patientPhone" class="text-muted">Non renseigné</span>
+            </div>
+          </td>
+
+          <!-- Status -->
+          <td class="status-cell">
+            <span class="status-badge" [class]="'status-' + appointment.status.toLowerCase()">
+              {{ getStatusLabel(appointment.status) }}
+            </span>
+          </td>
+
+          <!-- Actions -->
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <button class="btn-icon btn-success" 
+                      *ngIf="type === 'today' && appointment.status === 'CONFIRMED'"
+                      (click)="startConsultation(appointment)"
+                      title="Commencer la consultation">
+                <i class="fas fa-play-circle"></i>
+              </button>
+              <button class="btn-icon btn-primary" 
+                      *ngIf="appointment.appointmentType === 'virtual' && type === 'today' && appointment.status === 'CONFIRMED'"
+                      (click)="startVideoConsultation(appointment)"
+                      title="Vidéo consultation">
+                <i class="fas fa-video"></i>
+              </button>
+              <button class="btn-icon btn-danger" 
+                      *ngIf="appointment.status === 'CONFIRMED' && type !== 'history'"
+                      (click)="cancelAppointment(appointment)"
+                      title="Annuler">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

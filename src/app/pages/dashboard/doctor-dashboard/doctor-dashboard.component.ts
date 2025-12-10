@@ -7,6 +7,7 @@ import { User } from '../../../interfaces/user';
 import { CreateAvailabilityComponent } from '../../../components/availability/create-availability/create-availability.component';
 import { ViewAvailabilityComponent } from '../../../components/availability/view-availability/view-availability.component';
 import { DoctorAppointmentsComponent } from '../../../components/appointments/doctor-appointments/doctor-appointments.component';
+import { DoctorAppointmentsTableComponent } from '../../../components/appointments/doctor-appointments-table/doctor-appointments-table.component';
 import { ConsultationManagementComponent } from '../../../components/consultations/consultation-management/consultation-management.component';
 import { UserManagementComponent } from '../../../components/admin/user-management/user-management.component';
 import { PatientManagementComponent } from '../../../components/patients/patient-management/patient-management.component';
@@ -55,6 +56,7 @@ interface DashboardStats {
     CreateAvailabilityComponent,
     ViewAvailabilityComponent,
     DoctorAppointmentsComponent,
+    DoctorAppointmentsTableComponent,
     ConsultationManagementComponent,
     UserManagementComponent,
     PatientManagementComponent

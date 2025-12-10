@@ -208,17 +208,17 @@
         <div *ngIf="activeSection === 'appointments'">
           <!-- Today's Appointments -->
           <div *ngIf="activeSubSection === 'today-appointments'">
-            <app-doctor-appointments type="today"></app-doctor-appointments>
+            <app-doctor-appointments-table type="today"></app-doctor-appointments-table>
           </div>
 
           <!-- Upcoming Appointments -->
           <div *ngIf="activeSubSection === 'upcoming-appointments'">
-            <app-doctor-appointments type="upcoming"></app-doctor-appointments>
+            <app-doctor-appointments-table type="upcoming"></app-doctor-appointments-table>
           </div>
 
           <!-- Appointment History -->
           <div *ngIf="activeSubSection === 'appointment-history'">
-            <app-doctor-appointments type="history"></app-doctor-appointments>
+            <app-doctor-appointments-table type="history"></app-doctor-appointments-table>
           </div>
 
           <!-- Cancel Appointment -->
