@@ -2,6 +2,8 @@
   background: white;
   border-radius: 10px;
   padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .view-header {
@@ -10,7 +12,7 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #e0e0e0;
 }
 
 .view-header h3 {
@@ -19,62 +21,427 @@
   align-items: center;
   gap: 10px;
   color: #333;
-  font-size: 20px;
+  font-size: 1.75rem;
 }
 
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 15px;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+.current-period {
+  font-weight: 600;
+  color: #555;
+  min-width: 200px;
+  text-align: center;
+}
+
+/* Calendar Styles */
+.calendar-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.btn-primary:hover {
+.calendar-day-header {
+  padding: 15px;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.calendar-day-header:last-child {
+  border-right: none;
+}
+
+.day-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.day-date {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  min-height: 500px;
+}
+
+.calendar-day {
+  border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px;
+  background: #fafafa;
+  transition: background 0.2s;
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day.today {
+  background: #fff8e1;
+  box-shadow: inset 0 0 0 2px #ffc107;
+}
+
+.day-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.empty-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #bbb;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 20px;
+}
+
+.empty-day i {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+/* Availability Slots */
+.availability-slot {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid #4caf50;
+}
+
+.availability-slot:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 13px;
+.availability-slot.blocked {
+  border-left-color: #f44336;
+  background: #ffebee;
 }
 
-.btn-warning {
-  background: #ffc107;
+.availability-slot.has-bookings {
+  border-left-color: #2196f3;
+}
+
+.slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.slot-time {
+  font-weight: 600;
+  font-size: 0.85rem;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.btn-warning:hover {
-  background: #e0a800;
+.slot-time i {
+  color: #667eea;
+  font-size: 0.9rem;
 }
 
-.btn-success {
+.slot-status {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #e8f5e9;
+  color: #2e7d32;
+  text-transform: uppercase;
+}
+
+.slot-status.blocked {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.slot-info {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.duration-badge,
+.slots-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.duration-badge i {
+  color: #ff9800;
+}
+
+/* Mini Slots Preview */
+.mini-slots {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.mini-slot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e0e0e0;
+}
+
+.mini-slot.available {
+  background: #4caf50;
+}
+
+.mini-slot.booked {
+  background: #f44336;
+}
+
+.more-slots {
+  font-size: 0.7rem;
+  color: #666;
+  padding: 0 4px;
+}
+
+/* Slot Actions */
+.slot-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.btn-icon {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  background: #f5f5f5;
+  color: #666;
+}
+
+.btn-icon:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-icon.btn-warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.btn-icon.btn-warning:hover {
+  background: #ffc107;
+  color: white;
+}
+
+.btn-icon.btn-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.btn-icon.btn-success:hover {
   background: #28a745;
   color: white;
 }
 
-.btn-success:hover {
-  background: #218838;
+.btn-icon.btn-danger {
+  background: #f8d7da;
+  color: #721c24;
 }
 
-.btn-danger {
+.btn-icon.btn-danger:hover {
   background: #dc3545;
   color: white;
 }
 
-.btn-danger:hover {
-  background: #c82333;
+.btn-icon.btn-info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.btn-icon.btn-info:hover {
+  background: #17a2b8;
+  color: white;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.modal-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.btn-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.detail-info {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.detail-info p {
+  margin: 8px 0;
+  color: #555;
+}
+
+.slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.slot-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.slot-detail-item.booked {
+  border-left-color: #f44336;
+  background: #ffebee;
+}
+
+.slot-time-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.slot-time-detail i {
+  color: #667eea;
+}
+
+.slot-status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #e8f5e9;
+  color: #2e7d32;
+  text-transform: uppercase;
+}
+
+.slot-status-badge.booked {
+  background: #ffebee;
+  color: #c62828;
 }
 
 /* Loading State */
@@ -315,7 +682,34 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .calendar-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .calendar-header {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .calendar-header {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-actions {
+    flex-wrap: wrap;
+  }
+  
+  .current-period {
+    min-width: auto;
+    font-size: 0.9rem;
+  }
+  
   .availabilities-grid {
     grid-template-columns: 1fr;
   }

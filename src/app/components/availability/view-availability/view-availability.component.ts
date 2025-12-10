@@ -12,15 +12,100 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./view-availability.component.css']
 })
 export class ViewAvailabilityComponent implements OnInit {
-  availabilities: Availability[] = [];
+  availabilities: any[] = [];
   loading = false;
   error = '';
   successMessage = '';
 
+  // Calendar properties
+  currentWeekStart: Date = new Date();
+  weekDays: { date: Date; dayName: string }[] = [];
+  selectedAvailability: any = null;
+
   constructor(private availabilityService: AvailabilityService) {}
 
   ngOnInit(): void {
+    this.initializeWeek();
     this.loadAvailabilities();
+  }
+
+  private initializeWeek(): void {
+    const today = new Date();
+    // Get Monday of current week
+    const dayOfWeek = today.getDay();
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Handle Sunday
+    this.currentWeekStart = new Date(today);
+    this.currentWeekStart.setDate(today.getDate() + diff);
+    this.currentWeekStart.setHours(0, 0, 0, 0);
+    
+    this.generateWeekDays();
+  }
+
+  private generateWeekDays(): void {
+    this.weekDays = [];
+    const dayNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(this.currentWeekStart);
+      date.setDate(this.currentWeekStart.getDate() + i);
+      this.weekDays.push({
+        date: date,
+        dayName: dayNames[i]
+      });
+    }
+  }
+
+  previousWeek(): void {
+    this.currentWeekStart.setDate(this.currentWeekStart.getDate() - 7);
+    this.generateWeekDays();
+  }
+
+  nextWeek(): void {
+    this.currentWeekStart.setDate(this.currentWeekStart.getDate() + 7);
+    this.generateWeekDays();
+  }
+
+  getCurrentPeriodLabel(): string {
+    const endDate = new Date(this.currentWeekStart);
+    endDate.setDate(this.currentWeekStart.getDate() + 6);
+    
+    return `${this.formatDate(this.currentWeekStart.toISOString())} - ${this.formatDate(endDate.toISOString())}`;
+  }
+
+  getAvailabilitiesForDay(date: Date): any[] {
+    return this.availabilities.filter(availability => {
+      const availabilityDate = new Date(availability.startTime);
+      return this.isSameDay(availabilityDate, date);
+    });
+  }
+
+  private isSameDay(date1: Date, date2: Date): boolean {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+  }
+
+  isToday(date: Date): boolean {
+    const today = new Date();
+    return this.isSameDay(date, today);
+  }
+
+  hasBookings(availability: any): boolean {
+    if (!availability.slots) return false;
+    return availability.slots.some((slot: any) => slot.isBooked);
+  }
+
+  getAvailableSlotsCount(availability: any): number {
+    if (!availability.slots) return 0;
+    return availability.slots.filter((slot: any) => slot.isAvailable && !slot.isBooked).length;
+  }
+
+  showSlotDetails(availability: any): void {
+    this.selectedAvailability = availability;
+  }
+
+  closeSlotDetails(): void {
+    this.selectedAvailability = null;
   }
 
   loadAvailabilities(): void {
