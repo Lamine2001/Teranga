@@ -3,38 +3,39 @@
     <div class="modal-header">
       <h2 class="modal-title">Détails du Rendez-vous</h2>
       <button class="close-button" (click)="close()" aria-label="Fermer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        <i class="fas fa-times"></i>
       </button>
     </div>
 
     <div class="modal-body">
       <!-- Status Badge -->
       <div class="status-section">
-        <span class="status-badge" [ngClass]="getStatusClass(appointment.status)">
+        <span class="status-badge" [class]="'status-' + appointment.status.toLowerCase()">
           {{ getStatusLabel(appointment.status) }}
         </span>
       </div>
 
-      <!-- Patient Information -->
+      <!-- Doctor Information -->
       <div class="detail-section">
         <h3 class="section-title">
-          <i class="fas fa-user"></i> Informations Patient
+          <i class="fas fa-user-md"></i> Informations du Médecin
         </h3>
         <div class="detail-grid">
           <div class="detail-item">
             <span class="detail-label">Nom complet</span>
-            <span class="detail-value">{{ appointment.patientFirstName }} {{ appointment.patientLastName }}</span>
+            <span class="detail-value">Dr. {{ appointment.doctorFirstName }} {{ appointment.doctorLastName }}</span>
           </div>
-          <div class="detail-item" *ngIf="appointment.patientEmail">
+          <div class="detail-item" *ngIf="appointment.doctorSpecialty">
+            <span class="detail-label">Spécialité</span>
+            <span class="detail-value">{{ appointment.doctorSpecialty }}</span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.doctorDepartment">
+            <span class="detail-label">Département</span>
+            <span class="detail-value">{{ appointment.doctorDepartment }}</span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.doctorEmail">
             <span class="detail-label">Email</span>
-            <span class="detail-value">{{ appointment.patientEmail }}</span>
-          </div>
-          <div class="detail-item" *ngIf="appointment.patientPhone">
-            <span class="detail-label">Téléphone</span>
-            <span class="detail-value">{{ appointment.patientPhone }}</span>
+            <span class="detail-value">{{ appointment.doctorEmail }}</span>
           </div>
         </div>
       </div>
@@ -50,20 +51,52 @@
             <span class="detail-value">{{ getDateDisplay(appointment.appointmentTime) }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">Heure</span>
-            <span class="detail-value">{{ getTimeDisplay(appointment.appointmentTime) }} - {{ getTimeDisplay(appointment.endTime) }}</span>
+            <span class="detail-label">Heure de début</span>
+            <span class="detail-value">{{ getTimeDisplay(appointment.appointmentTime) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Heure de fin</span>
+            <span class="detail-value">{{ getTimeDisplay(appointment.endTime) }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Type de consultation</span>
             <span class="detail-value">
               <i [class]="appointment.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
-              {{ getTypeLabel(appointment.appointmentType) }}
+              {{ appointment.appointmentType === 'virtual' ? 'Téléconsultation' : 'En cabinet' }}
             </span>
           </div>
           <div class="detail-item" *ngIf="appointment.consultationFee">
             <span class="detail-label">Frais de consultation</span>
             <span class="detail-value">{{ appointment.consultationFee }} FCFA</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Meeting Details (for virtual appointments) -->
+      <div class="detail-section" *ngIf="appointment.appointmentType === 'virtual' && appointment.meetingLink">
+        <h3 class="section-title">
+          <i class="fas fa-video"></i> Détails de la Téléconsultation
+        </h3>
+        <div class="meeting-info">
+          <div class="meeting-link">
+            <i class="fas fa-link"></i>
+            <a [href]="appointment.meetingLink" target="_blank">Rejoindre la consultation</a>
+          </div>
+          <div class="meeting-details" *ngIf="appointment.meetingId">
+            <p><strong>ID:</strong> {{ appointment.meetingId }}</p>
+            <p *ngIf="appointment.meetingPasscode"><strong>Code:</strong> {{ appointment.meetingPasscode }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location Details (for onsite appointments) -->
+      <div class="detail-section" *ngIf="appointment.appointmentType === 'onsite' && appointment.clinicLocation">
+        <h3 class="section-title">
+          <i class="fas fa-map-marker-alt"></i> Lieu de Consultation
+        </h3>
+        <div class="location-info">
+          <p><strong>{{ appointment.clinicLocation }}</strong></p>
+          <p *ngIf="appointment.clinicAddress">{{ appointment.clinicAddress }}</p>
         </div>
       </div>
 

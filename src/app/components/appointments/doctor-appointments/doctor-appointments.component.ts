@@ -5,21 +5,7 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AppointmentDetailsModalComponent } from '../../../shared/components/appointment-details-modal/appointment-details-modal.component';
-
-interface Appointment {
-  id: number;
-  patientId?: number; // Added for consultation creation
-  patientFirstName: string;
-  patientLastName: string;
-  patientEmail: string;
-  patientPhone: string;
-  appointmentTime: string;
-  endTime: string;
-  appointmentType: 'virtual' | 'onsite';
-  status: string;
-  notes?: string;
-  consultationFee?: number;
-}
+import { AppointmentResponseDTO } from '../../../services/appointment.service';
 
 @Component({
   selector: 'app-doctor-appointments',
@@ -348,13 +334,13 @@ interface Appointment {
 export class DoctorAppointmentsComponent implements OnInit {
   @Input() type: 'today' | 'upcoming' | 'history' = 'today';
   
-  appointments: Appointment[] = [];
+  appointments: AppointmentResponseDTO[] = [];
   isLoading = false;
   error = '';
   
   // Propriétés pour le modal de détails
   showDetailsModal = false;
-  selectedAppointment: Appointment | null = null;
+  selectedAppointment: AppointmentResponseDTO | null = null;
   
   private readonly apiUrl = `${environment.apiUrl}/appointments/doctor`;
 
@@ -378,7 +364,7 @@ export class DoctorAppointmentsComponent implements OnInit {
 
     let endpoint = `${this.apiUrl}/${this.type}`;
     
-    this.http.get<Appointment[]>(endpoint, { headers }).subscribe({
+    this.http.get<AppointmentResponseDTO[]>(endpoint, { headers }).subscribe({
       next: (data) => {
         this.appointments = data;
         this.isLoading = false;
@@ -434,7 +420,7 @@ export class DoctorAppointmentsComponent implements OnInit {
    * This navigates to the consultation creation page with appointment ID
    * The patient will be automatically associated with the consultation
    */
-  startConsultation(appointment: Appointment) {
+  startConsultation(appointment: AppointmentResponseDTO) {
     // Navigate to consultation creation with appointmentId parameter
     // The CreateConsultationComponent will automatically:
     // 1. Load patient info from appointment
@@ -444,7 +430,7 @@ export class DoctorAppointmentsComponent implements OnInit {
     this.router.navigate(['/consultations/create', appointment.id]);
   }
 
-  viewDetails(appointment: Appointment) {
+  viewDetails(appointment: AppointmentResponseDTO) {
     this.selectedAppointment = appointment;
     this.showDetailsModal = true;
   }
@@ -454,12 +440,12 @@ export class DoctorAppointmentsComponent implements OnInit {
     this.selectedAppointment = null;
   }
 
-  startVideoConsultation(appointment: Appointment) {
+  startVideoConsultation(appointment: AppointmentResponseDTO) {
     // Navigate to video consultation room
     this.router.navigate(['/consultations/video', appointment.id]);
   }
 
-  cancelAppointment(appointment: Appointment) {
+  cancelAppointment(appointment: AppointmentResponseDTO) {
     if (confirm(`Êtes-vous sûr de vouloir annuler ce rendez-vous avec ${appointment.patientFirstName} ${appointment.patientLastName} ?`)) {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const headers = new HttpHeaders({

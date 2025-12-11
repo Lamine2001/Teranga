@@ -225,22 +225,29 @@
   </div>
 
   <!-- Modal de confirmation -->
-<app-confirm-dialog
-  [isOpen]="showConfirmDialog"
-  [title]="confirmDialogTitle"
-  [message]="confirmDialogMessage"
-  [confirmText]="'Annuler le rendez-vous'"
-  [cancelText]="'Garder'"
-  [type]="'danger'"
-  (confirmed)="onConfirmCancel()"
-  (cancelled)="onCancelDialog()">
-</app-confirm-dialog>
+  <app-confirm-dialog
+    [isOpen]="showConfirmDialog"
+    [title]="confirmDialogTitle"
+    [message]="confirmDialogMessage"
+    [confirmText]="'Annuler le rendez-vous'"
+    [cancelText]="'Garder'"
+    [type]="'danger'"
+    (confirmed)="onConfirmCancel()"
+    (cancelled)="onCancelDialog()">
+  </app-confirm-dialog>
 
-<!-- Notification -->
-<app-notification
-  [isVisible]="showNotification"
-  [message]="notificationMessage"
-  [type]="notificationType"
-  (closed)="onNotificationClosed()">
-</app-notification>
+  <!-- Modal de détails -->
+  <app-appointment-details-modal
+    [isOpen]="showDetailsModal"
+    [appointment]="selectedAppointment"
+    (closed)="closeDetailsModal()">
+  </app-appointment-details-modal>
+
+  <!-- Notification -->
+  <app-notification
+    [isVisible]="showNotification"
+    [message]="notificationMessage"
+    [type]="notificationType"
+    (closed)="onNotificationClosed()">
+  </app-notification>
 </div>

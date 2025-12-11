@@ -1,20 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-interface Appointment {
-  id: number;
-  patientId?: number;
-  patientFirstName: string;
-  patientLastName: string;
-  patientEmail: string;
-  patientPhone: string;
-  appointmentTime: string;
-  endTime: string;
-  appointmentType: 'virtual' | 'onsite';
-  status: string;
-  notes?: string;
-  consultationFee?: number;
-}
+import { AppointmentResponseDTO } from '../../../services/appointment.service';
 
 @Component({
   selector: 'app-appointment-details-modal',
@@ -25,11 +11,10 @@ interface Appointment {
 })
 export class AppointmentDetailsModalComponent {
   @Input() isOpen = false;
-  @Input() appointment: Appointment | null = null;
+  @Input() appointment: AppointmentResponseDTO | null = null;
   @Output() closed = new EventEmitter<void>();
 
   close(): void {
-    this.isOpen = false;
     this.closed.emit();
   }
 
@@ -67,13 +52,5 @@ export class AppointmentDetailsModalComponent {
       'COMPLETED': 'Terminé'
     };
     return statusLabels[status] || status;
-  }
-
-  getStatusClass(status: string): string {
-    return `status-${status.toLowerCase()}`;
-  }
-
-  getTypeLabel(type: string): string {
-    return type === 'virtual' ? 'Téléconsultation' : 'Consultation en cabinet';
   }
 }
