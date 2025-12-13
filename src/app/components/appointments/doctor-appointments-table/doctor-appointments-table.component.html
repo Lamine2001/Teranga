@@ -6,6 +6,25 @@
     </button>
   </div>
 
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-wrapper">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (ngModelChange)="onSearchChange()"
+        placeholder="Rechercher par nom, email ou téléphone du patient..." 
+        class="search-input">
+      <button *ngIf="searchQuery" (click)="searchQuery = ''; onSearchChange()" class="btn-clear-search">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="search-info" *ngIf="searchQuery">
+      {{ filteredAppointments.length }} résultat(s) trouvé(s) pour "{{ searchQuery }}"
+    </div>
+  </div>
+
   <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <i class="fas fa-spinner fa-spin"></i>
@@ -25,8 +44,15 @@
     <p>Aucun rendez-vous {{ type === 'today' ? 'aujourd\'hui' : type === 'upcoming' ? 'à venir' : 'dans l\'historique' }}</p>
   </div>
 
+  <!-- No Results -->
+  <div *ngIf="!isLoading && !error && appointments.length > 0 && filteredAppointments.length === 0" class="empty-state">
+    <i class="fas fa-search fa-3x"></i>
+    <h4>Aucun résultat</h4>
+    <p>Aucun rendez-vous ne correspond à votre recherche</p>
+  </div>
+
   <!-- Appointments Table -->
-  <div *ngIf="!isLoading && appointments.length > 0" class="table-wrapper">
+  <div *ngIf="!isLoading && filteredAppointments.length > 0" class="table-wrapper">
     <table class="appointments-table">
       <thead>
         <tr>
@@ -40,7 +66,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let appointment of appointments" 
+        <tr *ngFor="let appointment of getPaginatedAppointments()" 
             [class.today]="isToday(appointment.appointmentTime)"
             [class.virtual]="appointment.appointmentType === 'virtual'">
           
@@ -113,6 +139,11 @@
                       title="Vidéo consultation">
                 <i class="fas fa-video"></i>
               </button>
+              <button class="btn-icon btn-info" 
+                      (click)="viewDetails(appointment)"
+                      title="Voir les détails">
+                <i class="fas fa-eye"></i>
+              </button>
               <button class="btn-icon btn-danger" 
                       *ngIf="appointment.status === 'CONFIRMED' && type !== 'history'"
                       (click)="cancelAppointment(appointment)"
@@ -124,5 +155,93 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination-info">
+        Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à 
+        {{ currentPage * itemsPerPage > filteredAppointments.length ? filteredAppointments.length : currentPage * itemsPerPage }} 
+        sur {{ filteredAppointments.length }} rendez-vous
+      </div>
+      
+      <div class="pagination-controls">
+        <button 
+          class="btn-page" 
+          (click)="onPageChange(1)" 
+          [disabled]="currentPage === 1"
+          title="Première page">
+          <i class="fas fa-angle-double-left"></i>
+        </button>
+        
+        <button 
+          class="btn-page" 
+          (click)="onPageChange(currentPage - 1)" 
+          [disabled]="currentPage === 1"
+          title="Page précédente">
+          <i class="fas fa-angle-left"></i>
+        </button>
+        
+        <button 
+          *ngFor="let page of getPageNumbers()" 
+          class="btn-page" 
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+        
+        <button 
+          class="btn-page" 
+          (click)="onPageChange(currentPage + 1)" 
+          [disabled]="currentPage === totalPages"
+          title="Page suivante">
+          <i class="fas fa-angle-right"></i>
+        </button>
+        
+        <button 
+          class="btn-page" 
+          (click)="onPageChange(totalPages)" 
+          [disabled]="currentPage === totalPages"
+          title="Dernière page">
+          <i class="fas fa-angle-double-right"></i>
+        </button>
+      </div>
+
+      <div class="items-per-page">
+        <label>Éléments par page:</label>
+        <select [(ngModel)]="itemsPerPage" (ngModelChange)="currentPage = 1; applyFilters()">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Modal de confirmation -->
+<app-confirm-dialog
+  [isOpen]="showConfirmDialog"
+  [title]="confirmDialogTitle"
+  [message]="confirmDialogMessage"
+  [confirmText]="'Annuler le rendez-vous'"
+  [cancelText]="'Garder'"
+  [type]="'danger'"
+  (confirmed)="onConfirmCancel()"
+  (cancelled)="onCancelDialog()">
+</app-confirm-dialog>
+
+<!-- Modal de détails -->
+<app-appointment-details-modal
+  [isOpen]="showDetailsModal"
+  [appointment]="selectedAppointment"
+  (closed)="closeDetailsModal()">
+</app-appointment-details-modal>
+
+<!-- Notification -->
+<app-notification
+  [isVisible]="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  (closed)="onNotificationClosed()">
+</app-notification>
