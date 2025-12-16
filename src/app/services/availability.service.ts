@@ -4,12 +4,13 @@ import { Observable, throwError, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { CreateAvailabilityRequest } from '../interfaces/availability.interface';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AvailabilityService {
-  private apiUrl = 'http://localhost:8080/api/availability';
+  private apiUrl = environment.apiUrl + '/availability';
 
   constructor(
     private http: HttpClient,
