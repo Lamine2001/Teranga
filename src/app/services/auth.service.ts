@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = environment.apiUrl + '/auth';
   private tokenKey = 'token';
   private userKey = 'user';
   private currentUserSubject = new BehaviorSubject<User | null>(null);

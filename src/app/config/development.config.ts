@@ -1,4 +1,5 @@
 import { InjectionToken } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 /**
  * Configuration for development mode
@@ -39,5 +40,5 @@ export function getServiceUrl(servicePath: string): string {
     // Return a mock URL or use interceptors
     return `/mock${servicePath}`;
   }
-  return `http://localhost:8080/api${servicePath}`;
+  return environment.apiUrl + servicePath;
 }
