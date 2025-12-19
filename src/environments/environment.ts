@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://xn--m-sant-gva.com/api'
+  apiUrl: 'https://xn--m-sant-gva.com/api'
 };
 
