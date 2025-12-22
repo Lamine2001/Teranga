@@ -1,0 +1,446 @@
+<div class="appointment-wizard-container">
+  <!-- Stepper Header -->
+  <div class="wizard-header">
+    <div class="wizard-steps">
+      <div 
+        *ngFor="let step of getVisibleSteps(); let i = index"
+        class="wizard-step"
+        [class.active]="isStepActive(step.id)"
+        [class.completed]="isStepCompleted(step.id)"
+        [class.clickable]="canNavigateToStep(step.id)"
+        (click)="goToStep(step.id)"
+      >
+        <div class="step-number">
+          <i *ngIf="isStepCompleted(step.id)" class="fas fa-check"></i>
+          <span *ngIf="!isStepCompleted(step.id)">{{ getStepNumber(step.id) }}</span>
+        </div>
+        <div class="step-label">
+          <i [class]="step.icon"></i>
+          <span>{{ step.label }}</span>
+        </div>
+        <div *ngIf="i < getVisibleSteps().length - 1" class="step-connector"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step Content -->
+  <div class="wizard-content">
+    <!-- Étape 1: Mode de consultation -->
+    <div *ngIf="currentStep === 'consultation-mode'" class="step-content">
+      <div class="step-header">
+        <h2><i class="fas fa-video"></i> Comment souhaitez-vous consulter ?</h2>
+        <p>Choisissez le mode de consultation qui vous convient le mieux</p>
+      </div>
+      
+      <div class="consultation-modes">
+        <div class="mode-card" (click)="onConsultationModeSelected('video')">
+          <i class="fas fa-video"></i>
+          <h3>Téléconsultation</h3>
+          <p>Consultez à distance par vidéo</p>
+          <button class="btn-primary">Choisir <i class="fas fa-arrow-right"></i></button>
+        </div>
+        
+        <div class="mode-card" (click)="onConsultationModeSelected('onsite')">
+          <i class="fas fa-hospital"></i>
+          <h3>En cabinet</h3>
+          <p>Rendez-vous physique au cabinet</p>
+          <button class="btn-primary">Choisir <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 2: Type de patient -->
+    <div *ngIf="currentStep === 'patient-type'" class="step-content">
+      <div class="step-header">
+        <h2><i class="fas fa-users"></i> Êtes-vous déjà patient ?</h2>
+        <p>Sélectionnez votre statut pour continuer</p>
+      </div>
+      
+      <div class="patient-types">
+        <div class="type-card" (click)="onPatientTypeSelected('new')">
+          <i class="fas fa-user-plus"></i>
+          <h3>Nouveau patient</h3>
+          <p>Je n'ai jamais consulté dans cet établissement</p>
+          <button class="btn-primary">Continuer <i class="fas fa-arrow-right"></i></button>
+        </div>
+        
+        <div class="type-card" (click)="onPatientTypeSelected('existing')">
+          <i class="fas fa-user-check"></i>
+          <h3>Patient existant</h3>
+          <p>J'ai déjà un dossier médical</p>
+          <button class="btn-primary">Continuer <i class="fas fa-arrow-right"></i></button>
+        </div>
+        
+        <div class="type-card" (click)="onPatientTypeSelected('guest')">
+          <i class="fas fa-user-clock"></i>
+          <h3>Continuer sans compte</h3>
+          <p>Réserver rapidement sans créer de compte</p>
+          <button class="btn-primary">Continuer <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 3: Sélection du médecin (utilise le composant doctors-list existant) -->
+     <div *ngIf="currentStep === 'doctor-selection'" class="step-content">
+      <!-- <div class="step-header">
+        <h2><i class="fas fa-user-md"></i> Choisissez votre médecin</h2>
+        <p>Sélectionnez le praticien avec qui vous souhaitez prendre rendez-vous</p>
+      </div> -->
+      <app-doctors-list></app-doctors-list>
+    </div> 
+
+    <!-- Étape 4: Sélection du créneau -->
+    <div *ngIf="currentStep === 'slot-selection'" class="step-content">
+      <div class="step-header">
+        <h2><i class="fas fa-calendar"></i> Choisissez votre créneau</h2>
+        <p>Sélectionnez un créneau horaire disponible pour votre rendez-vous</p>
+      </div>
+      
+      <!-- Afficher les informations du médecin sélectionné -->
+      <div class="selected-doctor-info" *ngIf="context.selectedDoctor">
+        <div class="doctor-card-mini">
+          <i class="fas fa-user-md"></i>
+          <div>
+            <h4>Dr. {{ context.selectedDoctor.firstName }} {{ context.selectedDoctor.lastName }}</h4>
+            <p>{{ context.selectedDoctor.specialty }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Message d'instruction pour la sélection du créneau -->
+      <div class="slot-selection-info">
+        <p>Les créneaux disponibles sont affichés ci-dessus. Veuillez sélectionner l'horaire qui vous convient.</p>
+      </div>
+    </div>
+
+    <!-- Étape 5: Inscription -->
+    <div *ngIf="currentStep === 'registration'" class="step-content">
+      <!-- Pour les patients existants, demander la connexion -->
+      <div *ngIf="context.patientType === 'existing'" class="login-required">
+        <div class="login-header">
+          <i class="fas fa-sign-in-alt"></i>
+          <h2>Connexion requise</h2>
+          <p>Veuillez vous connecter pour confirmer votre rendez-vous</p>
+        </div>
+        
+        <div class="appointment-preview">
+          <h3>Récapitulatif de votre rendez-vous :</h3>
+          <div class="summary-item" *ngIf="context.selectedDoctor">
+            <i class="fas fa-user-md"></i>
+            <span>Dr. {{ context.selectedDoctor.firstName }} {{ context.selectedDoctor.lastName }}</span>
+          </div>
+          <div class="summary-item" *ngIf="context.selectedSlot">
+            <i class="fas fa-calendar"></i>
+            <span>{{ context.selectedSlot.startTime | date:'fullDate':'':'fr' }}</span>
+          </div>
+          <div class="summary-item" *ngIf="context.selectedSlot">
+            <i class="fas fa-clock"></i>
+            <span>{{ context.selectedSlot.startTime | date:'HH:mm' }}</span>
+          </div>
+        </div>
+        
+        <button class="btn-primary" (click)="navigateToLogin()">
+          <i class="fas fa-sign-in-alt"></i> Se connecter pour confirmer
+        </button>
+        
+        <div class="alternative-options">
+          <p>Pas encore de compte ?</p>
+          <button class="btn-secondary" (click)="onPatientTypeSelected('new')">
+            Créer un compte
+          </button>
+        </div>
+      </div>
+      
+      <!-- Pour les nouveaux patients et invités, afficher le formulaire d'inscription -->
+      <div *ngIf="context.patientType !== 'existing'" class="registration-form-container">
+        <div class="step-header">
+          <h2>
+            <i class="fas fa-user-plus"></i> 
+            {{ context.patientType === 'new' ? 'Créer votre compte' : 'Vos informations' }}
+          </h2>
+          <p>Veuillez remplir vos informations pour finaliser la réservation</p>
+        </div>
+
+        <!-- Affichage du message d'erreur -->
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-triangle"></i>
+          {{ errorMessage }}
+        </div>
+
+        <form [formGroup]="registrationForm" (ngSubmit)="onSubmitRegistration()">
+          <!-- Informations personnelles -->
+          <div class="form-section">
+            <h3>Informations personnelles</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">Prénom *</label>
+                <input 
+                  type="text" 
+                  id="firstName" 
+                  formControlName="firstName"
+                  [class.error]="registrationForm.get('firstName')?.invalid && registrationForm.get('firstName')?.touched"
+                  placeholder="Votre prénom"
+                >
+                <span class="error-message" *ngIf="registrationForm.get('firstName')?.invalid && registrationForm.get('firstName')?.touched">
+                  Le prénom est requis (min. 2 caractères)
+                </span>
+              </div>
+              
+              <div class="form-group">
+                <label for="lastName">Nom *</label>
+                <input 
+                  type="text" 
+                  id="lastName" 
+                  formControlName="lastName"
+                  [class.error]="registrationForm.get('lastName')?.invalid && registrationForm.get('lastName')?.touched"
+                  placeholder="Votre nom"
+                >
+                <span class="error-message" *ngIf="registrationForm.get('lastName')?.invalid && registrationForm.get('lastName')?.touched">
+                  Le nom est requis (min. 2 caractères)
+                </span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  formControlName="email"
+                  [class.error]="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched"
+                  placeholder="votre.email@example.com"
+                >
+                <span class="error-message" *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched">
+                  Email valide requis
+                </span>
+              </div>
+              
+              <div class="form-group">
+                <label for="phone">Téléphone *</label>
+                <input 
+                  type="tel" 
+                  id="phone" 
+                  formControlName="phone"
+                  [class.error]="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched"
+                  placeholder="771234567"
+                >
+                <span class="error-message" *ngIf="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched">
+                  Numéro de téléphone valide requis
+                </span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateOfBirth">Date de naissance *</label>
+                <input 
+                  type="date" 
+                  id="dateOfBirth" 
+                  formControlName="dateOfBirth"
+                  [class.error]="registrationForm.get('dateOfBirth')?.invalid && registrationForm.get('dateOfBirth')?.touched"
+                >
+                <span class="error-message" *ngIf="registrationForm.get('dateOfBirth')?.invalid && registrationForm.get('dateOfBirth')?.touched">
+                  La date de naissance est requise
+                </span>
+              </div>
+              
+              <div class="form-group">
+                <label for="gender">Sexe *</label>
+                <select 
+                  id="gender" 
+                  formControlName="gender"
+                  [class.error]="registrationForm.get('gender')?.invalid && registrationForm.get('gender')?.touched"
+                >
+                  <option value="">Sélectionnez</option>
+                  <option value="male">Homme</option>
+                  <option value="female">Femme</option>
+                </select>
+                <span class="error-message" *ngIf="registrationForm.get('gender')?.invalid && registrationForm.get('gender')?.touched">
+                  Veuillez sélectionner votre sexe
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Adresse -->
+          <div class="form-section">
+            <h3>Adresse</h3>
+            
+            <div class="form-group">
+              <label for="address">Adresse</label>
+              <input 
+                type="text" 
+                id="address" 
+                formControlName="address"
+                placeholder="Votre adresse"
+              >
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">Ville</label>
+                <input 
+                  type="text" 
+                  id="city" 
+                  formControlName="city"
+                  placeholder="Votre ville"
+                >
+              </div>
+              
+              <div class="form-group">
+                <label for="postalCode">Code postal</label>
+                <input 
+                  type="text" 
+                  id="postalCode" 
+                  formControlName="postalCode"
+                  placeholder="Code postal"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Mot de passe pour nouveau patient -->
+          <div class="form-section" *ngIf="context.patientType === 'new'">
+            <h3>Sécurité du compte</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password">Mot de passe *</label>
+                <div class="password-input">
+                  <input 
+                    [type]="showPassword ? 'text' : 'password'" 
+                    id="password" 
+                    formControlName="password"
+                    [class.error]="registrationForm.get('password')?.invalid && registrationForm.get('password')?.touched"
+                    placeholder="Minimum 8 caractères"
+                  >
+                  <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+                    <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+                <span class="error-message" *ngIf="registrationForm.get('password')?.invalid && registrationForm.get('password')?.touched">
+                  Le mot de passe doit contenir au moins 8 caractères
+                </span>
+              </div>
+              
+              <div class="form-group">
+                <label for="confirmPassword">Confirmer le mot de passe *</label>
+                <input 
+                  [type]="showPassword ? 'text' : 'password'" 
+                  id="confirmPassword" 
+                  formControlName="confirmPassword"
+                  [class.error]="registrationForm.get('confirmPassword')?.invalid && registrationForm.get('confirmPassword')?.touched"
+                  placeholder="Confirmez votre mot de passe"
+                >
+                <span class="error-message" *ngIf="registrationForm.get('confirmPassword')?.value !== registrationForm.get('password')?.value && registrationForm.get('confirmPassword')?.touched">
+                  Les mots de passe ne correspondent pas
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Récapitulatif du rendez-vous -->
+          <div class="appointment-summary-box">
+            <h3>Récapitulatif du rendez-vous</h3>
+            <div class="summary-item" *ngIf="context.selectedDoctor">
+              <i class="fas fa-user-md"></i>
+              <span>Dr. {{ context.selectedDoctor.firstName }} {{ context.selectedDoctor.lastName }}</span>
+            </div>
+            <div class="summary-item" *ngIf="context.selectedSlot">
+              <i class="fas fa-calendar"></i>
+              <span>{{ context.selectedSlot.startTime | date:'fullDate':'':'fr' }}</span>
+            </div>
+            <div class="summary-item" *ngIf="context.selectedSlot">
+              <i class="fas fa-clock"></i>
+              <span>{{ context.selectedSlot.startTime | date:'HH:mm' }}</span>
+            </div>
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="onGoBack()">
+              <i class="fas fa-arrow-left"></i> Retour
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="isLoading">
+              <i class="fas fa-check" *ngIf="!isLoading"></i>
+              <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+              {{ context.patientType === 'new' ? 'Créer le compte et réserver' : 'Confirmer la réservation' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Étape 6: Confirmation -->
+    <div *ngIf="currentStep === 'confirmation'" class="step-content">
+      <!-- Afficher le loader pendant la création du rendez-vous -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin fa-3x"></i>
+        </div>
+        <h3>Création de votre rendez-vous en cours...</h3>
+        <p>Veuillez patienter quelques instants</p>
+      </div>
+
+      <!-- Afficher le message d'erreur si présent -->
+      <div *ngIf="errorMessage && !isLoading" class="error-container">
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Erreur</h3>
+          <p>{{ errorMessage }}</p>
+          <button class="btn-secondary" (click)="onGoBack()">
+            <i class="fas fa-arrow-left"></i> Retour
+          </button>
+        </div>
+      </div>
+
+      <!-- Afficher la confirmation seulement si pas de loading et pas d'erreur -->
+      <div *ngIf="!isLoading && !errorMessage" class="confirmation-container">
+        <div class="confirmation-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Rendez-vous confirmé !</h2>
+        <p>Votre rendez-vous a été réservé avec succès.</p>
+        
+        <div class="appointment-summary">
+          <div class="summary-item" *ngIf="context.selectedDoctor">
+            <i class="fas fa-user-md"></i>
+            <span>Dr. {{ context.selectedDoctor.firstName }} {{ context.selectedDoctor.lastName }}</span>
+          </div>
+          <div class="summary-item" *ngIf="context.selectedSlot">
+            <i class="fas fa-calendar"></i>
+            <span>{{ context.selectedSlot.startTime | date:'fullDate':'':'fr' }}</span>
+          </div>
+          <div class="summary-item" *ngIf="context.selectedSlot">
+            <i class="fas fa-clock"></i>
+            <span>{{ context.selectedSlot.startTime | date:'HH:mm' }}</span>
+          </div>
+          
+          <!-- Afficher les détails du rendez-vous confirmé si disponible -->
+          <div class="summary-item" *ngIf="context.confirmedAppointment?.appointmentId">
+            <i class="fas fa-hashtag"></i>
+            <span>Référence: {{ context.confirmedAppointment.appointmentId }}</span>
+          </div>
+        </div>
+        
+        <button class="btn-primary" routerLink="/patient-dashboard">
+          Voir mes rendez-vous
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Footer -->
+  <div class="wizard-footer" *ngIf="currentStep !== 'confirmation'">
+    <button 
+      class="btn-secondary" 
+      (click)="onGoBack()"
+      *ngIf="currentStep !== 'consultation-mode'"
+    >
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+  </div>
+</div>
+

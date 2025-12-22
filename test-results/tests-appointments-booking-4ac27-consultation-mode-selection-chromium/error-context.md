@@ -1,0 +1,215 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "📞 514 852-1234" [ref=e8] [cursor=pointer]:
+          - /url: tel:+15148521234
+          - generic [ref=e9]: 📞
+          - generic [ref=e10]: 514 852-1234
+        - generic [ref=e11]: "|"
+        - generic [ref=e12]: Clinique de Santé Mentale
+      - link "👤 Connexion" [ref=e15] [cursor=pointer]:
+        - /url: /auth
+        - generic [ref=e16]: 👤
+        - generic [ref=e17]: Connexion
+    - banner [ref=e18]:
+      - navigation [ref=e19]:
+        - generic [ref=e21]:
+          - link "M-Santé Bien-être psychologique" [ref=e23] [cursor=pointer]:
+            - /url: /home
+            - img [ref=e25]
+            - generic [ref=e28]: M-Santé
+            - generic [ref=e29]: Bien-être psychologique
+          - generic [ref=e30]:
+            - link "Accueil" [ref=e31] [cursor=pointer]:
+              - /url: /home
+            - link "À propos" [ref=e32] [cursor=pointer]:
+              - /url: "#about"
+            - link "Services" [ref=e33] [cursor=pointer]:
+              - /url: "#services"
+            - link "Contact" [ref=e34] [cursor=pointer]:
+              - /url: "#contact"
+            - link "Tarifs" [ref=e35] [cursor=pointer]:
+              - /url: "#rates"
+          - link "📅 Prendre rendez-vous" [ref=e37] [cursor=pointer]:
+            - /url: /appointments/wizard
+            - generic [ref=e38]: 📅
+            - generic [ref=e39]: Prendre rendez-vous
+  - main [ref=e40]:
+    - generic [ref=e42]:
+      - generic [ref=e47]: Étape 1 sur 7 •
+      - generic [ref=e49]:
+        - generic [ref=e50] [cursor=pointer]:
+          - generic [ref=e52]: "1"
+          - generic [ref=e53]: Mode de consultation
+        - generic [ref=e55]:
+          - generic [ref=e57]: "2"
+          - generic [ref=e58]: Type de patient
+        - generic [ref=e60]:
+          - generic [ref=e62]: "3"
+          - generic [ref=e63]: Spécialité
+        - generic [ref=e65]:
+          - generic [ref=e67]: "4"
+          - generic [ref=e68]: Professionnel
+        - generic [ref=e70]:
+          - generic [ref=e72]: "5"
+          - generic [ref=e73]: Disponibilités
+        - generic [ref=e75]:
+          - generic [ref=e77]: "6"
+          - generic [ref=e78]: Informations
+        - generic [ref=e80]:
+          - generic [ref=e82]: "7"
+          - generic [ref=e83]: Confirmation
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - heading " Choisissez votre mode de consultation" [level=1] [ref=e88]:
+            - generic [ref=e89]: 
+            - text: Choisissez votre mode de consultation
+          - paragraph [ref=e90]: Sélectionnez le type de consultation qui vous convient le mieux
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94] [cursor=pointer]:
+              - generic [ref=e96]: 
+              - generic [ref=e97]:
+                - heading "Consultation en cabinet" [level=3] [ref=e98]
+                - paragraph [ref=e99]: Rencontrez votre professionnel de santé en personne dans un environnement médical professionnel
+                - generic [ref=e100]:
+                  - heading "Avantages :" [level=4] [ref=e101]
+                  - list [ref=e102]:
+                    - listitem [ref=e103]:
+                      - generic [ref=e104]: 
+                      - text: Examen physique complet
+                    - listitem [ref=e105]:
+                      - generic [ref=e106]: 
+                      - text: Équipements médicaux disponibles
+                    - listitem [ref=e107]:
+                      - generic [ref=e108]: 
+                      - text: Interaction directe avec le professionnel
+                    - listitem [ref=e109]:
+                      - generic [ref=e110]: 
+                      - text: Prise de tension, poids, etc.
+                    - listitem [ref=e111]:
+                      - generic [ref=e112]: 
+                      - text: Environnement stérile et sécurisé
+              - generic [ref=e114]: 
+            - generic [ref=e115] [cursor=pointer]:
+              - generic [ref=e117]: 
+              - generic [ref=e118]:
+                - heading "Consultation en vidéo" [level=3] [ref=e119]
+                - paragraph [ref=e120]: Consultez votre professionnel de santé à distance via une plateforme vidéo sécurisée
+                - generic [ref=e121]:
+                  - heading "Avantages :" [level=4] [ref=e122]
+                  - list [ref=e123]:
+                    - listitem [ref=e124]:
+                      - generic [ref=e125]: 
+                      - text: Consultation depuis chez vous
+                    - listitem [ref=e126]:
+                      - generic [ref=e127]: 
+                      - text: Économie de temps de transport
+                    - listitem [ref=e128]:
+                      - generic [ref=e129]: 
+                      - text: Plateforme vidéo sécurisée
+                    - listitem [ref=e130]:
+                      - generic [ref=e131]: 
+                      - text: Partage de documents en ligne
+                    - listitem [ref=e132]:
+                      - generic [ref=e133]: 
+                      - text: Flexibilité des horaires
+              - generic [ref=e135]: 
+          - button " Continuer" [ref=e137] [cursor=pointer]:
+            - generic [ref=e138]: 
+            - text: Continuer
+        - generic [ref=e140]:
+          - generic [ref=e141]: 
+          - generic [ref=e142]:
+            - heading "Besoin d'aide pour choisir ?" [level=4] [ref=e143]
+            - paragraph [ref=e144]: Consultez notre guide pour choisir le mode de consultation qui vous convient le mieux selon votre situation.
+            - link "Voir le guide " [ref=e145] [cursor=pointer]:
+              - /url: "#"
+              - text: Voir le guide
+              - generic [ref=e146]: 
+      - generic [ref=e147]:
+        - button " Recommencer" [ref=e148] [cursor=pointer]:
+          - generic [ref=e149]: 
+          - text: Recommencer
+        - generic [ref=e150]:
+          - generic [ref=e151]: 
+          - text: Besoin d'aide ?
+          - link "Contactez-nous" [ref=e152] [cursor=pointer]:
+            - /url: "#"
+  - contentinfo [ref=e154]:
+    - generic [ref=e155]:
+      - generic [ref=e156]:
+        - generic [ref=e157]:
+          - generic [ref=e158]:
+            - generic [ref=e159]:
+              - img [ref=e161]
+              - heading "M-Santé" [level=3] [ref=e164]
+            - paragraph [ref=e165]: Votre espace de bien-être psychologique et de développement personnel.
+          - paragraph [ref=e167]: Centre de Santé Mentale — Soins personnalisés et bienveillants
+        - generic [ref=e168]:
+          - heading "Navigation" [level=4] [ref=e169]
+          - list [ref=e170]:
+            - listitem [ref=e171]:
+              - link "À propos" [ref=e172] [cursor=pointer]:
+                - /url: "#about"
+            - listitem [ref=e173]:
+              - link "Services" [ref=e174] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=e175]:
+              - link "Contact" [ref=e176] [cursor=pointer]:
+                - /url: "#contact"
+            - listitem [ref=e177]:
+              - link "Tarifs" [ref=e178] [cursor=pointer]:
+                - /url: "#rates"
+        - generic [ref=e179]:
+          - heading "Contact" [level=4] [ref=e180]
+          - generic [ref=e181]:
+            - paragraph [ref=e182]:
+              - strong [ref=e183]: "Téléphone:"
+              - link "514 852-1234" [ref=e184] [cursor=pointer]:
+                - /url: tel:+15148521234
+            - paragraph [ref=e185]:
+              - strong [ref=e186]: "Email:"
+              - link "contact@mindcare.ca" [ref=e187] [cursor=pointer]:
+                - /url: mailto:contact@mindcare.ca
+            - paragraph [ref=e188]:
+              - strong [ref=e189]: "Adresse:"
+              - text: 2150 Rue Saint-Urbain, Suite 300
+              - text: Montréal (Québec) H2X 2N9
+            - paragraph [ref=e190]:
+              - strong [ref=e191]: "Heures d'ouverture:"
+              - text: "Lundi - Vendredi: 8h - 18h"
+              - text: "Samedi: 9h - 16h"
+        - generic [ref=e192]:
+          - heading "Suivez-nous" [level=4] [ref=e193]
+          - generic [ref=e194]:
+            - link "📘 Facebook" [ref=e195] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e196]: 📘
+              - text: Facebook
+            - link "📷 Instagram" [ref=e197] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e198]: 📷
+              - text: Instagram
+            - link "🐦 Twitter" [ref=e199] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e200]: 🐦
+              - text: Twitter
+          - link "Consulter maintenant" [ref=e202] [cursor=pointer]:
+            - /url: "#appointment"
+      - generic [ref=e205]:
+        - paragraph [ref=e206]: © 2025 MindCare - Centre de Santé Mentale. Tous droits réservés.
+        - generic [ref=e207]:
+          - link "Politique de confidentialité" [ref=e208] [cursor=pointer]:
+            - /url: "#privacy"
+          - generic [ref=e209]: "|"
+          - link "Conditions d'utilisation" [ref=e210] [cursor=pointer]:
+            - /url: "#terms"
+          - generic [ref=e211]: "|"
+          - link "Code d'éthique" [ref=e212] [cursor=pointer]:
+            - /url: "#ethics"
+```

@@ -1,0 +1,39 @@
+<div class="patient-management-container">
+  <div class="management-header" *ngIf="activeView !== 'medical-record'">
+    <h2>Gestion des Patients</h2>
+    <div class="view-switcher">
+      <button 
+        class="view-btn" 
+        [class.active]="activeView === 'list'"
+        (click)="switchView('list')">
+        <i class="fas fa-list"></i>
+        <span>Liste des Patients</span>
+      </button>
+      <button 
+        class="view-btn" 
+        [class.active]="activeView === 'search'"
+        (click)="switchView('search')">
+        <i class="fas fa-search"></i>
+        <span>Rechercher</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="management-content">
+    <app-patient-list 
+      *ngIf="activeView === 'list'"
+      (viewMedicalRecord)="onViewMedicalRecord($event)">
+    </app-patient-list>
+
+    <app-patient-search 
+      *ngIf="activeView === 'search'"
+      (viewMedicalRecord)="onViewMedicalRecord($event)">
+    </app-patient-search>
+
+    <app-medical-record 
+      *ngIf="activeView === 'medical-record'"
+      [patient]="selectedPatient"
+      (back)="onBackFromMedicalRecord()">
+    </app-medical-record>
+  </div>
+</div>

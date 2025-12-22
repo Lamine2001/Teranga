@@ -1,0 +1,752 @@
+{
+  "config": {
+    "configFile": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/playwright.config.ts",
+    "rootDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit.xml"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.0",
+    "workers": 5,
+    "webServer": {
+      "command": "npm start",
+      "url": "http://localhost:4200",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "tests/auth/login.spec.ts",
+      "file": "tests/auth/login.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Login Functionality",
+          "file": "tests/auth/login.spec.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should display login form",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 55,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2781,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:35.120Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-bbbb7b74770740389e9f",
+              "file": "tests/auth/login.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "should login as patient successfully",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 56,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 2502,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:35.146Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-a01b35f858f3cb758934",
+              "file": "tests/auth/login.spec.ts",
+              "line": 25,
+              "column": 7
+            },
+            {
+              "title": "should login as doctor successfully",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 57,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 2482,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:35.089Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-f563b6b2a35de6f96038",
+              "file": "tests/auth/login.spec.ts",
+              "line": 41,
+              "column": 7
+            },
+            {
+              "title": "should show error for invalid credentials",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 58,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 2589,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:35.679Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-6813b0f35566da221409",
+              "file": "tests/auth/login.spec.ts",
+              "line": 57,
+              "column": 7
+            },
+            {
+              "title": "should show validation error for empty fields",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 59,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 1030,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:36.397Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-5c5d6897d4870ca0f8da",
+              "file": "tests/auth/login.spec.ts",
+              "line": 75,
+              "column": 7
+            },
+            {
+              "title": "should navigate to registration page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 60,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 1199,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:45.809Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-76b81d57b22d64fb8212",
+              "file": "tests/auth/login.spec.ts",
+              "line": 92,
+              "column": 7
+            },
+            {
+              "title": "should navigate to forgot password page",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 61,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 581,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:46.514Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-b7ecabc836b6b94ed2f3",
+              "file": "tests/auth/login.spec.ts",
+              "line": 102,
+              "column": 7
+            },
+            {
+              "title": "should persist login after page refresh",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 62,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 236,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\n    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 292
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 292
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:292:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)\u001b[22m\n\u001b[2m    at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-19T18:00:48.419Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/test-results/tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 292
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "63976eba3e5fcd5ce808-89d8b73373c8f05d336c",
+              "file": "tests/auth/login.spec.ts",
+              "line": 113,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-10-19T18:00:32.229Z",
+    "duration": 18764.108000000007,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 8,
+    "flaky": 0
+  }
+}

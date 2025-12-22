@@ -1,0 +1,434 @@
+// Palette de couleurs pour le stepper selon les recommandations
+:host {
+  --teal-primary: #2E8B8B;           // Étapes terminées (confiance, stabilité)
+  --peach-active: #F6B890;           // Étape active (chaleureux, humain, doux)
+  --gray-inactive: #E0E0E0;          // Étapes à venir (discret, neutre)
+  --teal-pastel: #B2DADA;           // Alternative pour étapes à venir
+  --background-light: #F9F9F9;       // Arrière-plan du stepper
+  --white: #FFFFFF;
+  --text-dark: #333;
+  --text-light: #666;
+  --border-light: #f0f0f0;
+}
+
+.appointment-wizard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: var(--white);
+  min-height: 100vh;
+
+  // Wizard Header avec arrière-plan respirable
+  .wizard-header {
+    margin-bottom: 40px;
+    padding: 30px 20px;
+    background: var(--background-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+  }
+
+  .wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    position: relative;
+  }
+
+  .wizard-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    min-width: 120px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.clickable:hover {
+      transform: translateY(-2px);
+    }
+
+    // Étape active - couleur pêche chaleureuse
+    &.active .step-number {
+      background: var(--peach-active);
+      color: var(--white);
+      box-shadow: 0 0 0 4px rgba(246, 184, 144, 0.3);
+      border: 2px solid var(--peach-active);
+    }
+
+    &.active .step-label {
+      color: var(--peach-active);
+      font-weight: 600;
+    }
+
+    // Étapes terminées - teal principal
+    &.completed .step-number {
+      background: var(--teal-primary);
+      color: var(--white);
+      border: 2px solid var(--teal-primary);
+    }
+
+    &.completed .step-label {
+      color: var(--teal-primary);
+      font-weight: 500;
+    }
+
+    // Étapes à venir - gris doux
+    &:not(.active):not(.completed) .step-number {
+      background: var(--white);
+      color: var(--gray-inactive);
+      border: 2px solid var(--gray-inactive);
+    }
+
+    &:not(.active):not(.completed) .step-label {
+      color: var(--gray-inactive);
+    }
+  }
+
+  .step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+  }
+
+  .step-label {
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.3;
+    transition: all 0.3s ease;
+
+    i {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    span {
+      display: block;
+      max-width: 100px;
+    }
+  }
+
+  // Connecteurs entre les étapes
+  .step-connector {
+    position: absolute;
+    top: 25px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background: var(--gray-inactive);
+    z-index: -1;
+  }
+
+  // Contenu des étapes
+  .wizard-content {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .step-content {
+    min-height: 400px;
+  }
+
+  .step-header {
+    text-align: center;
+    margin-bottom: 40px;
+
+    h2 {
+      color: var(--text-dark);
+      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: 600;
+
+      i {
+        color: var(--teal-primary);
+        margin-right: 10px;
+      }
+    }
+
+    p {
+      color: var(--text-light);
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  // Boutons avec la palette de couleurs
+  .btn-primary {
+    background: var(--teal-primary);
+    color: var(--white);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+
+    &:hover {
+      background: #257a7a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(46, 139, 139, 0.3);
+    }
+
+    &:disabled {
+      background: var(--gray-inactive);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  .btn-secondary {
+    background: var(--white);
+    color: var(--text-dark);
+    border: 2px solid var(--gray-inactive);
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+
+    &:hover {
+      border-color: var(--teal-primary);
+      color: var(--teal-primary);
+      transform: translateY(-2px);
+    }
+  }
+
+  // Cards pour sélection mode/type
+  .consultation-modes, .patient-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+  }
+
+  .mode-card, .type-card {
+    background: var(--white);
+    border: 2px solid var(--border-light);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      border-color: var(--peach-active);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(246, 184, 144, 0.2);
+    }
+
+    i {
+      font-size: 48px;
+      color: var(--teal-primary);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    h3 {
+      color: var(--text-dark);
+      margin-bottom: 15px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    p {
+      color: var(--text-light);
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+  }
+
+  // Alertes et messages
+  .alert {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    &.alert-danger {
+      background: #fff5f5;
+      color: #c53030;
+      border-left: 4px solid #c53030;
+    }
+  }
+
+  // Formulaires
+  .form-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 14px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--gray-inactive);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+      background: var(--white);
+
+      &:focus {
+        outline: none;
+        border-color: var(--peach-active);
+        box-shadow: 0 0 0 3px rgba(246, 184, 144, 0.1);
+      }
+
+      &.error {
+        border-color: #c53030;
+      }
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  // Summary items avec couleur teal
+  .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: var(--background-light);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--teal-primary);
+
+    i {
+      color: var(--teal-primary);
+      font-size: 18px;
+      width: 20px;
+    }
+
+    span {
+      color: var(--text-dark);
+      font-weight: 500;
+    }
+  }
+
+  // Doctor info
+  .selected-doctor-info {
+    background: rgba(46, 139, 139, 0.05);
+    border: 2px solid var(--teal-pastel);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+
+    .doctor-card-mini {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      i {
+        font-size: 24px;
+        color: var(--teal-primary);
+      }
+    }
+  }
+
+  // Confirmation
+  .confirmation-container {
+    text-align: center;
+    padding: 40px 20px;
+
+    .confirmation-icon i {
+      font-size: 80px;
+      color: var(--teal-primary);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    h2 {
+      color: var(--teal-primary);
+      margin-bottom: 20px;
+      font-size: 32px;
+      font-weight: 600;
+    }
+  }
+
+  // Loading
+  .loading-container {
+    text-align: center;
+    padding: 60px 20px;
+
+    .loading-spinner i {
+      color: var(--peach-active);
+    }
+  }
+
+  // Footer wizard
+  .wizard-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding: 20px 0;
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .wizard-steps {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step-connector {
+      display: none;
+    }
+
+    .consultation-modes, .patient-types {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .wizard-content {
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .appointment-wizard-container {
+      padding: 10px;
+    }
+
+    .wizard-header {
+      padding: 20px 15px;
+    }
+  }
+}

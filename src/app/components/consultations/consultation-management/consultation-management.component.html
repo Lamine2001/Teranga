@@ -1,0 +1,183 @@
+<div class="consultation-management-container">
+  <!-- Header -->
+  <div class="management-header">
+    <div class="header-content">
+      <h1><i class="fas fa-notes-medical"></i> Gestion des Consultations</h1>
+      <p>Gérez vos consultations, rendez-vous et dossiers patients</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="navigateToHistory()">
+        <i class="fas fa-history"></i> Voir l'historique complet
+      </button>
+      <button class="btn btn-success" (click)="navigateToNewConsultation()">
+        <i class="fas fa-plus-circle"></i> Nouvelle Consultation
+      </button>
+    </div>
+  </div>
+
+  <!-- Debug info (remove after testing) -->
+ <!--  <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">
+    <strong>Debug:</strong> activeConsultations.length = {{ activeConsultations?.length || 0 }}
+    <br>
+    <strong>Has consultations:</strong> {{ (activeConsultations && activeConsultations.length > 0) ? 'YES' : 'NO' }}
+    <br>
+    <strong>Full data:</strong> <pre style="max-height: 200px; overflow: auto;">{{ activeConsultations | json }}</pre>
+  </div> -->
+
+  <!-- Active Consultations Alert -->
+  <div class="active-consultations-alert" *ngIf="activeConsultations && activeConsultations.length > 0" 
+       style="background: white; padding: 20px; margin: 20px 0; border: 2px solid #007bff;">
+    <div class="alert-content" style="margin-bottom: 15px;">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>
+        <strong>{{ activeConsultations.length }}</strong> 
+        consultation(s) en cours
+      </span>
+    </div>
+    <div class="active-list" style="display: flex; flex-direction: column; gap: 10px;">
+      <button 
+        class="active-consultation-btn"
+        *ngFor="let consultation of activeConsultations"
+        (click)="joinActiveConsultation(consultation)"
+        style="padding: 15px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; color: #000;"
+      >
+        <i class="fas fa-video" *ngIf="consultation.consultationType === 'virtual'" style="color: #007bff;"></i>
+        <i class="fas fa-hospital" *ngIf="consultation.consultationType === 'onsite'" style="color: #28a745;"></i>
+        <span style="flex: 1; color: #000; font-weight: 500;">
+          Patient: {{ consultation.patientFirstName || 'N/A' }} {{ consultation.patientLastName || 'N/A' }}
+          <br>
+          <small style="color: #666;">Type: {{ consultation.consultationType }} | ID: {{ consultation.id }}</small>
+        </span>
+        <i class="fas fa-arrow-right" style="color: #007bff;"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="statistics-grid" *ngIf="consultationSummary && !isLoadingStats">
+    <div class="stat-card stat-card-blue">
+      <div class="stat-icon">
+        <i class="fas fa-notes-medical"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ consultationSummary.totalConsultations }}</h3>
+        <p>Total Consultations</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-green">
+      <div class="stat-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ consultationSummary.completedConsultations }}</h3>
+        <p>Consultations Terminées</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-purple">
+      <div class="stat-icon">
+        <i class="fas fa-video"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ consultationSummary.consultationsByType.virtual }}</h3>
+        <p>Téléconsultations</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-orange">
+      <div class="stat-icon">
+        <i class="fas fa-hospital"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ consultationSummary.consultationsByType.onsite }}</h3>
+        <p>Consultations en Cabinet</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-teal">
+      <div class="stat-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ consultationSummary.averageDuration | number:'1.0-0' }} min</h3>
+        <p>Durée Moyenne</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-yellow">
+      <div class="stat-icon">
+        <i class="fas fa-star"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ consultationSummary.patientSatisfactionAverage | number:'1.1-1' }}/5</h3>
+        <p>Satisfaction Patients</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Statistics -->
+  <div class="statistics-loading" *ngIf="isLoadingStats">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement des statistiques...</p>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-navigation">
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'today'"
+      (click)="setActiveTab('today')"
+    >
+      <i class="fas fa-calendar-day"></i>
+      Aujourd'hui
+    </button>
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'upcoming'"
+      (click)="setActiveTab('upcoming')"
+    >
+      <i class="fas fa-calendar-week"></i>
+      À Venir
+    </button>
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'history'"
+      (click)="setActiveTab('history')"
+    >
+      <i class="fas fa-history"></i>
+      Historique
+    </button>
+  </div>
+
+  <!-- Appointments Content -->
+  <div class="appointments-content">
+    <app-doctor-appointments 
+      [type]="activeTab === 'today' ? 'today' : activeTab === 'upcoming' ? 'upcoming' : 'history'"
+    ></app-doctor-appointments>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-panel">
+    <h3><i class="fas fa-bolt"></i> Actions Rapides</h3>
+    <div class="actions-grid">
+      <button class="action-btn" (click)="navigateToNewConsultation()">
+        <i class="fas fa-user-plus"></i>
+        <span>Nouveau Patient</span>
+      </button>
+      <button class="action-btn" (click)="navigateToHistory()">
+        <i class="fas fa-search"></i>
+        <span>Rechercher</span>
+      </button>
+      <button class="action-btn" (click)="navigateToProfile()">
+        <i class="fas fa-user-md"></i>
+        <span>Mon Profil</span>
+      </button>
+      <button class="action-btn" (click)="loadStatistics()">
+        <i class="fas fa-sync-alt"></i>
+        <span>Actualiser</span>
+      </button>
+    </div>
+  </div>
+</div>
+

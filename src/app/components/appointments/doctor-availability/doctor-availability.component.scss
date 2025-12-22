@@ -1,0 +1,210 @@
+.availability-section {
+  padding: 1rem 0;
+
+  .divider {
+    margin: 0 0 1rem;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .availability-header {
+    margin-bottom: 1rem;
+
+    .section-title {
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+    }
+  }
+
+  .availability-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    .next-slot {
+      .slot-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+
+        &:hover {
+          background: #e9ecef;
+          transform: translateY(-2px);
+        }
+
+        &.primary {
+          background: #007bff;
+          color: white;
+          border-color: #007bff;
+
+          &:hover {
+            background: #0056b3;
+          }
+        }
+
+        .slot-date {
+          font-weight: 600;
+        }
+
+        .slot-time {
+          color: inherit;
+          opacity: 0.9;
+        }
+      }
+    }
+
+    .show-all-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+
+      i {
+        color: #007bff;
+      }
+
+      .link-button {
+        background: none;
+        border: none;
+        color: #007bff;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 0;
+
+        &:hover {
+          color: #0056b3;
+        }
+      }
+    }
+  }
+
+  .all-slots {
+    margin-top: 1.5rem;
+    animation: slideDown 0.3s ease;
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+
+      .slot-item {
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+
+        &.available {
+          border-color: #28a745;
+          background: #f8fff9;
+
+          &:hover {
+            background: #28a745;
+            color: white;
+            transform: translateY(-2px);
+
+            .status-badge.available {
+              color: white;
+            }
+          }
+        }
+
+        &.unavailable {
+          background: #f8f9fa;
+          color: #6c757d;
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+
+        .slot-date {
+          font-size: 0.85rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+        }
+
+        .slot-time {
+          font-size: 0.8rem;
+          opacity: 0.9;
+          margin-bottom: 0.5rem;
+        }
+
+        .slot-status {
+          .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+
+            &.available {
+              color: #28a745;
+              background: rgba(40, 167, 69, 0.1);
+            }
+
+            &.booked {
+              color: #dc3545;
+              background: rgba(220, 53, 69, 0.1);
+            }
+
+            i {
+              font-size: 0.7rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+
+    .spinner-small {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  .no-availability {
+    p {
+      color: #6c757d;
+      font-style: italic;
+      margin: 0;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

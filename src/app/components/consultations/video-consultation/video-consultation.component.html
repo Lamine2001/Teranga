@@ -1,0 +1,262 @@
+<div class="video-consultation-container">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin fa-3x"></i>
+    <p>Initialisation de la consultation vidéo...</p>
+    <p class="text-muted" *ngIf="videoConfig">Plateforme: {{ videoConfig.platform }}</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <i class="fas fa-exclamation-triangle fa-3x"></i>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="router.navigate(['/doctor-dashboard'])">
+      <i class="fas fa-home"></i> Retour au tableau de bord
+    </button>
+  </div>
+
+  <!-- Video Consultation Interface -->
+  <div class="video-interface" *ngIf="!isLoading && !errorMessage && consultation">
+    <!-- Header -->
+    <div class="video-header">
+      <div class="header-info">
+        <h2>
+          <i class="fas fa-video"></i> Consultation Vidéo
+          <span class="platform-badge" *ngIf="videoConfig">
+            {{ videoPlatform === 'jitsi' ? 'Jitsi' : 
+               videoPlatform === 'zoom' ? 'Zoom' : 
+               videoPlatform === 'teams' ? 'Teams' : 
+               videoPlatform === 'meet' ? 'Google Meet' : 
+               'Custom' }}
+          </span>
+        </h2>
+        <p class="patient-name">
+          <i class="fas fa-user"></i>
+          Patient: {{ consultation.patientFirstName }} {{ consultation.patientLastName }}
+        </p>
+      </div>
+      <div class="header-stats">
+        <span class="call-duration" *ngIf="isCallActive">
+          <i class="fas fa-clock"></i>
+          {{ formatDuration(callDuration) }}
+        </span>
+        <button class="btn btn-secondary" (click)="toggleNotesPanel()">
+          <i class="fas fa-notes-medical"></i>
+          {{ showNotesPanel ? 'Masquer' : 'Afficher' }} les notes
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="video-content" [class.notes-visible]="showNotesPanel">
+      <!-- Video Container -->
+      <div class="video-container">
+        <!-- Jitsi Container -->
+        <div id="jitsi-container" *ngIf="videoPlatform === 'jitsi'"></div>
+
+        <!-- Zoom Container -->
+        <div id="zmmtg-root" *ngIf="videoPlatform === 'zoom'"></div>
+
+        <!-- Teams/Meet Notice -->
+        <div class="external-platform-notice" *ngIf="videoPlatform === 'teams' || videoPlatform === 'meet'">
+          <i class="fas fa-external-link-alt fa-3x"></i>
+          <h3>Consultation ouverte dans une nouvelle fenêtre</h3>
+          <p *ngIf="videoPlatform === 'teams'">
+            La consultation Microsoft Teams a été ouverte dans une nouvelle fenêtre.
+          </p>
+          <p *ngIf="videoPlatform === 'meet'">
+            La consultation Google Meet a été ouverte dans une nouvelle fenêtre.
+          </p>
+          <p class="text-muted">
+            Une fois la consultation terminée, revenez ici pour compléter les notes.
+          </p>
+          <button class="btn btn-primary" (click)="handleCallEnded()">
+            <i class="fas fa-check"></i> J'ai terminé la consultation
+          </button>
+        </div>
+
+        <!-- Custom Platform Container -->
+        <div id="custom-container" *ngIf="videoPlatform === 'custom'"></div>
+        
+        <!-- Call Controls (for Jitsi only) -->
+        <div class="call-controls" *ngIf="isCallActive && videoPlatform === 'jitsi'">
+          <button class="control-btn" [class.active]="isMuted" (click)="toggleMute()">
+            <i [class]="isMuted ? 'fas fa-microphone-slash' : 'fas fa-microphone'"></i>
+            <span>{{ isMuted ? 'Activer micro' : 'Couper micro' }}</span>
+          </button>
+
+          <button class="control-btn" [class.active]="isVideoOff" (click)="toggleVideo()">
+            <i [class]="isVideoOff ? 'fas fa-video-slash' : 'fas fa-video'"></i>
+            <span>{{ isVideoOff ? 'Activer vidéo' : 'Couper vidéo' }}</span>
+          </button>
+
+          <button class="control-btn end-call" (click)="handleCallEnded()">
+            <i class="fas fa-phone-slash"></i>
+            <span>Terminer l'appel</span>
+          </button>
+        </div>
+
+        <!-- Call Not Started -->
+        <div class="call-placeholder" *ngIf="!isCallActive && videoPlatform !== 'teams' && videoPlatform !== 'meet'">
+          <i class="fas fa-video fa-3x"></i>
+          <h3>La consultation vidéo est prête</h3>
+          
+          <!-- Platform-specific info -->
+          <div class="platform-info" *ngIf="videoConfig">
+            <p class="platform-name">
+              <i [class]="videoPlatform === 'jitsi' ? 'fas fa-video' : 
+                         videoPlatform === 'zoom' ? 'fab fa-zoom' : 
+                         'fas fa-desktop'"></i>
+              Plateforme: 
+              <strong>{{ videoPlatform === 'jitsi' ? 'Jitsi Meet' : 
+                         videoPlatform === 'zoom' ? 'Zoom' : 
+                         videoConfig.customPlatformName || 'Custom' }}</strong>
+            </p>
+            
+            <!-- Zoom Meeting Info -->
+            <div class="meeting-info" *ngIf="videoPlatform === 'zoom' && videoConfig.zoomMeetingId">
+              <p><strong>ID de réunion:</strong> {{ videoConfig.zoomMeetingId }}</p>
+              <p *ngIf="videoConfig.zoomPasscode">
+                <strong>Code d'accès:</strong> {{ videoConfig.zoomPasscode }}
+              </p>
+            </div>
+
+            <!-- Room Info -->
+            <div class="meeting-info" *ngIf="videoPlatform === 'jitsi' && videoConfig.roomId">
+              <p><strong>Salle:</strong> {{ videoConfig.roomId }}</p>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" (click)="loadVideoSDK()">
+            <i class="fas fa-play"></i> Démarrer la consultation
+          </button>
+
+          <!-- Alternative join options for Zoom -->
+          <div class="alternative-join" *ngIf="videoPlatform === 'zoom' && videoConfig?.zoomJoinUrl">
+            <p class="text-muted">ou</p>
+            <a [href]="videoConfig?.meetingLink" target="_blank" class="btn btn-outline-primary">
+              <i class="fas fa-external-link-alt"></i> Ouvrir dans l'application Zoom
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Panel (Sidebar) -->
+      <div class="notes-panel" *ngIf="showNotesPanel">
+        <div class="notes-panel-header">
+          <h3><i class="fas fa-notes-medical"></i> Notes de Consultation</h3>
+          <button class="btn-close" (click)="toggleNotesPanel()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="notes-panel-content">
+          <app-consultation-notes
+            *ngIf="consultation"
+            [consultation]="consultation"
+            [readOnly]="false"
+            (consultationEnded)="onConsultationEnded()"
+          ></app-consultation-notes>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Info Panel -->
+    <div class="quick-info" *ngIf="!showNotesPanel">
+      <div class="info-item">
+        <i class="fas fa-user"></i>
+        <div>
+          <label>Patient</label>
+          <p>{{ consultation.patientFirstName }} {{ consultation.patientLastName }}</p>
+          <small *ngIf="consultation.patientEmail" class="text-muted">
+            {{ consultation.patientEmail }}
+          </small>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="fas fa-user-md"></i>
+        <div>
+          <label>Médecin</label>
+          <p>Dr. {{ consultation.doctorFirstName }} {{ consultation.doctorLastName }}</p>
+          <small class="text-muted">{{ consultation.doctorSpecialty }}</small>
+        </div>
+      </div>
+
+      <div class="info-item" *ngIf="consultation.chiefComplaint">
+        <i class="fas fa-comment-medical"></i>
+        <div>
+          <label>Motif</label>
+          <p>{{ consultation.chiefComplaint }}</p>
+        </div>
+      </div>
+
+      <div class="info-item" *ngIf="consultation.symptoms">
+        <i class="fas fa-heartbeat"></i>
+        <div>
+          <label>Symptômes</label>
+          <p>{{ consultation.symptoms }}</p>
+        </div>
+      </div>
+
+      <!-- Video Platform Info -->
+      <div class="info-item" *ngIf="videoConfig">
+        <i [class]="videoPlatform === 'jitsi' ? 'fas fa-video' : 
+                    videoPlatform === 'zoom' ? 'fab fa-zoom' : 
+                    videoPlatform === 'teams' ? 'fab fa-microsoft' :
+                    videoPlatform === 'meet' ? 'fab fa-google' :
+                    'fas fa-desktop'"></i>
+        <div>
+          <label>Plateforme vidéo</label>
+          <p>{{ videoPlatform === 'jitsi' ? 'Jitsi Meet' : 
+                 videoPlatform === 'zoom' ? 'Zoom' : 
+                 videoPlatform === 'teams' ? 'Microsoft Teams' :
+                 videoPlatform === 'meet' ? 'Google Meet' :
+                 videoConfig.customPlatformName || 'Custom' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call Instructions -->
+    <div class="call-instructions" *ngIf="!isCallActive">
+      <div class="instruction-card">
+        <i class="fas fa-info-circle"></i>
+        <div>
+          <h4>Instructions pour la téléconsultation</h4>
+          <ul>
+            <li>Assurez-vous que votre caméra et micro fonctionnent</li>
+            <li>Trouvez un endroit calme et privé</li>
+            <li>Préparez vos notes et dossier médical</li>
+            <li *ngIf="videoPlatform === 'jitsi'">
+              Cliquez sur "Démarrer" pour rejoindre la salle de consultation
+            </li>
+            <li *ngIf="videoPlatform === 'zoom'">
+              Cliquez sur "Démarrer" pour lancer Zoom Meeting
+            </li>
+            <li *ngIf="videoPlatform === 'teams' || videoPlatform === 'meet'">
+              La consultation s'ouvrira dans une nouvelle fenêtre
+            </li>
+            <li>Prenez des notes pendant la consultation</li>
+            <li>Complétez le dossier médical après la consultation</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Technical Requirements -->
+      <div class="instruction-card tech-requirements">
+        <i class="fas fa-laptop-medical"></i>
+        <div>
+          <h4>Prérequis techniques</h4>
+          <ul>
+            <li><i class="fas fa-check-circle text-success"></i> Connexion Internet stable</li>
+            <li><i class="fas fa-check-circle text-success"></i> Navigateur moderne (Chrome, Firefox, Edge)</li>
+            <li><i class="fas fa-check-circle text-success"></i> Webcam et microphone fonctionnels</li>
+            <li *ngIf="videoPlatform === 'zoom'">
+              <i class="fas fa-info-circle text-info"></i> 
+              Application Zoom optionnelle pour une meilleure expérience
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,459 @@
+.services {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #2e4057 50%, #1a252f 75%, #16202a 100%);
+  position: relative;
+  padding: 6rem 0;
+  overflow: hidden;
+  
+  // Animation d'entrée pour les cartes
+  .service-card {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+// Bannière décorative
+.services-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  
+  .banner-decoration {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    
+    .decoration-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(46, 139, 139, 0.3), rgba(58, 155, 155, 0.2));
+      animation: float 6s ease-in-out infinite;
+      box-shadow: 0 0 30px rgba(46, 139, 139, 0.2);
+      
+      &.circle-1 {
+        width: 200px;
+        height: 200px;
+        top: 10%;
+        right: 10%;
+        animation-delay: 0s;
+      }
+      
+      &.circle-2 {
+        width: 150px;
+        height: 150px;
+        bottom: 20%;
+        left: 5%;
+        animation-delay: 2s;
+      }
+      
+      &.circle-3 {
+        width: 100px;
+        height: 100px;
+        top: 60%;
+        right: 15%;
+        animation-delay: 4s;
+      }
+    }
+    
+    .decoration-wave {
+      position: absolute;
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(46, 139, 139, 0.15) 25%, 
+        rgba(46, 139, 139, 0.25) 50%, 
+        rgba(46, 139, 139, 0.15) 75%, 
+        transparent 100%);
+      
+      &.wave-1 {
+        top: 30%;
+        transform: rotate(-2deg);
+      }
+      
+      &.wave-2 {
+        bottom: 30%;
+        transform: rotate(2deg);
+      }
+    }
+  }
+}
+
+// Animation flottante pour les éléments décoratifs
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// En-tête de section amélioré
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 1;
+  
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 8px rgba(46, 139, 139, 0.5);
+    
+    @media (max-width: 768px) {
+      font-size: 2.2rem;
+    }
+  }
+  
+  .title-underline {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(135deg, #4dd0e1, #26c6da);
+    margin: 1rem auto 2rem;
+    border-radius: 2px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.4);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 8px;
+      background: #4dd0e1;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(77, 208, 225, 0.6);
+    }
+  }
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 0;
+  font-weight: 500;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+// Conteneur principal avec z-index
+.container {
+  position: relative;
+  z-index: 1;
+}
+
+.services-grid {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 4rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  
+  // Mobile : 1 colonne
+  grid-template-columns: 1fr;
+  
+  // Tablette : 2 colonnes
+  @media (min-width: 769px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  // Desktop : 3 colonnes
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  
+  // Très large écran : 3 colonnes
+  @media (min-width: 1400px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.service-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(46, 139, 139, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  height: fit-content;
+  box-shadow: 0 4px 20px rgba(46, 139, 139, 0.08);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary-color, #2E8B8B), #3a9b9b);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(46, 139, 139, 0.03) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+  }
+  
+  &:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 12px 40px rgba(46, 139, 139, 0.15);
+    border-color: rgba(46, 139, 139, 0.2);
+    background: rgba(255, 255, 255, 1);
+    
+    &::before {
+      transform: scaleX(1);
+    }
+    
+    &::after {
+      opacity: 1;
+    }
+    
+    .service-icon {
+      transform: scale(1.15) rotate(5deg);
+    }
+  }
+  
+  // Animation d'entrée différée pour chaque carte
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  &:nth-child(4) { animation-delay: 0.4s; }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--box-shadow-lg);
+    border-color: var(--primary-color);
+    
+    &::before {
+      transform: scaleX(1);
+    }
+    
+    .service-icon {
+      transform: scale(1.1);
+    }
+  }
+  
+  .service-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    transition: transform 0.3s ease;
+  }
+  
+  h3 {
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+  
+  p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+}
+
+.service-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+  li {
+    color: var(--text-light);
+    padding: 0.5rem 0;
+    position: relative;
+    padding-left: 1.5rem;
+    
+    &::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--success-color);
+      font-weight: bold;
+    }
+  }
+}
+
+.cta-section {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, var(--background-light), #ffffff);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  
+  h3 {
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+  
+  p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+  
+  .btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 768px) {
+  .service-card {
+    padding: 1.5rem;
+    
+    .service-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2.5rem;
+    }
+    
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
+  
+  .cta-section {
+    padding: 2rem 1rem;
+    
+    h3 {
+      font-size: 1.5rem;
+    }
+    
+    p {
+      font-size: 1rem;
+    }
+    
+    .btn-large {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .service-card {
+    .service-icon {
+      width: 70px;
+      height: 70px;
+      font-size: 2rem;
+    }
+  }
+  
+  .cta-section {
+    .btn-large {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+}
+
+// Styles pour les cartes cliquables simplifiées
+.clickable-card {
+  cursor: pointer;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  h3 {
+    font-size: 1.3rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+    text-align: center;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+  }
+  
+  .service-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-8px);
+    
+    h3 {
+      color: var(--primary-color);
+    }
+    
+    .service-icon {
+      transform: scale(1.15);
+    }
+  }
+  
+  // Animation pour les nouvelles cartes
+  &:nth-child(5) { animation-delay: 0.5s; }
+  &:nth-child(6) { animation-delay: 0.6s; }
+}

@@ -1,0 +1,116 @@
+<section id="rates" class="rates section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Nos Tarifs</h2>
+      <p class="section-subtitle">
+        Des tarifs transparents pour des services de qualité
+      </p>
+      <div class="title-underline"></div>
+    </div>
+
+    <!-- Consultations Standards -->
+    <div class="rates-section">
+      <h3 class="subsection-title">Consultations Standards</h3>
+      <div class="rates-grid">
+        <div class="rate-card" [class.popular]="consultation.popular" *ngFor="let consultation of consultationTypes">
+          <div class="popular-badge" *ngIf="consultation.popular">
+            <span>⭐ Populaire</span>
+          </div>
+          <div class="rate-header">
+            <h4>{{ consultation.title }}</h4>
+            <div class="rate-price">
+              <span class="price">{{ consultation.price }}$</span>
+              <span class="duration">{{ consultation.duration }}</span>
+            </div>
+          </div>
+          <p class="rate-description">{{ consultation.description }}</p>
+          <ul class="rate-features">
+            <li *ngFor="let feature of consultation.features">
+              <span class="check-icon">✓</span>
+              {{ feature }}
+            </li>
+          </ul>
+          <button class="btn btn-primary" routerLink="/appointments/wizard">
+            Prendre rendez-vous
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services Spécialisés -->
+    <div class="rates-section">
+      <h3 class="subsection-title">Services Spécialisés</h3>
+      <div class="specialized-services">
+        <div class="service-item" *ngFor="let service of specializedServices">
+          <div class="service-info">
+            <h4>{{ service.name }}</h4>
+            <p>{{ service.description }}</p>
+          </div>
+          <div class="service-price">{{ service.price }}$</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Forfaits -->
+    <div class="rates-section">
+      <h3 class="subsection-title">Forfaits Avantageux</h3>
+      <div class="packages-grid">
+        <div class="package-card" [class.popular]="package.popular" *ngFor="let package of packages">
+          <div class="popular-badge" *ngIf="package.popular">
+            <span>⭐ Meilleur choix</span>
+          </div>
+          <h4>{{ package.title }}</h4>
+          <div class="package-sessions">{{ package.sessions }}</div>
+          <div class="package-price">
+            <span class="price">{{ package.price }}$</span>
+            <span class="savings">{{ package.savings }}</span>
+          </div>
+          <p class="package-description">{{ package.description }}</p>
+          <button class="btn btn-outline" routerLink="/appointments/wizard">
+            Choisir ce forfait
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations Importantes -->
+    <div class="rates-info">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">💳</div>
+          <h4>Modes de Paiement</h4>
+          <p>Nous acceptons les paiements par carte, virement bancaire et les assurances privées.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📋</div>
+          <h4>Assurances</h4>
+          <p>Nous travaillons avec la plupart des compagnies d'assurance. Vérifiez votre couverture.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🔄</div>
+          <h4>Politique d'Annulation</h4>
+          <p>Annulation gratuite jusqu'à 24h avant le rendez-vous. Frais de 50% si annulation tardive.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📞</div>
+          <h4>Questions ?</h4>
+          <p>Contactez-nous pour plus d'informations sur nos tarifs et services.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h3>Prêt à commencer votre parcours de bien-être ?</h3>
+      <p>Réservez votre première consultation dès aujourd'hui</p>
+      <div class="cta-buttons">
+        <button class="btn btn-primary btn-large" routerLink="/appointments/wizard">
+          Prendre rendez-vous
+        </button>
+        <button class="btn btn-outline btn-large" routerLink="/contact">
+          Nous contacter
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

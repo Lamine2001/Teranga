@@ -1,0 +1,89 @@
+<section id="home" class="hero hero-with-background" [class.image-loaded]="imageLoaded">
+  <!-- Préchargement optimisé de l'image -->
+  <link rel="preload" as="image" href="/pic_12.jpg">
+  <link rel="preload" as="image" href="/loadingA.png">
+  
+  <!-- Image de préchargement cachée -->
+  <img 
+    src="/pic_12.jpg" 
+    alt="Hero Background" 
+    class="preload-image" 
+    (load)="onImageLoad()" 
+    (error)="onImageError()"
+    loading="eager"
+    fetchpriority="high"
+    style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;">
+  
+  <!-- Background avec image de chargement -->
+  <div class="hero-background-loading" [style.background-image]="'url(/loadingA.png)'"></div>
+  
+  <!-- Background placeholder qui s'estompe -->
+  <div class="hero-background-placeholder" [class.fade-out]="imageLoaded">
+    <div class="loading-overlay" *ngIf="!imageLoaded">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Chargement...</p>
+    </div>
+  </div>
+  
+  <!-- Background image haute qualité -->
+  <div class="hero-background-image" [class.loaded]="imageLoaded"></div>
+  
+  <!-- Overlay pour améliorer la lisibilité -->
+  <div class="hero-overlay"></div>
+  
+  <!-- Contenu principal -->
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <span class="highlight">M-Santé</span>
+        </h1>
+        <h2 class="hero-subtitle">
+          Votre bien-être, notre priorité
+        </h2>
+        <p class="hero-description">
+          Des consultations personnalisées avec nos professionnels qualifiés 
+          pour vous accompagner vers un mieux-être durable.
+        </p>
+        <div class="hero-actions">
+          <a href="/appointments/wizard" class="btn btn-primary btn-large">
+            <i class="fas fa-calendar-plus"></i>
+            Prendre rendez-vous
+          </a>
+          <a href="/services" class="btn btn-outline btn-large">
+            <i class="fas fa-info-circle"></i>
+            En savoir plus
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section services populaires -->
+  <div class="popular-services">
+    <div class="services-container">
+      <h3 class="services-title">
+        <i class="fas fa-star"></i>
+        Les plus demandés
+      </h3>
+      <div class="services-grid">
+        <a href="/services" class="service-item">
+          <i class="fas fa-user"></i>
+          <span>Thérapie individuelle</span>
+        </a>
+        <a href="/services" class="service-item">
+          <i class="fas fa-heart"></i>
+          <span>Coaching de vie</span>
+        </a>
+        <a href="/services" class="service-item">
+          <i class="fas fa-laptop-medical"></i>
+          <span>Soutien en ligne</span>
+        </a>
+        <a href="/services" class="service-item">
+          <i class="fas fa-leaf"></i>
+          <span>Bien-être</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,9 @@
+<div class="auth-page">
+  <div class="auth-container">
+    <!-- Form Container -->
+    <div class="form-container">
+      <app-login-form *ngIf="!showRegister" (switchToRegister)="toggleMode()"></app-login-form>
+      <app-register-form *ngIf="showRegister" (switchToLogin)="toggleMode()"></app-register-form>
+    </div>
+  </div>
+</div>

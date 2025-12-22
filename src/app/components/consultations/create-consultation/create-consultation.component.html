@@ -1,0 +1,505 @@
+<div class="create-consultation-container">
+  <!-- Header -->
+  <div class="consultation-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="router.navigate(['/doctor-dashboard'])" title="Retour au tableau de bord">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-user-md"></i> Nouvelle Consultation</h1>
+      <div class="consultation-timer" *ngIf="consultationStarted">
+        <i class="fas fa-clock"></i>
+        <span class="timer">{{ getConsultationDuration() }}</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-dashboard" (click)="router.navigate(['/doctor-dashboard'])">
+        <i class="fas fa-home"></i> Tableau de Bord
+      </button>
+      <button class="btn btn-secondary" (click)="router.navigate(['/doctor-dashboard'])">
+        <i class="fas fa-times"></i> Fermer
+      </button>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+  
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Patient Search (if no patient selected) -->
+  <div class="patient-search-section" *ngIf="!selectedPatient">
+    <!-- Toggle Button for Patients Table -->
+    <div class="view-toggle">
+      <button class="btn-toggle-view" (click)="togglePatientsTable()">
+        <i [class]="showPatientsTable ? 'fas fa-search' : 'fas fa-list'"></i>
+        {{ showPatientsTable ? 'Rechercher par nom' : 'Voir mes patients avec rendez-vous' }}
+      </button>
+    </div>
+
+    <!-- Patients Table View -->
+    <div class="patients-table-container" *ngIf="showPatientsTable">
+      <div class="table-card">
+        <div class="table-header">
+          <h2><i class="fas fa-users"></i> Mes Patients avec Rendez-vous</h2>
+          <div class="table-actions">
+            <div class="search-filter">
+              <i class="fas fa-filter"></i>
+              <input
+                type="text"
+                placeholder="Filtrer par nom, email, téléphone..."
+                (input)="filterPatientsTable($event)"
+                [(ngModel)]="tableFilterText"
+              >
+            </div>
+            <div class="status-filter">
+              <select [(ngModel)]="selectedStatusFilter" (change)="applyFilters()">
+                <option value="">Tous les statuts</option>
+                <option value="PENDING">En attente</option>
+                <option value="CONFIRMED">Confirmé</option>
+                <option value="COMPLETED">Terminé</option>
+                <option value="CANCELLED">Annulé</option>
+              </select>
+            </div>
+            <div class="date-filter">
+              <input 
+                type="date" 
+                [(ngModel)]="selectedStartDate" 
+                (change)="applyFilters()"
+                placeholder="Date début"
+              >
+              <input 
+                type="date" 
+                [(ngModel)]="selectedEndDate" 
+                (change)="applyFilters()"
+                placeholder="Date fin"
+              >
+            </div>
+            <button class="btn-refresh" (click)="loadPatientsWithAppointments()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="table-loading" *ngIf="isLoadingPatients">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Chargement des patients...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div class="table-empty" *ngIf="!isLoadingPatients && filteredPatients.length === 0">
+          <i class="fas fa-calendar-times fa-3x"></i>
+          <h3>Aucun patient trouvé</h3>
+          <p *ngIf="tableFilterText">Essayez un autre filtre</p>
+          <p *ngIf="!tableFilterText">Aucun rendez-vous confirmé pour le moment</p>
+        </div>
+
+        <!-- Patients Table -->
+        <div class="patients-table-wrapper" *ngIf="!isLoadingPatients && filteredPatients.length > 0">
+          <table class="patients-table">
+            <thead>
+              <tr>
+                <th (click)="sortPatientsTable('name')" class="sortable">
+                  <span>Patient</span>
+                  <i class="fas" [class.fa-sort-up]="tableSortColumn === 'name' && tableSortDirection === 'asc'"
+                     [class.fa-sort-down]="tableSortColumn === 'name' && tableSortDirection === 'desc'"
+                     [class.fa-sort]="tableSortColumn !== 'name'"></i>
+                </th>
+                <th>Contact</th>
+                <th (click)="sortPatientsTable('date')" class="sortable">
+                  <span>Prochain RDV</span>
+                  <i class="fas" [class.fa-sort-up]="tableSortColumn === 'date' && tableSortDirection === 'asc'"
+                     [class.fa-sort-down]="tableSortColumn === 'date' && tableSortDirection === 'desc'"
+                     [class.fa-sort]="tableSortColumn !== 'date'"></i>
+                </th>
+                <th>Type</th>
+                <th (click)="sortPatientsTable('status')" class="sortable">
+                  <span>Statut</span>
+                  <i class="fas" [class.fa-sort-up]="tableSortColumn === 'status' && tableSortDirection === 'asc'"
+                     [class.fa-sort-down]="tableSortColumn === 'status' && tableSortDirection === 'desc'"
+                     [class.fa-sort]="tableSortColumn !== 'status'"></i>
+                </th>
+                <th class="action-column">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let patient of filteredPatients" class="patient-row">
+                <td class="patient-cell">
+                  <div class="patient-avatar-mini">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="patient-name-container">
+                    <span class="patient-name-table">{{ patient.patientFirstName }} {{ patient.patientLastName }}</span>
+                    <span class="consultation-badge" *ngIf="patient.hasConsultation" title="Consultation déjà créée">
+                      <i class="fas fa-file-medical"></i> Consultation existante
+                    </span>
+                  </div>
+                </td>
+                <td class="contact-cell">
+                  <div class="contact-info">
+                    <span *ngIf="patient.patientEmail"><i class="fas fa-envelope"></i> {{ patient.patientEmail }}</span>
+                    <span *ngIf="patient.patientPhone"><i class="fas fa-phone"></i> {{ patient.patientPhone }}</span>
+                  </div>
+                </td>
+                <td class="date-cell">
+                  {{ formatDateTime(patient.appointmentTime) }}
+                </td>
+                <td class="type-cell">
+                  <span class="type-badge" [class.badge-video]="patient.appointmentType === 'virtual'"
+                        [class.badge-onsite]="patient.appointmentType === 'onsite'">
+                    <i [class]="patient.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
+                    {{ patient.appointmentType === 'virtual' ? 'Vidéo' : 'Cabinet' }}
+                  </span>
+                </td>
+                <td class="status-cell">
+                  <span class="status-badge" [class]="getStatusClass(patient.status)">
+                    {{ patient.status }}
+                  </span>
+                </td>
+                <td class="action-cell">
+                  <button class="btn-select-patient" (click)="selectPatientFromTable(patient)">
+                    <i [class]="patient.hasConsultation ? 'fas fa-eye' : 'fas fa-user-check'"></i>
+                    {{ patient.hasConsultation ? 'Voir' : 'Créer consultation' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="table-footer">
+            <span>{{ filteredPatients.length }} patient(s) affiché(s)</span>
+            <span *ngIf="tableFilterText">sur {{ patientsWithAppointments.length }} total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Form View -->
+    <div class="search-card" *ngIf="!showPatientsTable">
+      <h2><i class="fas fa-search"></i> Rechercher un Patient</h2>
+      
+      <form [formGroup]="searchPatientForm" (ngSubmit)="searchPatients()">
+        <div class="search-form">
+          <div class="form-group">
+            <label>Type de recherche</label>
+            <select formControlName="searchType">
+              <option value="name">Nom</option>
+              <option value="email">Email</option>
+              <option value="phone">Téléphone</option>
+              <option value="id">ID Patient</option>
+            </select>
+          </div>
+
+          <div class="form-group search-input-group">
+            <label>Recherche (minimum 4 caractères)</label>
+            <div class="autocomplete-wrapper">
+              <div class="input-with-button">
+                <input
+                  type="text"
+                  formControlName="searchQuery"
+                  placeholder="Tapez au moins 4 caractères..."
+                  (input)="onSearchInput($event)"
+                  (blur)="closeAutocomplete()"
+                  (keyup.enter)="searchPatients()"
+                  autocomplete="off"
+                >
+                <button type="submit" class="btn btn-primary" [disabled]="searchPatientForm.invalid || isSearching">
+                  <i class="fas fa-search" *ngIf="!isSearching"></i>
+                  <i class="fas fa-spinner fa-spin" *ngIf="isSearching"></i>
+                  Rechercher
+                </button>
+              </div>
+              
+              <!-- Autocomplete Dropdown -->
+              <div class="autocomplete-dropdown" *ngIf="showAutocomplete && searchResults.length > 0">
+                <div class="autocomplete-header">
+                  <i class="fas fa-users"></i>
+                  <span>{{ searchResults.length }} patient(s) trouvé(s)</span>
+                </div>
+                <div class="autocomplete-item" 
+                     *ngFor="let patient of searchResults" 
+                     (mousedown)="selectPatient(patient)">
+                  <div class="patient-avatar-small">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="patient-info-small">
+                    <div class="patient-name">{{ patient.firstName }} {{ patient.lastName }}</div>
+                    <div class="patient-details">
+                      <span *ngIf="patient.email"><i class="fas fa-envelope"></i> {{ patient.email }}</span>
+                      <span *ngIf="patient.phone"><i class="fas fa-phone"></i> {{ patient.phone }}</span>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+              
+              <!-- Searching Indicator -->
+              <div class="autocomplete-loading" *ngIf="isSearching && showAutocomplete">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Recherche en cours...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Search Results (Manual Search) -->
+      <div class="search-results" *ngIf="!showAutocomplete && searchResults.length > 0">
+        <h3>Résultats de la recherche ({{ searchResults.length }})</h3>
+        <div class="patient-list">
+          <div class="patient-card" *ngFor="let patient of searchResults" (click)="selectPatient(patient)">
+            <div class="patient-info">
+              <div class="patient-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="patient-details">
+                <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+                <p><i class="fas fa-envelope"></i> {{ patient.email }}</p>
+                <p *ngIf="patient.phone"><i class="fas fa-phone"></i> {{ patient.phone }}</p>
+                <p *ngIf="patient.dateOfBirth">
+                  <i class="fas fa-birthday-cake"></i> 
+                  {{ getPatientAge(patient.dateOfBirth) }} ans
+                </p>
+              </div>
+            </div>
+            <div class="select-btn">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-results" *ngIf="searchResults.length === 0 && searchPatientForm.get('searchQuery')?.value">
+        <i class="fas fa-user-slash fa-2x"></i>
+        <p>Aucun patient trouvé</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Consultation Interface (when patient is selected) -->
+  <div class="consultation-interface" *ngIf="selectedPatient">
+    <div class="interface-layout">
+      <!-- Left Panel: Patient Info & History -->
+      <div class="left-panel">
+        <!-- Patient Information Card -->
+        <div class="patient-info-card">
+          <div class="card-header">
+            <h3><i class="fas fa-user"></i> Informations Patient</h3>
+            <button class="btn-icon" (click)="clearPatientSelection()" *ngIf="!consultationStarted">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="patient-details">
+            <div class="detail-row">
+              <label>Nom complet:</label>
+              <span>{{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Email:</label>
+              <span>{{ selectedPatient.email }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedPatient.phone">
+              <label>Téléphone:</label>
+              <span>{{ selectedPatient.phone }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedPatient.dateOfBirth">
+              <label>Âge:</label>
+              <span>{{ getPatientAge(selectedPatient.dateOfBirth) }} ans</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedPatient.gender">
+              <label>Genre:</label>
+              <span>{{ selectedPatient.gender }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedPatient.address">
+              <label>Adresse:</label>
+              <span>{{ selectedPatient.address }}</span>
+            </div>
+          </div>
+
+          <!-- Medical History -->
+          <div class="medical-history" *ngIf="selectedPatient.medicalHistory && selectedPatient.medicalHistory.length > 0">
+            <h4><i class="fas fa-heartbeat"></i> Antécédents Médicaux</h4>
+            <ul>
+              <li *ngFor="let history of selectedPatient.medicalHistory">
+                <i class="fas fa-check-circle"></i> {{ history }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- Start Consultation Button -->
+          <div class="action-section" *ngIf="!consultationStarted">
+            <button class="btn btn-primary btn-block" (click)="startNewConsultation()" [disabled]="isLoading">
+              <i class="fas fa-play-circle"></i>
+              {{ isLoading ? 'Démarrage...' : 'Démarrer la Consultation' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Previous Consultations -->
+        <div class="previous-consultations-card">
+          <div class="card-header">
+            <h3><i class="fas fa-history"></i> Consultations Précédentes</h3>
+            <button class="btn-toggle" (click)="showPatientHistory = !showPatientHistory">
+              <i [class]="showPatientHistory ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+            </button>
+          </div>
+
+          <div class="consultations-list" *ngIf="showPatientHistory">
+            <!-- Loading -->
+            <div class="loading" *ngIf="isLoadingHistory">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Chargement de l'historique...</p>
+            </div>
+
+            <!-- No consultations -->
+            <div class="empty-state" *ngIf="!isLoadingHistory && patientPreviousConsultations.length === 0">
+              <i class="fas fa-folder-open"></i>
+              <p>Aucune consultation antérieure</p>
+            </div>
+
+            <!-- Consultations list -->
+            <div class="consultation-item" 
+                 *ngFor="let consultation of patientPreviousConsultations"
+                 (click)="viewPreviousConsultation(consultation.appointmentId)">
+              <div class="consultation-date">
+                <i class="fas fa-calendar"></i>
+                {{ consultation.startedAt ? formatDate(consultation.startedAt) : 'Date non disponible' }}
+              </div>
+              <div class="consultation-info">
+                <p class="doctor-name">{{ consultation.doctorName }}</p>
+                <p class="diagnosis"><strong>Patient:</strong> {{ consultation.patientName }}</p>
+                <p class="treatment"><strong>Traitement:</strong> {{ consultation.status }}</p>
+              <!--   <span class="prescription-badge" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
+                  <i class="fas fa-prescription"></i>
+                  {{ consultation.prescriptions.length }} ordonnance(s)
+                </span> -->
+              </div>
+              <div class="view-btn">
+                <i class="fas fa-eye"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Consultation Notes -->
+      <div class="right-panel">
+        <!-- Consultation Tabs -->
+        <div class="consultation-tabs" *ngIf="consultationStarted">
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'current'"
+            (click)="activeTab = 'current'"
+          >
+            <i class="fas fa-notes-medical"></i>
+            Notes de Consultation
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'history'"
+            (click)="activeTab = 'history'"
+          >
+            <i class="fas fa-history"></i>
+            Historique
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'attachments'"
+            (click)="activeTab = 'attachments'"
+          >
+            <i class="fas fa-paperclip"></i>
+            Documents
+          </button>
+        </div>
+
+        <!-- Current Consultation Notes -->
+        <div class="notes-panel" *ngIf="consultationStarted && currentConsultation && currentConsultation.id && activeTab === 'current'">
+          <app-consultation-notes
+            [consultation]="currentConsultation"
+            [consultationId]="currentConsultation.id"
+            [appointmentId]="selectedAppointment?.id"
+            [doctorSpecialty]="currentConsultation.doctorSpecialty"
+            [readOnly]="currentConsultation.status === 'completed' || currentConsultation.status === 'cancelled'"
+            [showLimitedFields]="currentConsultation.doctorSpecialty === 'other' || currentConsultation.doctorSpecialty === 'Autre'"
+            (consultationEnded)="onConsultationEnded()"
+          ></app-consultation-notes>
+        </div>
+
+        <!-- Show loading or error if consultation ID is missing -->
+        <div class="notes-panel" *ngIf="consultationStarted && currentConsultation && !currentConsultation.id && activeTab === 'current'">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Erreur: ID de consultation manquant. Veuillez rafraîchir la page ou redémarrer la consultation.
+          </div>
+        </div>
+
+        <!-- History Tab Content -->
+        <div class="history-panel" *ngIf="activeTab === 'history' && consultationStarted">
+          <div class="consultations-timeline">
+            <h3>Historique du patient</h3>
+            
+            <!-- Loading State -->
+            <div class="timeline-loading" *ngIf="isLoadingHistory">
+              <i class="fas fa-spinner fa-spin fa-2x"></i>
+              <p>Chargement de l'historique...</p>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="timeline-empty" *ngIf="!isLoadingHistory && patientPreviousConsultations.length === 0">
+              <i class="fas fa-folder-open fa-3x"></i>
+              <p>Aucune consultation terminée trouvée pour ce patient</p>
+            </div>
+            
+            <!-- Timeline Items -->
+            <div class="timeline-item" *ngFor="let consultation of patientPreviousConsultations">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+              <!--   <div class="timeline-date">{{ formatDate(consultation.date) }}</div> -->
+                <div class="timeline-doctor">{{ consultation.doctorName }}</div>
+                <div class="timeline-diagnosis"><strong>Patient:</strong> {{ consultation.patientName }}</div>
+                <div class="timeline-treatment" >
+                  <strong>Statut:</strong> {{ consultation.status }}
+                </div>
+               <!--  <div class="timeline-prescriptions" *ngIf="consultation.prescriptions && consultation.prescriptions.length > 0">
+                  <i class="fas fa-prescription"></i> {{ consultation.prescriptions.length }} ordonnance(s)
+                </div> -->
+                <button class="btn-view-details" (click)="viewPreviousConsultation(consultation.appointmentId)">
+                  <i class="fas fa-eye"></i> Voir détails
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attachments Tab Content -->
+        <div class="attachments-panel" *ngIf="activeTab === 'attachments' && consultationStarted">
+          <div class="attachments-section">
+            <h3>Documents et Pièces Jointes</h3>
+            <div class="upload-area">
+              <i class="fas fa-cloud-upload-alt fa-3x"></i>
+              <p>Glissez-déposez des fichiers ici ou cliquez pour sélectionner</p>
+              <input type="file" multiple (change)="onFileSelect($event)" style="display:none" #fileInput>
+              <button class="btn btn-primary" (click)="fileInput.click()">
+                <i class="fas fa-upload"></i> Sélectionner des fichiers
+              </button>
+            </div>
+            <p class="coming-soon">Fonctionnalité de téléchargement bientôt disponible</p>
+          </div>
+        </div>
+
+        <!-- Placeholder when consultation not started -->
+        <div class="placeholder-panel" *ngIf="!consultationStarted">
+          <i class="fas fa-play-circle fa-4x"></i>
+          <h3>Consultation non démarrée</h3>
+          <p>Sélectionnez un patient et cliquez sur "Démarrer la Consultation" pour commencer</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

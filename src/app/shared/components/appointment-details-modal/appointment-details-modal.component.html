@@ -1,0 +1,120 @@
+<div class="modal-overlay" *ngIf="isOpen && appointment" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 class="modal-title">Détails du Rendez-vous</h2>
+      <button class="close-button" (click)="close()" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Status Badge -->
+      <div class="status-section">
+        <span class="status-badge" [class]="'status-' + appointment.status.toLowerCase()">
+          {{ getStatusLabel(appointment.status) }}
+        </span>
+      </div>
+
+      <!-- Doctor Information -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <i class="fas fa-user-md"></i> Informations du Médecin
+        </h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Nom complet</span>
+            <span class="detail-value">Dr. {{ appointment.doctorFirstName }} {{ appointment.doctorLastName }}</span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.doctorSpecialty">
+            <span class="detail-label">Spécialité</span>
+            <span class="detail-value">{{ appointment.doctorSpecialty }}</span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.doctorDepartment">
+            <span class="detail-label">Département</span>
+            <span class="detail-value">{{ appointment.doctorDepartment }}</span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.doctorEmail">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">{{ appointment.doctorEmail }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointment Information -->
+      <div class="detail-section">
+        <h3 class="section-title">
+          <i class="fas fa-calendar-check"></i> Informations du Rendez-vous
+        </h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">{{ getDateDisplay(appointment.appointmentTime) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Heure de début</span>
+            <span class="detail-value">{{ getTimeDisplay(appointment.appointmentTime) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Heure de fin</span>
+            <span class="detail-value">{{ getTimeDisplay(appointment.endTime) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Type de consultation</span>
+            <span class="detail-value">
+              <i [class]="appointment.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
+              {{ appointment.appointmentType === 'virtual' ? 'Téléconsultation' : 'En cabinet' }}
+            </span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.consultationFee">
+            <span class="detail-label">Frais de consultation</span>
+            <span class="detail-value">{{ appointment.consultationFee }} FCFA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meeting Details (for virtual appointments) -->
+      <div class="detail-section" *ngIf="appointment.appointmentType === 'virtual' && appointment.meetingLink">
+        <h3 class="section-title">
+          <i class="fas fa-video"></i> Détails de la Téléconsultation
+        </h3>
+        <div class="meeting-info">
+          <div class="meeting-link">
+            <i class="fas fa-link"></i>
+            <a [href]="appointment.meetingLink" target="_blank">Rejoindre la consultation</a>
+          </div>
+          <div class="meeting-details" *ngIf="appointment.meetingId">
+            <p><strong>ID:</strong> {{ appointment.meetingId }}</p>
+            <p *ngIf="appointment.meetingPasscode"><strong>Code:</strong> {{ appointment.meetingPasscode }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location Details (for onsite appointments) -->
+      <div class="detail-section" *ngIf="appointment.appointmentType === 'onsite' && appointment.clinicLocation">
+        <h3 class="section-title">
+          <i class="fas fa-map-marker-alt"></i> Lieu de Consultation
+        </h3>
+        <div class="location-info">
+          <p><strong>{{ appointment.clinicLocation }}</strong></p>
+          <p *ngIf="appointment.clinicAddress">{{ appointment.clinicAddress }}</p>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="detail-section" *ngIf="appointment.notes">
+        <h3 class="section-title">
+          <i class="fas fa-notes-medical"></i> Notes
+        </h3>
+        <div class="notes-content">
+          {{ appointment.notes }}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="close()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

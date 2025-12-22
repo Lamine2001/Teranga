@@ -1,0 +1,253 @@
+<div class="patient-dashboard-container">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="welcome-section">
+      <h1><i class="fas fa-user-circle"></i> Tableau de Bord Patient</h1>
+      <p *ngIf="currentUser">
+        Bienvenue, {{ currentUser.firstName }} {{ currentUser.lastName }} !
+      </p>
+    </div>
+    <div class="user-actions">
+      <button class="btn btn-outline-primary" (click)="onProfileClick()">
+        <i class="fas fa-user-edit"></i> Profil
+      </button>
+      <button class="btn btn-outline-danger" (click)="onLogoutClick()">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <div class="action-card primary" (click)="onRendezVousClick()">
+      <div class="action-icon">
+        <i class="fas fa-calendar-plus"></i>
+      </div>
+      <div class="action-content">
+        <h3>Prendre un Rendez-vous</h3>
+        <p>Rechercher et réserver un créneau avec un médecin</p>
+      </div>
+      <div class="action-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+
+    <div class="action-card secondary" (click)="onViewAppointmentsClick()">
+      <div class="action-icon">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div class="action-content">
+        <h3>Mes Rendez-vous</h3>
+        <p>Consulter et gérer vos rendez-vous</p>
+      </div>
+      <div class="action-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Appointments -->
+  <div class="appointments-section">
+    <div class="section-header">
+      <h2><i class="fas fa-clock"></i> Prochains Rendez-vous</h2>
+      <button class="btn-link" *ngIf="!showAllAppointments && hasMoreThanThreeAppointments()" (click)="onViewAppointmentsClick()">
+        Voir tous <i class="fas fa-arrow-right"></i>
+      </button>
+      <button class="btn-link" *ngIf="canShowLess()" (click)="onShowLimitedAppointments()">
+        Voir moins <i class="fas fa-arrow-up"></i>
+      </button>
+    </div>
+    
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="error && !isLoading">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ error }}
+      <button class="btn-retry" (click)="loadUpcomingAppointments()">
+        <i class="fas fa-sync-alt"></i> Réessayer
+      </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement des rendez-vous...</p>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="appointments-table-container" *ngIf="!isLoading && !error && upcomingAppointments.length > 0">
+      <table class="appointments-table">
+        <thead>
+          <tr>
+            <th><i class="fas fa-user-md"></i> Médecin</th>
+            <th><i class="fas fa-stethoscope"></i> Spécialité</th>
+            <th><i class="fas fa-calendar"></i> Date</th>
+            <th><i class="fas fa-clock"></i> Heure</th>
+            <th><i class="fas fa-video"></i> Type</th>
+            <th><i class="fas fa-info-circle"></i> Statut</th>
+            <th><i class="fas fa-cog"></i> Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let appointment of getDisplayedAppointments()" 
+              class="appointment-row"
+              [class.today]="isAppointmentToday(appointment.appointmentTime)"
+              [class.virtual]="appointment.appointmentType === 'virtual'">
+            
+            <!-- Doctor Info -->
+            <td class="doctor-cell">
+              <div class="doctor-info-inline">
+                <div class="doctor-avatar-small">
+                  <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-name-inline">
+                  <strong>Dr. {{ appointment.doctorFirstName }} {{ appointment.doctorLastName }}</strong>
+                  <small *ngIf="appointment.doctorDepartment">{{ appointment.doctorDepartment }}</small>
+                </div>
+              </div>
+            </td>
+
+            <!-- Specialty -->
+            <td class="specialty-cell">
+              <span class="specialty-badge">{{ appointment.doctorSpecialty || 'Médecine Générale' }}</span>
+            </td>
+
+            <!-- Date -->
+            <td class="date-cell">
+              <div class="date-display">
+                <i class="fas fa-calendar-day"></i>
+                <span>{{ getDateDisplay(appointment.appointmentTime) }}</span>
+              </div>
+            </td>
+
+            <!-- Time -->
+            <td class="time-cell">
+              <div class="time-display">
+                <i class="fas fa-clock"></i>
+                <span>{{ getTimeDisplay(appointment.appointmentTime) }}</span>
+              </div>
+            </td>
+
+            <!-- Type -->
+            <td class="type-cell">
+              <span class="type-badge" [class.virtual]="appointment.appointmentType === 'virtual'">
+                <i [class]="appointment.appointmentType === 'virtual' ? 'fas fa-video' : 'fas fa-hospital'"></i>
+                {{ appointment.appointmentType === 'virtual' ? 'Téléconsultation' : 'En cabinet' }}
+              </span>
+            </td>
+
+            <!-- Status -->
+            <td class="status-cell">
+              <span class="status-badge" [class]="'status-' + appointment.status.toLowerCase()">
+                {{ getStatusLabel(appointment.status) }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td class="actions-cell">
+              <div class="action-buttons">
+                <button class="btn-icon btn-primary" 
+                        *ngIf="appointment.appointmentType === 'virtual' && isAppointmentToday(appointment.appointmentTime)"
+                        title="Rejoindre la consultation">
+                  <i class="fas fa-video"></i>
+                </button>
+                <button class="btn-icon btn-info" 
+                        (click)="viewAppointmentDetails(appointment)"
+                        title="Voir les détails">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icon btn-danger" 
+                        *ngIf="canCancelAppointment(appointment)" 
+                        (click)="cancelAppointment(appointment)"
+                        title="Annuler le rendez-vous">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="no-appointments" *ngIf="!isLoading && !error && upcomingAppointments.length === 0">
+      <i class="fas fa-calendar-times"></i>
+      <h3>Aucun rendez-vous à venir</h3>
+      <p>Prenez votre premier rendez-vous en cliquant sur le bouton ci-dessus</p>
+      <button class="btn-primary" (click)="onRendezVousClick()">
+        <i class="fas fa-calendar-plus"></i> Prendre un rendez-vous
+      </button>
+    </div>
+  </div>
+
+  <!-- Health Summary -->
+  <div class="health-summary">
+    <h2><i class="fas fa-heartbeat"></i> Résumé de Santé</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Rendez-vous à Venir</h3>
+          <p class="summary-number">{{ upcomingAppointments.length }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-history"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Historique</h3>
+          <p class="summary-number">{{ appointmentHistory.length }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Médecins Consultés</h3>
+          <p class="summary-number">{{ getUniqueDoctorsCount() }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-stethoscope"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Spécialités</h3>
+          <p class="summary-number">{{ getUniqueSpecialtiesCount() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation -->
+  <app-confirm-dialog
+    [isOpen]="showConfirmDialog"
+    [title]="confirmDialogTitle"
+    [message]="confirmDialogMessage"
+    [confirmText]="'Annuler le rendez-vous'"
+    [cancelText]="'Garder'"
+    [type]="'danger'"
+    (confirmed)="onConfirmCancel()"
+    (cancelled)="onCancelDialog()">
+  </app-confirm-dialog>
+
+  <!-- Modal de détails -->
+  <app-appointment-details-modal
+    [isOpen]="showDetailsModal"
+    [appointment]="selectedAppointment"
+    (closed)="closeDetailsModal()">
+  </app-appointment-details-modal>
+
+  <!-- Notification -->
+  <app-notification
+    [isVisible]="showNotification"
+    [message]="notificationMessage"
+    [type]="notificationType"
+    (closed)="onNotificationClosed()">
+  </app-notification>
+</div>

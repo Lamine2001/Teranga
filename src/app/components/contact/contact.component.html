@@ -1,0 +1,146 @@
+<section id="contact" class="contact section">
+  <div class="container">
+    <h2 class="section-title">Contactez-nous</h2>
+    
+    <div class="contact-content">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div class="contact-details">
+            <h4>Email</h4>
+            <a href="mailto:msante.notification&#64;gmail.com">msante.notification&#64;gmail.com</a>
+          </div>
+        </div>
+        
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div class="contact-details">
+            <h4>Téléphone</h4>
+            <a href="tel:+15142920801">+1 514 292-0801</a>
+          </div>
+        </div>
+        
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div class="contact-details">
+            <h4>Adresse</h4>
+            <address>
+              1050 Beaver Hall, 3e étage<br>
+              Montréal (Québec)
+            </address>
+          </div>
+        </div>
+        
+        <div class="social-links">
+          <h4>Suivez-nous</h4>
+          <div class="social-icons">
+            <a href="#" class="social-link">
+              <div class="social-icon">📘</div>
+              <span>Facebook</span>
+            </a>
+            <a href="#" class="social-link">
+              <div class="social-icon">📷</div>
+              <span>Instagram</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="contact-form">
+        <h3>Envoyez-nous un message</h3>
+        
+        <!-- Message de succès -->
+        <div *ngIf="submitSuccess" class="alert alert-success" role="alert">
+          <strong>✓ Succès!</strong> {{ successMessage }}
+        </div>
+        
+        <!-- Message d'erreur -->
+        <div *ngIf="submitError" class="alert alert-error" role="alert">
+          <strong>✗ Erreur!</strong> {{ errorMessage }}
+        </div>
+        
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit(); $event.preventDefault()" class="form" novalidate>
+          <div class="form-group">
+            <label for="name">Nom complet <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="name" 
+              formControlName="name"
+              [class.invalid]="isFieldInvalid('name')"
+              required>
+            <span *ngIf="isFieldInvalid('name')" class="error-message">
+              {{ getFieldError('name') }}
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email"
+              [class.invalid]="isFieldInvalid('email')"
+              required>
+            <span *ngIf="isFieldInvalid('email')" class="error-message">
+              {{ getFieldError('email') }}
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="phone">Téléphone</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              formControlName="phone"
+              [class.invalid]="isFieldInvalid('phone')"
+              placeholder="+1234567890">
+            <span *ngIf="isFieldInvalid('phone')" class="error-message">
+              {{ getFieldError('phone') }}
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="subject">Sujet <span class="required">*</span></label>
+            <select 
+              id="subject" 
+              formControlName="subject"
+              [class.invalid]="isFieldInvalid('subject')"
+              required>
+              <option value="">Sélectionnez un sujet</option>
+              <option *ngFor="let subject of subjects" [value]="subject.value">
+                {{ subject.label }}
+              </option>
+            </select>
+            <span *ngIf="isFieldInvalid('subject')" class="error-message">
+              {{ getFieldError('subject') }}
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="message">Message <span class="required">*</span></label>
+            <textarea 
+              id="message" 
+              formControlName="message"
+              [class.invalid]="isFieldInvalid('message')"
+              rows="5" 
+              required></textarea>
+            <span *ngIf="isFieldInvalid('message')" class="error-message">
+              {{ getFieldError('message') }}
+            </span>
+            <small class="character-count">
+              {{ contactForm.get('message')?.value?.length || 0 }} / 1000 caractères
+            </small>
+          </div>
+          
+          <button 
+            type="submit" 
+            class="btn btn-primary btn-large"
+            [disabled]="isSubmitting || contactForm.invalid">
+            <span *ngIf="!isSubmitting">Envoyer le message</span>
+            <span *ngIf="isSubmitting">Envoi en cours...</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

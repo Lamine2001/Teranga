@@ -1,0 +1,189 @@
+<div class="edit-profile-container">
+  <div class="edit-header">
+    <button class="btn-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Retour au profil
+    </button>
+    <h1><i class="fas fa-user-edit"></i> Modifier le Profil</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement du profil...</p>
+  </div>
+
+  <div *ngIf="success" class="success-message">
+    <i class="fas fa-check-circle"></i>
+    Profil mis à jour avec succès ! Redirection...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading" class="profile-form">
+    <!-- Informations personnelles -->
+    <div class="form-section">
+      <h2>Informations personnelles</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName">Prénom *</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            class="form-control"
+            [class.is-invalid]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+            Le prénom est requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Nom *</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            class="form-control"
+            [class.is-invalid]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+            Le nom est requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-control"
+            [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+            Email valide requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Téléphone *</label>
+          <input
+            type="tel"
+            id="phone"
+            formControlName="phone"
+            class="form-control"
+            placeholder="+221 77 123 45 67"
+            [class.is-invalid]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched">
+            Format de téléphone invalide
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dateOfBirth">Date de naissance</label>
+          <input
+            type="date"
+            id="dateOfBirth"
+            formControlName="dateOfBirth"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="address">Adresse</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            class="form-control"
+            rows="2"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations professionnelles (pour les médecins) -->
+    <div class="form-section" *ngIf="isDoctor">
+      <h2>Informations professionnelles</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="specialty">Spécialité</label>
+          <input
+            type="text"
+            id="specialty"
+            formControlName="specialty"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="licenseNumber">Numéro de licence</label>
+          <input
+            type="text"
+            id="licenseNumber"
+            formControlName="licenseNumber"
+            class="form-control"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact d'urgence -->
+    <div class="form-section">
+      <h2>Contact d'urgence</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="emergencyContactName">Nom du contact</label>
+          <input
+            type="text"
+            id="emergencyContactName"
+            formControlName="emergencyContactName"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="emergencyContactPhone">Téléphone du contact</label>
+          <input
+            type="tel"
+            id="emergencyContactPhone"
+            formControlName="emergencyContactPhone"
+            class="form-control"
+            [class.is-invalid]="profileForm.get('emergencyContactPhone')?.invalid && profileForm.get('emergencyContactPhone')?.touched"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="emergencyContactRelationship">Relation</label>
+          <select
+            id="emergencyContactRelationship"
+            formControlName="emergencyContactRelationship"
+            class="form-control"
+          >
+            <option value="">Sélectionner</option>
+            <option value="Conjoint(e)">Conjoint(e)</option>
+            <option value="Parent">Parent</option>
+            <option value="Enfant">Enfant</option>
+            <option value="Frère/Sœur">Frère/Sœur</option>
+            <option value="Ami(e)">Ami(e)</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">
+        <i class="fas fa-times"></i> Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || saving">
+        <i class="fas fa-save" *ngIf="!saving"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="saving"></i>
+        {{ saving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+      </button>
+    </div>
+  </form>
+</div>

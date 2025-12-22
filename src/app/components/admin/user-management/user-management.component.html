@@ -1,0 +1,211 @@
+<div class="user-management-container">
+  <!-- Header with Stats -->
+  <div class="management-header">
+    <h2>Gestion des Utilisateurs</h2>
+    <div class="stats-summary">
+      <div class="stat-item pending">
+        <i class="fas fa-clock"></i>
+        <span class="stat-number">{{ pendingCount }}</span>
+        <span class="stat-label">En attente</span>
+      </div>
+      <div class="stat-item active">
+        <i class="fas fa-check-circle"></i>
+        <span class="stat-number">{{ activeCount }}</span>
+        <span class="stat-label">Actifs</span>
+      </div>
+      <div class="stat-item disabled">
+        <i class="fas fa-ban"></i>
+        <span class="stat-number">{{ disabledCount }}</span>
+        <span class="stat-label">Désactivés</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-navigation">
+    <button class="tab-button" 
+            [class.active]="activeTab === 'pending'"
+            (click)="switchTab('pending')">
+      <i class="fas fa-clock"></i>
+      <span>En attente ({{ pendingCount }})</span>
+    </button>
+    <button class="tab-button" 
+            [class.active]="activeTab === 'active'"
+            (click)="switchTab('active')">
+      <i class="fas fa-check-circle"></i>
+      <span>Actifs ({{ activeCount }})</span>
+    </button>
+    <button class="tab-button" 
+            [class.active]="activeTab === 'disabled'"
+            (click)="switchTab('disabled')">
+      <i class="fas fa-ban"></i>
+      <span>Désactivés ({{ disabledCount }})</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement des utilisateurs...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadUsers()">Réessayer</button>
+  </div>
+
+  <!-- Content -->
+  <div class="tab-content" *ngIf="!isLoading && !error">
+    <!-- Pending Users -->
+    <div *ngIf="activeTab === 'pending'" class="users-section">
+      <div *ngIf="pendingUsers.length === 0" class="empty-state">
+        <i class="fas fa-inbox fa-3x"></i>
+        <p>Aucun utilisateur en attente d'activation</p>
+      </div>
+
+      <div class="users-grid" *ngIf="pendingUsers.length > 0">
+        <div class="user-card" *ngFor="let user of pendingUsers">
+          <div class="user-header">
+            <i class="fas fa-user-circle user-avatar"></i>
+            <div class="user-info">
+              <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+              <span class="user-role">{{ getRoleLabel(user.userType) }}</span>
+            </div>
+            <span class="status-badge pending">En attente</span>
+          </div>
+
+          <div class="user-details">
+            <div class="detail-row">
+              <i class="fas fa-envelope"></i>
+              <span>{{ user.email }}</span>
+            </div>
+            <div class="detail-row" *ngIf="user.phone">
+              <i class="fas fa-phone"></i>
+              <span>{{ user.phone }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="fas fa-calendar"></i>
+              <span>Inscrit le {{ getDateDisplay(user.createdAt) }}</span>
+            </div>
+          </div>
+
+          <div class="user-actions">
+            <button class="btn-action btn-success" (click)="activateUser(user)">
+              <i class="fas fa-check"></i> Activer
+            </button>
+            <button class="btn-action btn-danger" (click)="deleteUser(user)">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Users -->
+    <div *ngIf="activeTab === 'active'" class="users-section">
+      <div *ngIf="activeUsers.length === 0" class="empty-state">
+        <i class="fas fa-inbox fa-3x"></i>
+        <p>Aucun utilisateur actif</p>
+      </div>
+
+      <div class="users-grid" *ngIf="activeUsers.length > 0">
+        <div class="user-card" *ngFor="let user of activeUsers">
+          <div class="user-header">
+            <i class="fas fa-user-circle user-avatar"></i>
+            <div class="user-info">
+              <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+              <span class="user-role">{{ getRoleLabel(user.userType) }}</span>
+            </div>
+            <span class="status-badge active">Actif</span>
+          </div>
+
+          <div class="user-details">
+            <div class="detail-row">
+              <i class="fas fa-envelope"></i>
+              <span>{{ user.email }}</span>
+            </div>
+            <div class="detail-row" *ngIf="user.phone">
+              <i class="fas fa-phone"></i>
+              <span>{{ user.phone }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="fas fa-calendar"></i>
+              <span>Inscrit le {{ getDateDisplay(user.createdAt) }}</span>
+            </div>
+          </div>
+
+          <div class="user-actions">
+            <button class="btn-action btn-warning" (click)="disableUser(user)">
+              <i class="fas fa-ban"></i> Désactiver
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disabled Users -->
+    <div *ngIf="activeTab === 'disabled'" class="users-section">
+      <div *ngIf="disabledUsers.length === 0" class="empty-state">
+        <i class="fas fa-inbox fa-3x"></i>
+        <p>Aucun utilisateur désactivé</p>
+      </div>
+
+      <div class="users-grid" *ngIf="disabledUsers.length > 0">
+        <div class="user-card" *ngFor="let user of disabledUsers">
+          <div class="user-header">
+            <i class="fas fa-user-circle user-avatar"></i>
+            <div class="user-info">
+              <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+              <span class="user-role">{{ getRoleLabel(user.userType) }}</span>
+            </div>
+            <span class="status-badge disabled">Désactivé</span>
+          </div>
+
+          <div class="user-details">
+            <div class="detail-row">
+              <i class="fas fa-envelope"></i>
+              <span>{{ user.email }}</span>
+            </div>
+            <div class="detail-row" *ngIf="user.phone">
+              <i class="fas fa-phone"></i>
+              <span>{{ user.phone }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="fas fa-calendar"></i>
+              <span>Inscrit le {{ getDateDisplay(user.createdAt) }}</span>
+            </div>
+          </div>
+
+          <div class="user-actions">
+            <button class="btn-action btn-success" (click)="activateUser(user)">
+              <i class="fas fa-check"></i> Réactiver
+            </button>
+            <button class="btn-action btn-danger" (click)="deleteUser(user)">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmation -->
+<app-confirm-dialog
+  [isOpen]="showConfirmDialog"
+  [title]="confirmDialogTitle"
+  [message]="confirmDialogMessage"
+  [type]="'danger'"
+  (confirmed)="onConfirmAction()"
+  (cancelled)="onCancelDialog()">
+</app-confirm-dialog>
+
+<!-- Notification -->
+<app-notification
+  [isVisible]="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  (closed)="onNotificationClosed()">
+</app-notification>

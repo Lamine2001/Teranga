@@ -1,0 +1,64 @@
+<div class="patient-list-container">
+  <div class="list-header">
+    <h3>Mes Patients ({{ totalPatients }})</h3>
+    <button class="btn-refresh" (click)="loadPatients()">
+      <i class="fas fa-sync-alt"></i> Actualiser
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement des patients...</p>
+  </div>
+
+  <div *ngIf="error" class="error-state">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadPatients()">Réessayer</button>
+  </div>
+
+  <div *ngIf="!isLoading && !error && patients.length === 0" class="empty-state">
+    <i class="fas fa-users fa-3x"></i>
+    <p>Aucun patient enregistré</p>
+  </div>
+
+  <div class="patients-grid" *ngIf="!isLoading && patients.length > 0">
+    <div class="patient-card" *ngFor="let patient of patients">
+      <div class="patient-header">
+        <div class="patient-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="patient-info">
+          <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+          <span class="patient-age">{{ getAge(patient.dateOfBirth) }} ans</span>
+          <span class="patient-gender">{{ getGenderLabel(patient.gender) }}</span>
+        </div>
+      </div>
+
+      <div class="patient-details">
+        <div class="detail-row">
+          <i class="fas fa-envelope"></i>
+          <span>{{ patient.email }}</span>
+        </div>
+        <div class="detail-row">
+          <i class="fas fa-phone"></i>
+          <span>{{ patient.phone }}</span>
+        </div>
+        <div class="detail-row">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{ patient.address }}</span>
+        </div>
+        <div class="detail-row">
+          <i class="fas fa-birthday-cake"></i>
+          <span>{{ patient.dateOfBirth | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="patient-actions">
+        <button class="btn-action btn-primary" (click)="onViewMedicalRecord(patient)">
+          <i class="fas fa-file-medical"></i> Dossier Médical
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

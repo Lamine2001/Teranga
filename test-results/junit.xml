@@ -1,0 +1,316 @@
+<testsuites id="" name="" tests="8" failures="8" skipped="0" errors="0" time="18.764108000000007">
+<testsuite name="tests/auth/login.spec.ts" timestamp="2025-10-19T18:00:33.414Z" hostname="chromium" tests="8" failures="8" skipped="0" time="13.4" errors="0">
+<testcase name="Login Functionality › should display login form" classname="tests/auth/login.spec.ts" time="2.781">
+<failure message="login.spec.ts:16:7 should display login form" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:16:7 › Login Functionality › should display login form ─────
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-0fdb0-y-should-display-login-form-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Login Functionality › should login as patient successfully" classname="tests/auth/login.spec.ts" time="2.502">
+<failure message="login.spec.ts:25:7 should login as patient successfully" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:25:7 › Login Functionality › should login as patient successfully 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-90b9b-gin-as-patient-successfully-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Login Functionality › should login as doctor successfully" classname="tests/auth/login.spec.ts" time="2.482">
+<failure message="login.spec.ts:41:7 should login as doctor successfully" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:41:7 › Login Functionality › should login as doctor successfully 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-edee5-ogin-as-doctor-successfully-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Login Functionality › should show error for invalid credentials" classname="tests/auth/login.spec.ts" time="2.589">
+<failure message="login.spec.ts:57:7 should show error for invalid credentials" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:57:7 › Login Functionality › should show error for invalid credentials 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-1cf4d-ror-for-invalid-credentials-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Login Functionality › should show validation error for empty fields" classname="tests/auth/login.spec.ts" time="1.03">
+<failure message="login.spec.ts:75:7 should show validation error for empty fields" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:75:7 › Login Functionality › should show validation error for empty fields 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-ae7a8-tion-error-for-empty-fields-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Login Functionality › should navigate to registration page" classname="tests/auth/login.spec.ts" time="1.199">
+<failure message="login.spec.ts:92:7 should navigate to registration page" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:92:7 › Login Functionality › should navigate to registration page 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-918a3-vigate-to-registration-page-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Login Functionality › should navigate to forgot password page" classname="tests/auth/login.spec.ts" time="0.581">
+<failure message="login.spec.ts:102:7 should navigate to forgot password page" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:102:7 › Login Functionality › should navigate to forgot password page 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-5e938-ate-to-forgot-password-page-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Login Functionality › should persist login after page refresh" classname="tests/auth/login.spec.ts" time="0.236">
+<failure message="login.spec.ts:113:7 should persist login after page refresh" type="FAILURE">
+<![CDATA[  [chromium] › tests/auth/login.spec.ts:113:7 › Login Functionality › should persist login after page refresh 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at AuthHelper.clearAuth (/Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/helpers/auth-helper.ts:128:21)
+        at /Users/noelgoudiaby/NEW_DEVELOPMENT/MSANTE-OFFICIEL/securemsante/Teranga/e2e/tests/auth/login.spec.ts:13:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../test-results/tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../test-results/tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/video.webm]]
+
+[[ATTACHMENT|tests-auth-login-Login-Fun-a0235-st-login-after-page-refresh-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

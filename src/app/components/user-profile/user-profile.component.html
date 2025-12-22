@@ -1,0 +1,125 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <button class="btn-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+    </button>
+    <h1><i class="fas fa-user-circle"></i> Mon Profil</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement du profil...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="userProfile && !loading" class="profile-content">
+    <div class="profile-actions">
+      <button class="btn btn-primary" (click)="editProfile()">
+        <i class="fas fa-edit"></i> Modifier le profil
+      </button>
+      <button class="btn btn-secondary" (click)="changePassword()">
+        <i class="fas fa-key"></i> Changer le mot de passe
+      </button>
+    </div>
+
+    <div class="profile-sections">
+      <!-- Informations personnelles -->
+      <div class="profile-section">
+        <h2><i class="fas fa-info-circle"></i> Informations personnelles</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Prénom</label>
+            <p>{{ userProfile.firstName || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Nom</label>
+            <p>{{ userProfile.lastName || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <p>{{ userProfile.email }}</p>
+          </div>
+          <div class="info-item">
+            <label>Téléphone</label>
+            <p>{{ userProfile.phone || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Date de naissance</label>
+            <p>{{ formatDate(userProfile.dateOfBirth) }}</p>
+          </div>
+          <div class="info-item">
+            <label>Adresse</label>
+            <p>{{ userProfile.address || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Rôle</label>
+            <p class="role-badge">{{ userProfile.userType }}</p>
+          </div>
+          <div class="info-item">
+            <label>Statut</label>
+            <p class="status-badge" [class.active]="userProfile.enabled">
+              {{ userProfile.enabled ? 'Actif' : 'Inactif' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations professionnelles (pour les médecins) -->
+      <div class="profile-section" *ngIf="userProfile.userType === 'DOCTOR' || userProfile.specialty">
+        <h2><i class="fas fa-user-md"></i> Informations professionnelles</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Spécialité</label>
+            <p>{{ userProfile.specialty || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Numéro de licence</label>
+            <p>{{ userProfile.licenseNumber || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Département</label>
+            <p>{{ userProfile.department || 'Non renseigné' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact d'urgence -->
+      <div class="profile-section">
+        <h2><i class="fas fa-phone-alt"></i> Contact d'urgence</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Nom du contact</label>
+            <p>{{ userProfile.emergencyContactName || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Téléphone</label>
+            <p>{{ userProfile.emergencyContactPhone || 'Non renseigné' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Relation</label>
+            <p>{{ userProfile.emergencyContactRelationship || 'Non renseigné' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations système -->
+      <div class="profile-section">
+        <h2><i class="fas fa-cog"></i> Informations système</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Date de création</label>
+            <p>{{ formatDate(userProfile.createdAt) }}</p>
+          </div>
+          <div class="info-item">
+            <label>Dernière mise à jour</label>
+            <p>{{ formatDate(userProfile.updatedAt) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

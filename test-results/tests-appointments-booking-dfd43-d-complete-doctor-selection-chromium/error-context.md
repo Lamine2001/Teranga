@@ -1,0 +1,334 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "📞 514 852-1234" [ref=e8] [cursor=pointer]:
+          - /url: tel:+15148521234
+          - generic [ref=e9]: 📞
+          - generic [ref=e10]: 514 852-1234
+        - generic [ref=e11]: "|"
+        - generic [ref=e12]: Clinique de Santé Mentale
+      - link "👤 Connexion" [ref=e15] [cursor=pointer]:
+        - /url: /auth
+        - generic [ref=e16]: 👤
+        - generic [ref=e17]: Connexion
+    - banner [ref=e18]:
+      - navigation [ref=e19]:
+        - generic [ref=e21]:
+          - link "M-Santé Bien-être psychologique" [ref=e23] [cursor=pointer]:
+            - /url: /home
+            - img [ref=e25]
+            - generic [ref=e28]: M-Santé
+            - generic [ref=e29]: Bien-être psychologique
+          - generic [ref=e30]:
+            - link "Accueil" [ref=e31] [cursor=pointer]:
+              - /url: /home
+            - link "À propos" [ref=e32] [cursor=pointer]:
+              - /url: "#about"
+            - link "Services" [ref=e33] [cursor=pointer]:
+              - /url: "#services"
+            - link "Contact" [ref=e34] [cursor=pointer]:
+              - /url: "#contact"
+            - link "Tarifs" [ref=e35] [cursor=pointer]:
+              - /url: "#rates"
+          - link "📅 Prendre rendez-vous" [ref=e37] [cursor=pointer]:
+            - /url: /appointments/wizard
+            - generic [ref=e38]: 📅
+            - generic [ref=e39]: Prendre rendez-vous
+  - main [ref=e40]:
+    - generic [ref=e41]:
+      - generic [ref=e43]:
+        - img "Hero Background"
+        - generic [ref=e50]:
+          - heading "M-Santé" [level=1] [ref=e51]
+          - heading "Votre bien-être, notre priorité" [level=2] [ref=e52]
+          - paragraph [ref=e53]: Des consultations personnalisées avec nos professionnels qualifiés pour vous accompagner vers un mieux-être durable.
+          - generic [ref=e54]:
+            - link " Prendre rendez-vous" [ref=e55] [cursor=pointer]:
+              - /url: /appointments/wizard
+              - generic [ref=e56]: 
+              - text: Prendre rendez-vous
+            - link " En savoir plus" [ref=e57] [cursor=pointer]:
+              - /url: /services
+              - generic [ref=e58]: 
+              - text: En savoir plus
+        - generic [ref=e60]:
+          - heading " Les plus demandés" [level=3] [ref=e61]:
+            - generic [ref=e62]: 
+            - text: Les plus demandés
+          - generic [ref=e63]:
+            - link " Thérapie individuelle" [ref=e64] [cursor=pointer]:
+              - /url: /services
+              - generic [ref=e65]: 
+              - generic [ref=e66]: Thérapie individuelle
+            - link " Coaching de vie" [ref=e67] [cursor=pointer]:
+              - /url: /services
+              - generic [ref=e68]: 
+              - generic [ref=e69]: Coaching de vie
+            - link " Soutien en ligne" [ref=e70] [cursor=pointer]:
+              - /url: /services
+              - generic [ref=e71]: 
+              - generic [ref=e72]: Soutien en ligne
+            - link " Bien-être" [ref=e73] [cursor=pointer]:
+              - /url: /services
+              - generic [ref=e74]: 
+              - generic [ref=e75]: Bien-être
+      - generic [ref=e78]:
+        - heading "Nous sommes là pour vous accompagner" [level=2] [ref=e79]
+        - generic [ref=e82]:
+          - generic [ref=e83]:
+            - generic [ref=e84]: 💔
+            - paragraph [ref=e85]: "\" Vous vivez des tensions dans votre couple qui vous épuisent émotionnellement ? \""
+          - generic [ref=e86]:
+            - generic [ref=e87]: 🤐
+            - paragraph [ref=e88]: "\" Vous doutez souvent de vos capacités et vous avez peur de ne pas être à la hauteur ? \""
+          - generic [ref=e89]:
+            - generic [ref=e90]: 😔
+            - paragraph [ref=e91]: "\" Vous avez du mal à trouver un emploi stable et cela vous inquiète pour votre avenir ? \""
+          - generic [ref=e92]:
+            - generic [ref=e93]: �
+            - paragraph [ref=e94]: "\" Vous vous sentez parfois dépassé.e par toutes vos responsabilités quotidiennes ? \""
+          - generic [ref=e95]:
+            - generic [ref=e96]: 🔍
+            - paragraph [ref=e97]: "\" Vous avez du mal à trouver un sens à votre vie ou à trouver votre place dans le monde ? \""
+          - generic [ref=e98]:
+            - generic [ref=e99]: 😰
+            - paragraph [ref=e100]: "\" Vous souffrez de stress et de sentiments anxieux chroniques ? \""
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - heading "Nos Services" [level=2] [ref=e105]
+          - paragraph [ref=e106]: Prenez soin de votre bien-être psychologique avec nos services spécialisés
+        - generic [ref=e108]:
+          - generic [ref=e109] [cursor=pointer]:
+            - generic [ref=e110]: 👤
+            - heading "Psychothérapie & Soutien individuel" [level=3] [ref=e111]
+          - generic [ref=e112] [cursor=pointer]:
+            - generic [ref=e113]: 💑
+            - heading "Thérapie relationnelle" [level=3] [ref=e114]
+          - generic [ref=e115] [cursor=pointer]:
+            - generic [ref=e116]: 🧠
+            - heading "Évaluations psychologiques" [level=3] [ref=e117]
+          - generic [ref=e118] [cursor=pointer]:
+            - generic [ref=e119]: 🚀
+            - heading "Développement & Formation" [level=3] [ref=e120]
+          - generic [ref=e121] [cursor=pointer]:
+            - generic [ref=e122]: �
+            - heading "Soutien psychologique en ligne" [level=3] [ref=e123]
+          - generic [ref=e124] [cursor=pointer]:
+            - generic [ref=e125]: 👥
+            - heading "Ateliers de groupe" [level=3] [ref=e126]
+      - generic [ref=e129]:
+        - heading "Témoignages clients" [level=2] [ref=e130]
+        - paragraph [ref=e131]: Ce que disent nos patients sur leur expérience chez M-Santé
+        - generic [ref=e132]:
+          - generic [ref=e133]:
+            - text: "\""
+            - generic [ref=e134]:
+              - generic [ref=e135]: ⭐
+              - generic [ref=e136]: ⭐
+              - generic [ref=e137]: ⭐
+              - generic [ref=e138]: ⭐
+              - generic [ref=e139]: ⭐
+            - paragraph [ref=e140]: "\"Grâce à l'accompagnement de M-Santé, j'ai retrouvé confiance en moi et appris à gérer mon stress. L'écoute bienveillante et les techniques proposées m'ont vraiment aidée à surmonter mes difficultés.\""
+            - generic [ref=e141]:
+              - generic [ref=e142]: A
+              - generic [ref=e143]:
+                - heading "Aminata Diallo" [level=4] [ref=e144]
+                - text: Patiente
+          - generic [ref=e145]:
+            - text: "\""
+            - generic [ref=e146]:
+              - generic [ref=e147]: ⭐
+              - generic [ref=e148]: ⭐
+              - generic [ref=e149]: ⭐
+              - generic [ref=e150]: ⭐
+              - generic [ref=e151]: ⭐
+            - paragraph [ref=e152]: "\"L'approche thérapeutique de M-Santé m'a permis de traverser une période difficile de ma vie. Les psychologues sont à l'écoute, professionnels et créent un véritable espace de sécurité.\""
+            - generic [ref=e153]:
+              - generic [ref=e154]: M
+              - generic [ref=e155]:
+                - heading "Moussa Ndiaye" [level=4] [ref=e156]
+                - text: Patient
+          - generic [ref=e157]:
+            - text: "\""
+            - generic [ref=e158]:
+              - generic [ref=e159]: ⭐
+              - generic [ref=e160]: ⭐
+              - generic [ref=e161]: ⭐
+              - generic [ref=e162]: ⭐
+              - generic [ref=e163]: ⭐
+            - paragraph [ref=e164]: "\"J'ai trouvé chez M-Santé un accompagnement personnalisé qui a transformé ma vision de moi-même. Les séances m'ont permis de développer des outils concrets pour mieux vivre au quotidien.\""
+            - generic [ref=e165]:
+              - generic [ref=e166]: J
+              - generic [ref=e167]:
+                - heading "Jean-Baptiste Moreau" [level=4] [ref=e168]
+                - text: Patient
+          - generic [ref=e169]:
+            - text: "\""
+            - generic [ref=e170]:
+              - generic [ref=e171]: ⭐
+              - generic [ref=e172]: ⭐
+              - generic [ref=e173]: ⭐
+              - generic [ref=e174]: ⭐
+              - generic [ref=e175]: ⭐
+            - paragraph [ref=e176]: "\"L'équipe de M-Santé m'a accompagnée avec une grande humanité dans un moment de vulnérabilité. Leur approche respectueuse et leurs méthodes efficaces m'ont redonné espoir et sérénité.\""
+            - generic [ref=e177]:
+              - generic [ref=e178]: G
+              - generic [ref=e179]:
+                - heading "Grace Mukendi" [level=4] [ref=e180]
+                - text: Patiente
+          - generic [ref=e181]:
+            - text: "\""
+            - generic [ref=e182]:
+              - generic [ref=e183]: ⭐
+              - generic [ref=e184]: ⭐
+              - generic [ref=e185]: ⭐
+              - generic [ref=e186]: ⭐
+              - generic [ref=e187]: ⭐
+            - paragraph [ref=e188]: "\"M-Santé m'a aidé à surmonter mes peurs et à retrouver ma joie de vivre. L'accompagnement patient et les techniques apprises m'ont permis de me reconstruire durablement.\""
+            - generic [ref=e189]:
+              - generic [ref=e190]: K
+              - generic [ref=e191]:
+                - heading "Kouamé Adjoua" [level=4] [ref=e192]
+                - text: Patiente
+      - generic [ref=e195]:
+        - heading "Ils nous font confiance ✨" [level=2] [ref=e196]
+        - generic [ref=e197]:
+          - generic [ref=e200]: 🎓 Université Cheikh Anta Diop
+          - generic [ref=e203]: 🏥 Hôpital Le Dantec
+          - generic [ref=e206]: 📱 Orange Sénégal
+          - generic [ref=e209]: ⚡ SENELEC
+      - generic [ref=e212]:
+        - heading "Contactez-nous" [level=2] [ref=e213]
+        - generic [ref=e214]:
+          - generic [ref=e215]:
+            - generic [ref=e216]:
+              - generic [ref=e217]: 📧
+              - generic [ref=e218]:
+                - heading "Email" [level=4] [ref=e219]
+                - link "communication@vitamedicale.ca" [ref=e220] [cursor=pointer]:
+                  - /url: mailto:communication@vitamedicale.ca
+            - generic [ref=e221]:
+              - generic [ref=e222]: 📞
+              - generic [ref=e223]:
+                - heading "Téléphone" [level=4] [ref=e224]
+                - link "+1 514 292-0801" [ref=e225] [cursor=pointer]:
+                  - /url: tel:+15142920801
+            - generic [ref=e226]:
+              - generic [ref=e227]: 📍
+              - generic [ref=e228]:
+                - heading "Adresse" [level=4] [ref=e229]
+                - generic [ref=e230]:
+                  - text: 1665 Rue Sainte-Catherine, 3e étage
+                  - text: Montréal (Québec) H3H 1L9
+            - generic [ref=e231]:
+              - heading "Suivez-nous" [level=4] [ref=e232]
+              - generic [ref=e233]:
+                - link "📘 Facebook" [ref=e234] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e235]: 📘
+                  - generic [ref=e236]: Facebook
+                - link "📷 Instagram" [ref=e237] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e238]: 📷
+                  - generic [ref=e239]: Instagram
+          - generic [ref=e240]:
+            - heading "Envoyez-nous un message" [level=3] [ref=e241]
+            - generic [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]: Nom complet
+                - textbox "Nom complet" [ref=e245]
+              - generic [ref=e246]:
+                - generic [ref=e247]: Email
+                - textbox "Email" [ref=e248]
+              - generic [ref=e249]:
+                - generic [ref=e250]: Téléphone
+                - textbox "Téléphone" [ref=e251]
+              - generic [ref=e252]:
+                - generic [ref=e253]: Sujet
+                - combobox "Sujet" [ref=e254]:
+                  - option "Sélectionnez un sujet" [selected]
+                  - option "Prise de rendez-vous"
+                  - option "Demande d'information"
+                  - option "Urgence"
+                  - option "Autre"
+              - generic [ref=e255]:
+                - generic [ref=e256]: Message
+                - textbox "Message" [ref=e257]
+              - button "Envoyer le message" [ref=e258] [cursor=pointer]
+  - contentinfo [ref=e260]:
+    - generic [ref=e261]:
+      - generic [ref=e262]:
+        - generic [ref=e263]:
+          - generic [ref=e264]:
+            - generic [ref=e265]:
+              - img [ref=e267]
+              - heading "M-Santé" [level=3] [ref=e270]
+            - paragraph [ref=e271]: Votre espace de bien-être psychologique et de développement personnel.
+          - paragraph [ref=e273]: Centre de Santé Mentale — Soins personnalisés et bienveillants
+        - generic [ref=e274]:
+          - heading "Navigation" [level=4] [ref=e275]
+          - list [ref=e276]:
+            - listitem [ref=e277]:
+              - link "À propos" [ref=e278] [cursor=pointer]:
+                - /url: "#about"
+            - listitem [ref=e279]:
+              - link "Services" [ref=e280] [cursor=pointer]:
+                - /url: "#services"
+            - listitem [ref=e281]:
+              - link "Contact" [ref=e282] [cursor=pointer]:
+                - /url: "#contact"
+            - listitem [ref=e283]:
+              - link "Tarifs" [ref=e284] [cursor=pointer]:
+                - /url: "#rates"
+        - generic [ref=e285]:
+          - heading "Contact" [level=4] [ref=e286]
+          - generic [ref=e287]:
+            - paragraph [ref=e288]:
+              - strong [ref=e289]: "Téléphone:"
+              - link "514 852-1234" [ref=e290] [cursor=pointer]:
+                - /url: tel:+15148521234
+            - paragraph [ref=e291]:
+              - strong [ref=e292]: "Email:"
+              - link "contact@mindcare.ca" [ref=e293] [cursor=pointer]:
+                - /url: mailto:contact@mindcare.ca
+            - paragraph [ref=e294]:
+              - strong [ref=e295]: "Adresse:"
+              - text: 2150 Rue Saint-Urbain, Suite 300
+              - text: Montréal (Québec) H2X 2N9
+            - paragraph [ref=e296]:
+              - strong [ref=e297]: "Heures d'ouverture:"
+              - text: "Lundi - Vendredi: 8h - 18h"
+              - text: "Samedi: 9h - 16h"
+        - generic [ref=e298]:
+          - heading "Suivez-nous" [level=4] [ref=e299]
+          - generic [ref=e300]:
+            - link "📘 Facebook" [ref=e301] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e302]: 📘
+              - text: Facebook
+            - link "📷 Instagram" [ref=e303] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e304]: 📷
+              - text: Instagram
+            - link "🐦 Twitter" [ref=e305] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e306]: 🐦
+              - text: Twitter
+          - link "Consulter maintenant" [ref=e308] [cursor=pointer]:
+            - /url: "#appointment"
+      - generic [ref=e311]:
+        - paragraph [ref=e312]: © 2025 MindCare - Centre de Santé Mentale. Tous droits réservés.
+        - generic [ref=e313]:
+          - link "Politique de confidentialité" [ref=e314] [cursor=pointer]:
+            - /url: "#privacy"
+          - generic [ref=e315]: "|"
+          - link "Conditions d'utilisation" [ref=e316] [cursor=pointer]:
+            - /url: "#terms"
+          - generic [ref=e317]: "|"
+          - link "Code d'éthique" [ref=e318] [cursor=pointer]:
+            - /url: "#ethics"
+```
